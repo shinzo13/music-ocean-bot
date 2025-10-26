@@ -30,3 +30,6 @@ ITEM_URL = "https://www.deezer.com/us/{type}/{id}"
 
 # Regex Patterns
 DATA_PATTERN = r"window\.__DZR_APP_STATE__\s*=\s*(\{.*?\})\s*<\s*/\s*script>"
+
+# Format links
+COVER_URL = "https://cdn-images.dzcdn.net/images/cover/{image_id}/1000x1000-000000-80-0-0.jpg"
