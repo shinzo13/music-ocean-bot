@@ -27,6 +27,7 @@ USERDATA_URL = (
     "&api_token="
 )
 ITEM_URL = "https://www.deezer.com/us/{type}/{id}"
+MEDIA_URL = "https://media.deezer.com/v1/get_url"
 
 # Regex Patterns
 DATA_PATTERN = r"window\.__DZR_APP_STATE__\s*=\s*(\{.*?\})\s*<\s*/\s*script>"

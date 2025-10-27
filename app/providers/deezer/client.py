@@ -6,7 +6,7 @@ from aiohttp import ClientSession
 
 from app.providers.deezer.enums.entity_type import EntityType
 from app.providers.deezer.models import DeezerTrack, DeezerAlbum, DeezerPlaylist, DeezerArtist
-from app.providers.deezer.utils import get_arl
+from app.providers.deezer.utils import get_arl, decrypt_track
 from app.providers.deezer.enums import DeezerAPIMethod
 from app.providers.deezer.constants import *
 
@@ -109,13 +109,48 @@ class DeezerClient:
     async def get_playlist_tracks(self, playlist_id: int):
         return await self._get_entity_tracks(EntityType.PLAYLIST, playlist_id)
 
+    async def _get_client_track(self, track_id: int):
+        async with self.session.get(
+            ITEM_URL.format(
+                type="track",
+                id=track_id
+            )
+        ) as resp:
+            match = re.search(DATA_PATTERN, await resp.text(), re.DOTALL).group(1)
+        return DeezerTrack.from_client(json.loads(match))
 
+    async def _get_track_url(self, track_token: str) -> str:
+        async with self.session.post(
+            MEDIA_URL,
+            json={
+                'license_token': self.license_token,
+                'media': [{'type': "FULL", "formats": [{
+                    "cipher": "BF_CBC_STRIPE",
+                    "format": "MP3_128"  # TODO
+                }]}],
+                'track_tokens': [track_token]
+            }
+        ) as resp:
+            resp.raise_for_status()
+            data = await resp.json()
+        url = data['data'][0]['media'][0]['sources'][0]['url']
+        return url
 
+    async def download_track(self, track_id: int) -> bytes:
+        track = await self._get_client_track(track_id)
 
+        # TODO: country restriction handling
 
+        track_url = await self._get_track_url(track.track_token)
+        async with self.session.get(track_url) as resp:
+            track_bytes = await decrypt_track(resp, track.id)
 
+            # TODO: id3 tags
+            # async with self.session.get(track.cover_url) as resp:
+            #     resp.raise_for_status()
+            #     cover = await resp.read()
 
-
+        return track_bytes
 
 
 
