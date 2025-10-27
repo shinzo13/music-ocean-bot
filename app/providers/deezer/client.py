@@ -4,6 +4,7 @@ from typing import Any
 
 from aiohttp import ClientSession
 
+from app.providers.deezer.enums.entity_type import EntityType
 from app.providers.deezer.models import DeezerTrack, DeezerAlbum, DeezerPlaylist, DeezerArtist
 from app.providers.deezer.utils import get_arl
 from app.providers.deezer.enums import DeezerAPIMethod
@@ -52,18 +53,24 @@ class DeezerClient:
         ) as resp:
             raw_data = await resp.json()
             if "error" in raw_data:
-                raise # TODO separeted DeezerAPIException
-            return raw_data # TODO data processing
+                raise # TODO separated DeezerAPIException
+            return raw_data["data"]
 
-    async def _get_client_track(self, track_id: int):
+    # kinda similar to _api_request() but it has custom path and certain output type
+    # so its better to make another function for that..
+    # or maybe i can make base _api_request base func and then _api_method and this one?? TODO
+    async def _get_entity_tracks(
+        self,
+        entity_type: EntityType,
+        entity_id: int
+    ) -> list[DeezerTrack]:
         async with self.session.get(
-            ITEM_URL.format(
-                type="track",
-                id=track_id
-            )
+            f"{API_URL}/{entity_type}/{entity_id}/tracks"
         ) as resp:
-            match = re.search(DATA_PATTERN, await resp.text(), re.DOTALL).group(1)
-        return DeezerTrack.from_client(json.loads(match))
+            raw_data = await resp.json()
+            if "error" in raw_data:
+                raise # TODO separated DeezerAPIException
+            return [DeezerTrack.from_api(raw_track) for raw_track in raw_data["data"]]
 
     async def search_tracks(self, query: str) -> list[DeezerTrack]:
         raw_data = await self._api_request(
@@ -93,8 +100,14 @@ class DeezerClient:
         )
         return [DeezerArtist.from_api(raw_artist) for raw_artist in raw_data]
 
+    async def get_album_tracks(self, album_id: int):
+        return await self._get_entity_tracks(EntityType.ALBUM, album_id)
 
+    async def get_artist_tracks(self, artist_id: int):
+        return await self._get_entity_tracks(EntityType.ARTIST, artist_id)
 
+    async def get_playlist_tracks(self, playlist_id: int):
+        return await self._get_entity_tracks(EntityType.PLAYLIST, playlist_id)
 
 
 
