@@ -152,8 +152,8 @@ class DeezerClient:
 
         return track_bytes
 
-
-
+    async def close(self):
+        await self.session.close()
 
 
 
