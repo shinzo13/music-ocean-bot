@@ -1,4 +1,4 @@
-from app.providers.common.models import Artist
+from app.musicocean.providers.common.models import Artist
 
 
 class DeezerArtist(Artist):

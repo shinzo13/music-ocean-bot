@@ -1,9 +1,7 @@
 from typing import Optional
 
-from app.providers.common.models import Track
-from app.providers.deezer.models import DeezerAlbum
-from app.providers.deezer.models.deezer_artist import DeezerArtist
-from app.providers.deezer.constants import COVER_URL
+from app.musicocean.providers.common.models import Track
+from app.musicocean.providers.deezer.constants import COVER_URL
 
 class DeezerTrack(Track):
     preview_url: Optional[str] = None   # API

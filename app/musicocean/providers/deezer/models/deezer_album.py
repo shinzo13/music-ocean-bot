@@ -1,5 +1,4 @@
-from app.providers.common.models import Album
-from app.providers.deezer.models import DeezerArtist
+from app.musicocean.providers.common.models import Album
 
 
 class DeezerAlbum(Album):

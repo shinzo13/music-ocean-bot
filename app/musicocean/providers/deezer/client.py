@@ -1,14 +1,13 @@
 import json
 import re
-from typing import Any
 
 from aiohttp import ClientSession
 
-from app.providers.deezer.enums.entity_type import EntityType
-from app.providers.deezer.models import DeezerTrack, DeezerAlbum, DeezerPlaylist, DeezerArtist
-from app.providers.deezer.utils import get_arl, decrypt_track
-from app.providers.deezer.enums import DeezerAPIMethod
-from app.providers.deezer.constants import *
+from app.musicocean.providers.deezer.enums.entity_type import EntityType
+from app.musicocean.providers.deezer.models import DeezerTrack, DeezerAlbum, DeezerPlaylist, DeezerArtist
+from app.musicocean.providers.deezer.utils import get_arl, decrypt_track
+from app.musicocean.providers.deezer.enums import DeezerAPIMethod
+
 
 class DeezerClient:
     def __init__(
