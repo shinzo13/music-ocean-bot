@@ -1,4 +1,4 @@
-from app.musicocean.providers.common.models import Playlist
+from app.musicocean.models import Playlist
 
 class DeezerPlaylist(Playlist):
 
