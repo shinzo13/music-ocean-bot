@@ -3,21 +3,23 @@ import re
 
 from aiohttp import ClientSession
 
-from app.musicocean.providers.deezer.enums.entity_type import EntityType
-from app.musicocean.providers.deezer.models import DeezerTrack, DeezerAlbum, DeezerPlaylist, DeezerArtist
-from app.musicocean.providers.deezer.utils import get_arl, decrypt_track
-from app.musicocean.providers.deezer.enums import DeezerAPIMethod
+from app.modules.musicocean.providers.deezer.enums.entity_type import EntityType
+from app.modules.musicocean.providers.deezer.models import DeezerTrack, DeezerTrackPreview, DeezerAlbum, DeezerPlaylist, DeezerArtist
+from app.modules.musicocean.providers.deezer.utils import decrypt_track, get_arl
+from app.modules.musicocean.providers.deezer.enums import DeezerAPIMethod
+from app.modules.musicocean.providers.deezer.constants import *
+from app.modules.musicocean.providers.deezer.utils import write_id3
 
 
 class DeezerClient:
     def __init__(
             self,
             login: str,
-            passwd: str,
+            password: str,
             proxies: dict[str, str] = None # TODO
     ):
         self.login = login
-        self.passwd = passwd
+        self.password = password
 
         self.session = None
         self.arl = None
@@ -25,7 +27,7 @@ class DeezerClient:
     async def setup(self):
         self.arl = await get_arl(
             self.login,
-            self.passwd,
+            self.password,
         )
         self.session = ClientSession(
             cookies={
@@ -71,12 +73,12 @@ class DeezerClient:
                 raise # TODO separated DeezerAPIException
             return [DeezerTrack.from_api(raw_track) for raw_track in raw_data["data"]]
 
-    async def search_tracks(self, query: str) -> list[DeezerTrack]:
+    async def search_tracks(self, query: str) -> list[DeezerTrackPreview]:
         raw_data = await self._api_request(
             method=DeezerAPIMethod.SEARCH_TRACKS,
             q=query
         )
-        return [DeezerTrack.from_api(raw_track) for raw_track in raw_data]
+        return [DeezerTrackPreview.from_dict(raw_track) for raw_track in raw_data]
 
     async def search_albums(self, query: str) -> list[DeezerAlbum]:
         raw_data = await self._api_request(
@@ -116,7 +118,7 @@ class DeezerClient:
             )
         ) as resp:
             match = re.search(DATA_PATTERN, await resp.text(), re.DOTALL).group(1)
-        return DeezerTrack.from_client(json.loads(match))
+        return DeezerTrack.from_dict(json.loads(match)["DATA"])
 
     async def _get_track_url(self, track_token: str) -> str:
         async with self.session.post(
@@ -135,7 +137,7 @@ class DeezerClient:
         url = data['data'][0]['media'][0]['sources'][0]['url']
         return url
 
-    async def download_track(self, track_id: int) -> bytes:
+    async def download_track(self, track_id: int) -> DeezerTrack:
         track = await self._get_client_track(track_id)
 
         # TODO: country restriction handling
@@ -144,12 +146,17 @@ class DeezerClient:
         async with self.session.get(track_url) as resp:
             track_bytes = await decrypt_track(resp, track.id)
 
-            # TODO: id3 tags
-            # async with self.session.get(track.cover_url) as resp:
-            #     resp.raise_for_status()
-            #     cover = await resp.read()
+        async with self.session.get(track.cover_url) as resp:
+            resp.raise_for_status()
+            cover = await resp.read()
 
-        return track_bytes
+        track.cover = cover
+        track.content = write_id3(
+            track=track,
+            source=track_bytes
+        )
+
+        return track
 
     async def close(self):
         await self.session.close()
