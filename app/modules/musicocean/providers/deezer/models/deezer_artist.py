@@ -1,10 +1,10 @@
-from app.musicocean.models import Artist
+from app.modules.musicocean.models import Artist
 
 
 class DeezerArtist(Artist):
 
     @classmethod
-    def from_api(cls, data: dict):
+    def from_dict(cls, data: dict):
         return cls(
             id=data['id'],
             name=data['name'],

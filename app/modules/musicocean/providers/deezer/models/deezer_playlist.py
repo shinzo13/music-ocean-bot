@@ -1,9 +1,9 @@
-from app.musicocean.models import Playlist
+from app.modules.musicocean.models import Playlist
 
 class DeezerPlaylist(Playlist):
 
     @classmethod
-    def from_api(cls, data: dict):
+    def from_dict(cls, data: dict):
         return cls(
             id=int(data["id"]),
             title=data["title"],

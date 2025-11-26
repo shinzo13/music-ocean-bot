@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from app.musicocean.providers.deezer.models.deezer_artist import Artist
+from app.modules.musicocean.models import Artist
 
 
 class Album(BaseModel):

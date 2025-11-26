@@ -1,10 +1,10 @@
-from app.musicocean.models import Album
+from app.modules.musicocean.models import Album
 
 
 class DeezerAlbum(Album):
 
     @classmethod
-    def from_api(cls, data):
+    def from_dict(cls, data):
         return cls(
             id=int(data['id']),
             title=data['title'],
