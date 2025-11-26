@@ -1,9 +1,12 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
-class Track(BaseModel):
+class TrackPreview(BaseModel):
     id: int
     title: str
     artist_name: str
     # TODO album_title: str
     cover_url: str
+    preview_url: Optional[str]
