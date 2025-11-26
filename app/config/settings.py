@@ -1,10 +1,19 @@
+from typing import List
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic.types import SecretStr
 
 
+class LoggingSettings(BaseSettings):
+    level: str
+    file: str
+
 class BotSettings(BaseSettings):
     token: SecretStr
 
+class TelegramSettings(BaseSettings):
+    channel_id: int
+    workers: List[SecretStr]
 
 class DeezerSettings(BaseSettings):
     login: SecretStr
@@ -19,8 +28,10 @@ class Settings(BaseSettings):
         case_sensitive=False
     )
 
+    logging: LoggingSettings
     bot: BotSettings
     deezer: DeezerSettings
+    telegram: TelegramSettings
 
 
 settings = Settings()  # noqa
