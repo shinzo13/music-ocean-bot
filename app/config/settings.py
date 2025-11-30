@@ -8,6 +8,18 @@ class LoggingSettings(BaseSettings):
     level: str
     file: str
 
+class DatabaseSettings(BaseSettings):
+    user: str
+    password: SecretStr
+    db: str
+    host: str = "postgres"
+    port: int = 5432
+
+    @property
+    def url(self) -> str:
+        return f"postgresql+asyncpg://{self.user}:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.db}"
+
+
 class BotSettings(BaseSettings):
     token: SecretStr
 
@@ -30,8 +42,9 @@ class Settings(BaseSettings):
 
     logging: LoggingSettings
     bot: BotSettings
-    deezer: DeezerSettings
     telegram: TelegramSettings
+    deezer: DeezerSettings
+    database: DatabaseSettings
 
 
 settings = Settings()  # noqa
