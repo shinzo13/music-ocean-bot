@@ -1,13 +1,8 @@
 import logging
 import sys
-from pathlib import Path
-from logging.handlers import RotatingFileHandler
 
 
-def setup_logging(
-        level: str,
-        log_file: str | None = "logs/bot.log"
-):
+def setup_logging(level: str):
     log_format = logging.Formatter(
         fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S"
@@ -21,13 +16,9 @@ def setup_logging(
     console_handler.setFormatter(log_format)
     logger.addHandler(console_handler)
 
-    if log_file:
-        log_path = Path(log_file)
-        log_path.parent.mkdir(parents=True, exist_ok=True)
-        file_handler = RotatingFileHandler(log_file, encoding="utf-8")
-        file_handler.setLevel(level)
-        file_handler.setFormatter(log_format)
-        logger.addHandler(file_handler)
+    # TODO settings for that
+    logging.getLogger("sqlalchemy").setLevel(logging.WARNING)
+    logging.getLogger("aiogram").setLevel(logging.WARNING)
 
 def get_logger(name: str) -> logging.Logger:
     return logging.getLogger(name)
