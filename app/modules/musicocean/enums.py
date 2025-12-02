@@ -1,5 +1,7 @@
-from enum import StrEnum
+from enum import Enum
 
-class Provider(StrEnum):
-    DEEZER = 'Deezer'
-    ...
+class Engine(Enum):
+    DEEZER = "DEEZER"
+    SOUNDCLOUD = "SOUNDCLOUD"
+    YOUTUBE = "YOUTUBE"
+    SPOTIFY = "SPOTIFY"

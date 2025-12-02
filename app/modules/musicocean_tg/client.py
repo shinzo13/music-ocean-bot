@@ -6,6 +6,8 @@ from aiogram.enums.parse_mode import ParseMode
 from app.modules.musicocean.client import MusicOceanClient
 from aiogram import Bot
 
+from app.modules.musicocean.enums import Engine
+
 
 # so fucking many abstractions
 class TelegramMusicOceanClient(MusicOceanClient):
@@ -31,8 +33,8 @@ class TelegramMusicOceanClient(MusicOceanClient):
             raise "can't post messages"
         # similar checkup for workers here
 
-    async def download_track(self, track_id: int) -> str:
-        track = await super().download_track(track_id)
+    async def download_track(self, engine: Engine, track_id: int) -> str:
+        track = await super().download_track(engine, track_id)
         file_id = (await self.bot.send_audio(
             self.channel_id,
             audio=BufferedInputFile(
