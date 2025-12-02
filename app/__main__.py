@@ -11,6 +11,8 @@ from app.database.models.base import Base
 from app.di.container import setup_container
 from app.bot.handlers.inline import default_search, chosen
 from app.bot.handlers.messages import channel
+from app.bot.middlewares import MainMiddleware
+
 
 setup_logging(
     level=settings.logging.level,
@@ -32,6 +34,8 @@ async def main():
 
     container = setup_container()
     setup_dishka(container=container, router=dp, auto_inject=True)
+
+    dp.update.outer_middleware(MainMiddleware())
 
     dp.include_routers(
         default_search.router,
