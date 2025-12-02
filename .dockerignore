@@ -1,0 +1,7 @@
+# All
+**
+
+# Except
+!app
+!pyproject.toml
+!uv.lock
