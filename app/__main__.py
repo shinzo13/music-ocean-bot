@@ -6,6 +6,8 @@ from dishka.integrations.aiogram import setup_dishka
 
 from app.config.log import setup_logging, get_logger
 from app.config.settings import settings
+from app.database.core import create_engine, create_session_factory
+from app.database.models.base import Base
 from app.di.container import setup_container
 from app.bot.handlers.inline import default_search, chosen
 from app.bot.handlers.messages import channel
@@ -23,6 +25,10 @@ async def main():
         default=DefaultBotProperties(parse_mode=ParseMode.HTML)
     )
     dp = Dispatcher()
+
+    engine = create_engine(settings.database.url)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
     container = setup_container()
     setup_dishka(container=container, router=dp, auto_inject=True)

@@ -1,5 +1,6 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, DateTime, func
+from sqlalchemy import Integer, DateTime, func, BigInteger
+
 
 class Base(DeclarativeBase):
     pass
@@ -18,4 +19,4 @@ class TimestampMixin:
 
 
 class IntIDMixin:
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
