@@ -1,8 +1,8 @@
 from typing import List
-from sqlalchemy import Integer, Boolean, Enum, BigInteger
+from sqlalchemy import Boolean, Enum, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.models.base import Base, TimestampMixin, IntIDMixin
-from app.modules.musicocean.enums import Engine
+from app.modules.musicocean.enums.engine import Engine
 
 
 class User(Base, TimestampMixin, IntIDMixin):

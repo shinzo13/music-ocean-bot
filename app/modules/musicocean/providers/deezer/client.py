@@ -3,7 +3,7 @@ import re
 
 from aiohttp import ClientSession
 
-from app.modules.musicocean.providers.deezer.enums.entity_type import EntityType
+from app.modules.musicocean.enums.entity_type import EntityType
 from app.modules.musicocean.providers.deezer.models import DeezerTrack, DeezerTrackPreview, DeezerAlbum, DeezerPlaylist, DeezerArtist
 from app.modules.musicocean.providers.deezer.utils import decrypt_track, get_arl
 from app.modules.musicocean.providers.deezer.enums import DeezerAPIMethod

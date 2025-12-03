@@ -1,13 +1,12 @@
 from app.database.repositories import TrackRepository
-from app.modules.musicocean.enums import Engine
+from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.models import TrackPreview
 from aiogram.types import (
     InlineQueryResultAudio,
     InlineQueryResultCachedAudio,
     InlineQueryResultDocument,
     InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    InlineQueryResult
+    InlineKeyboardButton
 )
 
 from app.config.log import get_logger

@@ -6,7 +6,7 @@ from aiogram.enums.parse_mode import ParseMode
 from app.modules.musicocean.client import MusicOceanClient
 from aiogram import Bot
 
-from app.modules.musicocean.enums import Engine
+from app.modules.musicocean.enums.engine import Engine
 
 
 # so fucking many abstractions

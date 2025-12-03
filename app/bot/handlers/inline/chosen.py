@@ -1,4 +1,4 @@
-from aiogram import Router, F, Bot
+from aiogram import Router, Bot
 from aiogram.types import ChosenInlineResult
 from aiogram.types import InputMediaAudio
 from dishka import FromDishka
@@ -6,7 +6,7 @@ from dishka import FromDishka
 from app.database.repositories import TrackRepository
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 from app.config.log import get_logger
-from app.modules.musicocean.enums import Engine
+from app.modules.musicocean.enums.engine import Engine
 
 
 logger = get_logger(__name__)

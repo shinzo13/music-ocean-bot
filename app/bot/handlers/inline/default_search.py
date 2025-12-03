@@ -1,11 +1,10 @@
 from aiogram import Router, F
 from aiogram.types import InlineQuery
-from aiogram.types import InlineQueryResultAudio
 from dishka import FromDishka
 
 from app.database.repositories import TrackRepository
 from app.modules.musicocean_tg import TelegramMusicOceanClient
-from app.modules.musicocean.enums import Engine
+from app.modules.musicocean.enums.engine import Engine
 from app.bot.utils.search_results import get_track_results
 from app.config.log import get_logger
 

@@ -1,7 +1,7 @@
-from sqlalchemy import String, Integer, ForeignKey, Enum, BigInteger
+from sqlalchemy import String, ForeignKey, Enum, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.models.base import Base, TimestampMixin, IntIDMixin
-from app.modules.musicocean.enums import Engine
+from app.modules.musicocean.enums.engine import Engine
 
 
 class Track(Base, TimestampMixin, IntIDMixin):

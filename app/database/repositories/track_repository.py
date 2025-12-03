@@ -1,8 +1,8 @@
 from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.database.models import Track, User
-from app.modules.musicocean.enums import Engine
+from app.database.models import Track
+from app.modules.musicocean.enums.engine import Engine
 from app.config.log import get_logger
 
 logger = get_logger(__name__)

@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.models import User
 from app.config.log import get_logger
-from app.modules.musicocean.enums import Engine
+from app.modules.musicocean.enums.engine import Engine
 
 logger = get_logger(__name__)
 
