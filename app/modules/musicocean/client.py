@@ -1,8 +1,7 @@
 from typing import Union
 
 from app.modules.musicocean.providers import DeezerClient
-from app.config.settings import settings
-from app.modules.musicocean.enums import Engine
+from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.providers.deezer.models import (
     DeezerTrackPreview,
     DeezerTrack,
@@ -32,11 +31,6 @@ class MusicOceanClient:
         if not self.selected_engine:
             self.selected_engine = self.deezer
 
-    async def setup_all(self):
-        if self.deezer:
-            await self.deezer.setup()
-        # ...
-        self.ready = True
 
     def _get_engine(self, engine: Engine):
         match engine:
@@ -50,20 +44,27 @@ class MusicOceanClient:
                 return self.spotify
         return None
 
-    # TODO unions
-    async def search_tracks(self, engine: Engine, query: str) -> list[DeezerTrackPreview]:
+
+    async def search_tracks(self, engine: Engine, query: str) -> Union[list[DeezerTrackPreview]]:
         return await self._get_engine(engine).search_tracks(query)
-    async def search_albums(self, engine: Engine, query: str) -> list[DeezerAlbum]:
+
+    async def search_albums(self, engine: Engine, query: str) -> Union[list[DeezerAlbum]]:
         return await self._get_engine(engine).search_albums(query)
-    async def search_playlists(self, engine: Engine, query: str) -> list[DeezerPlaylist]:
+
+    async def search_playlists(self, engine: Engine, query: str) -> Union[list[DeezerPlaylist]]:
         return await self._get_engine(engine).search_playlists(query)
-    async def search_artists(self, engine: Engine, query: str) -> list[DeezerArtist]:
+
+    async def search_artists(self, engine: Engine, query: str) -> Union[list[DeezerArtist]]:
         return await self._get_engine(engine).search_artists(query)
+
     async def get_album_tracks(self, engine: Engine, album_id: int):
-        ...
+        return await self._get_engine(engine).get_album_tracks(album_id)
+
     async def get_artist_tracks(self, engine: Engine, artist_id: int):
-        ...
+        return await self._get_engine(engine).get_artist_tracks(artist_id)
+
     async def get_playlist_tracks(self, engine: Engine, playlist_id: int):
-        ...
+        return await self._get_engine(engine).get_playlist_tracks(playlist_id)
+
     async def download_track(self, engine: Engine, track_id: int) -> Union[DeezerTrack]:
         return await self._get_engine(engine).download_track(track_id)
