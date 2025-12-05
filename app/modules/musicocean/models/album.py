@@ -1,10 +1,8 @@
 from pydantic import BaseModel
 
-from app.modules.musicocean.models import Artist
-
 
 class Album(BaseModel):
     id: int
     title: str
-    artist: Artist
+    artist_name: str
     cover_url: str # not sure

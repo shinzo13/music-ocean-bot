@@ -8,6 +8,6 @@ class DeezerAlbum(Album):
         return cls(
             id=int(data['id']),
             title=data['title'],
-            artist=data['artist'],
+            artist_name=data['artist']['name'],
             cover_url=data['cover_xl'],
         )
