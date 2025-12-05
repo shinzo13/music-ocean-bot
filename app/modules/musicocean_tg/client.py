@@ -1,6 +1,6 @@
 from aiogram.client.default import DefaultBotProperties
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.types import BufferedInputFile
+from aiogram.types import BufferedInputFile, URLInputFile
 from aiogram.enums.parse_mode import ParseMode
 
 from app.modules.musicocean.client import MusicOceanClient
@@ -41,11 +41,11 @@ class TelegramMusicOceanClient(MusicOceanClient):
                 file=track.content,
                 filename=f"{track.artist_name} – {track.title}.mp3"
             ),
-            caption=f"<code>{track_id}</code>",
-            thumbnail=BufferedInputFile(
-                file=track.cover,
-                filename="thumbnail.png"
-            )
+            title=track.title,
+            thumbnail=URLInputFile(track.cover_url),
+            performer=track.artist_name,
+            duration=track.duration,
+            caption=f"<code>{track_id}</code>"
         )).audio.file_id
         return file_id
 
