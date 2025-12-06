@@ -9,16 +9,17 @@ from app.config.settings import settings
 from app.database.core import create_engine, create_session_factory
 from app.database.models.base import Base
 from app.di.container import setup_container
-from app.bot.handlers.inline import default_search, chosen
+from app.bot.handlers.inline import (
+    default_search,
+    chosen,
+    advanced_search,
+    id_search
+)
 from app.bot.handlers.messages import channel
 from app.bot.middlewares import MainMiddleware
 
 
-setup_logging(
-    level=settings.logging.level,
-    log_file=settings.logging.file
-)
-
+setup_logging(level=settings.logging.level)
 logger = get_logger(__name__)
 
 async def main():
@@ -38,6 +39,8 @@ async def main():
     dp.update.outer_middleware(MainMiddleware())
 
     dp.include_routers(
+        id_search.router,
+        advanced_search.router,
         default_search.router,
         chosen.router,
         #channel.router,
