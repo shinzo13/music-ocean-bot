@@ -3,6 +3,7 @@ from typing import Optional
 from app.modules.musicocean.models import Track
 from app.modules.musicocean.providers.deezer.constants import COVER_URL
 
+
 class DeezerTrack(Track):
     track_token: Optional[str] = None
     duration: Optional[int] = None
@@ -12,7 +13,7 @@ class DeezerTrack(Track):
         return cls(
             id=int(data["SNG_ID"]),
             title=data["SNG_TITLE"],
-            cover_url=COVER_URL.format(image_id=data['ALB_PICTURE']),
+            cover_url=COVER_URL.format(album_id=data['ALB_ID']),
             track_token=data["TRACK_TOKEN"],
             artist_name=", ".join(data["SNG_CONTRIBUTORS"]["main_artist"]),
             duration=data["DURATION"]
