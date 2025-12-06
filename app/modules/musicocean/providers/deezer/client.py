@@ -4,12 +4,15 @@ import re
 from aiohttp import ClientSession
 
 from app.modules.musicocean.enums.entity_type import EntityType
+from app.modules.musicocean.providers.deezer.exceptions import DeezerDataException, DeezerException
 from app.modules.musicocean.providers.deezer.models import DeezerTrack, DeezerTrackPreview, DeezerAlbum, DeezerPlaylist, DeezerArtist
 from app.modules.musicocean.providers.deezer.utils import decrypt_track, get_arl
 from app.modules.musicocean.providers.deezer.enums import DeezerAPIMethod
 from app.modules.musicocean.providers.deezer.constants import *
 from app.modules.musicocean.providers.deezer.utils import write_id3
+from app.config.log import get_logger
 
+logger = get_logger(__name__)
 
 class DeezerClient:
     def __init__(
@@ -66,12 +69,19 @@ class DeezerClient:
         entity_id: int
     ) -> list[DeezerTrack]:
         async with self.session.get(
-            f"{API_URL}/{entity_type}/{entity_id}/tracks"
+            f"{API_URL}/{entity_type.value}/{entity_id}/tracks"
         ) as resp:
             raw_data = await resp.json()
             if "error" in raw_data:
-                raise # TODO separated DeezerAPIException
-            return [DeezerTrack.from_api(raw_track) for raw_track in raw_data["data"]]
+                match raw_data["error"]["type"]:
+                    case "DataException":
+                        raise DeezerDataException("No data for entity was found")
+                    case _: # TODO other
+                        raise DeezerException(raw_data["error"]["message"])
+
+            # patching for COVER_URL костыль пиздец епта
+            raw_data = [raw_track | {entity_type.value: {"id": entity_id}} for raw_track in raw_data["data"]]
+            return [DeezerTrackPreview.from_dict(raw_track) for raw_track in raw_data]
 
     async def search_tracks(self, query: str) -> list[DeezerTrackPreview]:
         raw_data = await self._api_request(
@@ -85,7 +95,7 @@ class DeezerClient:
             method=DeezerAPIMethod.SEARCH_ALBUMS,
             q=query
         )
-        return [DeezerAlbum.from_api(raw_album) for raw_album in raw_data]
+        return [DeezerAlbum.from_dict(raw_album) for raw_album in raw_data]
 
     async def search_playlists(self, query: str) -> list[DeezerPlaylist]:
         raw_data = await self._api_request(
@@ -99,7 +109,7 @@ class DeezerClient:
             method=DeezerAPIMethod.SEARCH_ARTISTS,
             q=query
         )
-        return [DeezerArtist.from_api(raw_artist) for raw_artist in raw_data]
+        return [DeezerArtist.from_dict(raw_artist) for raw_artist in raw_data]
 
     async def get_album_tracks(self, album_id: int):
         return await self._get_entity_tracks(EntityType.ALBUM, album_id)
