@@ -19,10 +19,10 @@ async def get_playlist_results(
         InlineQueryResultArticle(
             id=f"{ENGINE_PREFIXES[engine]}_pl_{playlist.id}",
             title=playlist.title,
-            description=playlist.XXXXX,
+            description=f"{playlist.track_count} tracks", # TODO maybe author instead
             thumbnail_url=playlist.cover_url,
             input_message_content=InputTextMessageContent(
-                message_text=f'<b>{playlist.title}</b>\n<i>{playlist.XXXXX}</i><a href="{playlist.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
+                message_text=f'<b>{playlist.title}</b>\n<i>{playlist.track_count} tracks</i><a href="{playlist.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
             ),
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(
