@@ -4,12 +4,12 @@ import re
 from aiohttp import ClientSession
 
 from app.modules.musicocean.enums.entity_type import EntityType
-from app.modules.musicocean.providers.deezer.exceptions import DeezerDataException, DeezerException
-from app.modules.musicocean.providers.deezer.models import DeezerTrack, DeezerTrackPreview, DeezerAlbum, DeezerPlaylist, DeezerArtist
-from app.modules.musicocean.providers.deezer.utils import decrypt_track, get_arl
-from app.modules.musicocean.providers.deezer.enums import DeezerAPIMethod
-from app.modules.musicocean.providers.deezer.constants import *
-from app.modules.musicocean.providers.deezer.utils import write_id3
+from app.modules.musicocean.engines.deezer.exceptions import DeezerDataException, DeezerException
+from app.modules.musicocean.engines.deezer.models import DeezerTrack, DeezerTrackPreview, DeezerAlbum, DeezerPlaylist, DeezerArtist
+from app.modules.musicocean.engines.deezer.utils import decrypt_track, get_arl
+from app.modules.musicocean.engines.deezer.enums import DeezerAPIMethod
+from app.modules.musicocean.engines.deezer.constants import *
+from app.modules.musicocean.engines.deezer.utils import write_id3
 from app.config.log import get_logger
 
 logger = get_logger(__name__)

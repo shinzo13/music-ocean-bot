@@ -1,8 +1,8 @@
 from typing import Union
 
-from app.modules.musicocean.providers import DeezerClient
+from app.modules.musicocean.engines import DeezerClient
 from app.modules.musicocean.enums.engine import Engine
-from app.modules.musicocean.providers.deezer.models import (
+from app.modules.musicocean.engines.deezer.models import (
     DeezerTrackPreview,
     DeezerTrack,
     DeezerAlbum,

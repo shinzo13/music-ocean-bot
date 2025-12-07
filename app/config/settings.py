@@ -4,9 +4,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic.types import SecretStr
 
 
+class DevSettings(BaseSettings):
+    enabled: bool
+    arl: str
+
 class LoggingSettings(BaseSettings):
     level: str
-    file: str
 
 class DatabaseSettings(BaseSettings):
     user: str
@@ -39,6 +42,8 @@ class Settings(BaseSettings):
         env_file_encoding='utf-8',
         case_sensitive=False
     )
+
+    dev: DevSettings
 
     logging: LoggingSettings
     bot: BotSettings

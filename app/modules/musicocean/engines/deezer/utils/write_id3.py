@@ -1,6 +1,6 @@
 import struct
 
-from app.modules.musicocean.providers.deezer.models import DeezerTrack
+from app.modules.musicocean.engines.deezer.models import DeezerTrack
 
 
 def write_id3(
