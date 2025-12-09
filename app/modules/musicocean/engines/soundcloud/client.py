@@ -10,17 +10,35 @@ from app.modules.musicocean.utils import write_id3
 class SoundCloudClient:
 
     session: ClientSession | None
+    client_id: str | None
 
-    def __init__(
-        self,
-        client_id: str,
-    ):
-        self.client_id = client_id
-
+    def __init__(self):
+        self.client_id = None
         self.session = None
+
+    async def _get_client_id(self) -> str:
+        async with self.session.get("https://soundcloud.com") as resp:
+            text = await resp.text()
+            matches = re.findall(
+                r"(https://a-v2\.sndcdn\.com/assets/0-[^.]+\.js)",
+                text
+            )
+            if not matches:
+                raise
+            url = matches[0]
+        async with self.session.get(url) as resp:
+            text = await resp.text()
+            client_id = re.search(
+                r"client_id:\"([^\"]+)\"",
+                text
+            )
+            if not client_id:
+                raise
+        return client_id.group(1)
 
     async def setup(self):
         self.session = ClientSession(raise_for_status=True)
+        self.client_id = await self._get_client_id()
 
     async def _api_request(
             self,
