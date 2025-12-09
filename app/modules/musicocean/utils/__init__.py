@@ -1,0 +1,1 @@
+from .write_id3 import write_id3

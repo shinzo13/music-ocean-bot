@@ -1,10 +1,10 @@
 import struct
 
-from app.modules.musicocean.engines.deezer.models import DeezerTrack
+from app.modules.musicocean.models import Track
 
 
 def write_id3(
-        track: DeezerTrack,
+        track: Track,
         source: bytes
 ) -> bytes:
     frames = b''.join([

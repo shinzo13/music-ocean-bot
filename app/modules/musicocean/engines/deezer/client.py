@@ -9,7 +9,7 @@ from app.modules.musicocean.engines.deezer.models import DeezerTrack, DeezerTrac
 from app.modules.musicocean.engines.deezer.utils import decrypt_track, get_arl
 from app.modules.musicocean.engines.deezer.enums import DeezerAPIMethod
 from app.modules.musicocean.engines.deezer.constants import *
-from app.modules.musicocean.engines.deezer.utils import write_id3
+from app.modules.musicocean.utils import write_id3
 from app.config.log import get_logger
 
 logger = get_logger(__name__)
