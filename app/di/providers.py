@@ -20,6 +20,8 @@ class TelegramMusicOceanClientProvider(Provider):
             password=settings.deezer.password.get_secret_value()
         )
 
+        await musicocean.setup_soundcloud()
+
         await musicocean.checkup()
 
         yield musicocean

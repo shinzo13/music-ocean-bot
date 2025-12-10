@@ -1,6 +1,7 @@
 from typing import Union
 
 from app.modules.musicocean.engines import DeezerClient
+from app.modules.musicocean.engines.soundcloud import SoundCloudClient
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.engines.deezer.models import (
     DeezerTrackPreview,
@@ -14,7 +15,6 @@ class MusicOceanClient:
     def __init__(self):
 
         # TODO as fields
-        self.selected_engine = None
         self.ready = False
 
         self.deezer = None
@@ -28,9 +28,10 @@ class MusicOceanClient:
             password=password
         )
         await self.deezer.setup()
-        if not self.selected_engine:
-            self.selected_engine = self.deezer
 
+    async def setup_soundcloud(self):
+        self.soundcloud = SoundCloudClient()
+        await self.soundcloud.setup()
 
     def _get_engine(self, engine: Engine):
         match engine:
