@@ -1,17 +1,20 @@
 from typing import Optional
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.database.models import User
+
 from app.config.log import get_logger
+from app.database.models import User
 from app.modules.musicocean.enums.engine import Engine
 
 logger = get_logger(__name__)
+
 
 class UserRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def add_user(self,user_id: int) -> User:
+    async def add_user(self, user_id: int) -> User:
         user = User(
             user_id=user_id,
             is_admin=False,

@@ -4,13 +4,7 @@ from aiogram import Router, F, Bot
 from aiogram.types import InlineQuery
 from dishka import FromDishka
 
-from app.bot.constants import ENTITY_PREFIXES
-from app.database.repositories import TrackRepository
-from app.modules.musicocean.enums import EntityType
-from app.modules.musicocean_tg import TelegramMusicOceanClient
-from app.modules.musicocean.enums.engine import Engine
 from app.bot.utils.search_results import (
-    get_track_results,
     get_album_results,
     get_artist_results,
     get_playlist_results,
@@ -18,13 +12,15 @@ from app.bot.utils.search_results import (
 )
 from app.config.log import get_logger
 from app.database.models import User as DatabaseUser
-
+from app.modules.musicocean.enums.engine import Engine
+from app.modules.musicocean_tg import TelegramMusicOceanClient
 
 logger = get_logger(__name__)
 
 router = Router()
 
 REGEX = r'^(?:(dz|sc|yt|sp):)?(al|album|pl|playlist|ar|artist):(.+)$'
+
 
 @router.inline_query(F.query.regexp(REGEX).as_('match'))
 async def inline_query(

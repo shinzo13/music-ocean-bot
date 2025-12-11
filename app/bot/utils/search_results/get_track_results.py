@@ -1,25 +1,22 @@
 import html
 
-from app.database.repositories import TrackRepository
-from app.modules.musicocean.enums.engine import Engine
-from app.modules.musicocean.models import TrackPreview, Album, Artist, Playlist
 from aiogram.types import (
-    InlineQueryResultAudio,
-    InlineQueryResultCachedAudio,
-    InlineQueryResultDocument,
     InlineKeyboardMarkup,
     InlineKeyboardButton, InputTextMessageContent, InlineQueryResultArticle
 )
 
-from app.config.log import get_logger
 from app.bot.constants import ENGINE_PREFIXES
+from app.config.log import get_logger
+from app.modules.musicocean.enums.engine import Engine
+from app.modules.musicocean.models import TrackPreview
 
 logger = get_logger(__name__)
 
+
 async def get_track_results(
-    engine: Engine,
-    matches: list[TrackPreview]
-): # TODO annotation
+        engine: Engine,
+        matches: list[TrackPreview]
+):  # TODO annotation
 
     reply_markup = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(

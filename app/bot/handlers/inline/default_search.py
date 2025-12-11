@@ -4,24 +4,25 @@ from aiogram import Router, F
 from aiogram.types import InlineQuery
 from dishka import FromDishka
 
-from app.database.repositories import TrackRepository
-from app.modules.musicocean_tg import TelegramMusicOceanClient
-from app.modules.musicocean.enums.engine import Engine
 from app.bot.utils.search_results import get_track_results, usage_guide_result
 from app.config.log import get_logger
-from app.database.models import User as DatabaseUser # TODO costyl
+from app.database.models import User as DatabaseUser  # TODO costyl
+from app.database.repositories import TrackRepository
+from app.modules.musicocean.enums.engine import Engine
+from app.modules.musicocean_tg import TelegramMusicOceanClient
 
 logger = get_logger(__name__)
 
 router = Router()
 
+
 @router.inline_query(F.query.regexp(r'^(?:(dz|sc|yt|sp):)?(.+)$').as_('match'))
 async def inline_query(
-    query: InlineQuery,
-    match: re.Match,
-    user: DatabaseUser,
-    musicocean: FromDishka[TelegramMusicOceanClient],
-    track_repo: FromDishka[TrackRepository]
+        query: InlineQuery,
+        match: re.Match,
+        user: DatabaseUser,
+        musicocean: FromDishka[TelegramMusicOceanClient],
+        track_repo: FromDishka[TrackRepository]
 ):
     logger.info(f"User #{query.from_user.id} searched for \"{query.query}\"")
 

@@ -3,16 +3,14 @@ from aiogram.types import ChosenInlineResult
 from aiogram.types import InputMediaAudio
 from dishka import FromDishka
 
-from app.database.repositories import TrackRepository
-from app.modules.musicocean_tg import TelegramMusicOceanClient
 from app.config.log import get_logger
+from app.database.repositories import TrackRepository
 from app.modules.musicocean.enums.engine import Engine
-
+from app.modules.musicocean_tg import TelegramMusicOceanClient
 
 logger = get_logger(__name__)
 
 router = Router()
-
 
 
 @router.chosen_inline_result()

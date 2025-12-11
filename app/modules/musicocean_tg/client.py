@@ -1,11 +1,10 @@
+from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
+from aiogram.enums.parse_mode import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import BufferedInputFile, URLInputFile
-from aiogram.enums.parse_mode import ParseMode
 
 from app.modules.musicocean.client import MusicOceanClient
-from aiogram import Bot
-
 from app.modules.musicocean.enums.engine import Engine
 
 
@@ -48,6 +47,3 @@ class TelegramMusicOceanClient(MusicOceanClient):
             caption=f"<code>{track_id}</code>"
         )).audio.file_id
         return file_id
-
-
-

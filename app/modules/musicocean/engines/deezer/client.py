@@ -3,23 +3,25 @@ import re
 
 from aiohttp import ClientSession
 
-from app.modules.musicocean.enums.entity_type import EntityType
-from app.modules.musicocean.engines.deezer.exceptions import DeezerDataException, DeezerException
-from app.modules.musicocean.engines.deezer.models import DeezerTrack, DeezerTrackPreview, DeezerAlbum, DeezerPlaylist, DeezerArtist
-from app.modules.musicocean.engines.deezer.utils import decrypt_track, get_arl
-from app.modules.musicocean.engines.deezer.enums import DeezerAPIMethod
-from app.modules.musicocean.engines.deezer.constants import *
-from app.modules.musicocean.utils import write_id3
 from app.config.log import get_logger
+from app.modules.musicocean.engines.deezer.constants import *
+from app.modules.musicocean.engines.deezer.enums import DeezerAPIMethod
+from app.modules.musicocean.engines.deezer.exceptions import DeezerDataException, DeezerException
+from app.modules.musicocean.engines.deezer.models import DeezerTrack, DeezerTrackPreview, DeezerAlbum, DeezerPlaylist, \
+    DeezerArtist
+from app.modules.musicocean.engines.deezer.utils import decrypt_track, get_arl
+from app.modules.musicocean.enums.entity_type import EntityType
+from app.modules.musicocean.utils import write_id3
 
 logger = get_logger(__name__)
+
 
 class DeezerClient:
     def __init__(
             self,
             login: str,
             password: str,
-            proxies: dict[str, str] = None # TODO
+            proxies: dict[str, str] = None  # TODO
     ):
         self.login = login
         self.password = password
@@ -27,6 +29,7 @@ class DeezerClient:
         self.session = None
         self.arl = None
         self.license_token = None
+
     async def setup(self):
         self.arl = await get_arl(
             self.login,
@@ -47,36 +50,36 @@ class DeezerClient:
         self.license_token = options['license_token']
 
     async def _api_request(
-        self,
-        method: DeezerAPIMethod,
-        **kwargs
+            self,
+            method: DeezerAPIMethod,
+            **kwargs
     ) -> dict:
         async with self.session.get(
-            f"{API_URL}/{method}",
-            params=kwargs
+                f"{API_URL}/{method}",
+                params=kwargs
         ) as resp:
             raw_data = await resp.json()
             if "error" in raw_data:
-                raise # TODO separated DeezerAPIException
+                raise  # TODO separated DeezerAPIException
             return raw_data["data"]
 
     # kinda similar to _api_request() but it has custom path and certain output type
     # so its better to make another function for that..
     # or maybe i can make base _api_request base func and then _api_method and this one?? TODO
     async def _get_entity_tracks(
-        self,
-        entity_type: EntityType,
-        entity_id: int
+            self,
+            entity_type: EntityType,
+            entity_id: int
     ) -> list[DeezerTrack]:
         async with self.session.get(
-            f"{API_URL}/{entity_type.value}/{entity_id}/tracks"
+                f"{API_URL}/{entity_type.value}/{entity_id}/tracks"
         ) as resp:
             raw_data = await resp.json()
             if "error" in raw_data:
                 match raw_data["error"]["type"]:
                     case "DataException":
                         raise DeezerDataException("No data for entity was found")
-                    case _: # TODO other
+                    case _:  # TODO other
                         raise DeezerException(raw_data["error"]["message"])
 
             # patching for COVER_URL костыль пиздец епта
@@ -122,25 +125,25 @@ class DeezerClient:
 
     async def _get_client_track(self, track_id: int):
         async with self.session.get(
-            ITEM_URL.format(
-                type="track",
-                id=track_id
-            )
+                ITEM_URL.format(
+                    type="track",
+                    id=track_id
+                )
         ) as resp:
             match = re.search(DATA_PATTERN, await resp.text(), re.DOTALL).group(1)
         return DeezerTrack.from_dict(json.loads(match)["DATA"])
 
     async def _get_track_url(self, track_token: str) -> str:
         async with self.session.post(
-            MEDIA_URL,
-            json={
-                'license_token': self.license_token,
-                'media': [{'type': "FULL", "formats": [{
-                    "cipher": "BF_CBC_STRIPE",
-                    "format": "MP3_128"  # TODO
-                }]}],
-                'track_tokens': [track_token]
-            }
+                MEDIA_URL,
+                json={
+                    'license_token': self.license_token,
+                    'media': [{'type': "FULL", "formats": [{
+                        "cipher": "BF_CBC_STRIPE",
+                        "format": "MP3_128"  # TODO
+                    }]}],
+                    'track_tokens': [track_token]
+                }
         ) as resp:
             resp.raise_for_status()
             data = await resp.json()
@@ -170,6 +173,3 @@ class DeezerClient:
 
     async def close(self):
         await self.session.close()
-
-
-

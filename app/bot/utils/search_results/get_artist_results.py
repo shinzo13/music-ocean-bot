@@ -1,5 +1,3 @@
-from app.modules.musicocean.enums.engine import Engine
-from app.modules.musicocean.models import Artist
 from aiogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -8,11 +6,13 @@ from aiogram.types import (
 )
 
 from app.bot.constants import ENGINE_PREFIXES
+from app.modules.musicocean.enums.engine import Engine
+from app.modules.musicocean.models import Artist
 
 
 async def get_artist_results(
-    engine: Engine,
-    matches: list[Artist]
+        engine: Engine,
+        matches: list[Artist]
 ):
     return [
         InlineQueryResultArticle(

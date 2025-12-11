@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class SoundCloudAPIMethod(Enum):
     SEARCH_TRACKS = 'search/tracks'
     SEARCH_ALBUMS = 'search/albums'

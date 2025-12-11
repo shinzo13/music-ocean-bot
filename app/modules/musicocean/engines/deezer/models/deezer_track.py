@@ -1,7 +1,7 @@
 from typing import Optional
 
-from app.modules.musicocean.models import Track
 from app.modules.musicocean.engines.deezer.constants import COVER_URL
+from app.modules.musicocean.models import Track
 
 
 class DeezerTrack(Track):

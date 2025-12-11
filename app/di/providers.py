@@ -1,10 +1,12 @@
 from typing import AsyncIterator
+
 from dishka import Provider, Scope, provide
-from app.modules.musicocean_tg import TelegramMusicOceanClient
-from app.config.settings import Settings, settings
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+
+from app.config.settings import settings
 from app.database.core import create_engine, create_session_factory
 from app.database.repositories import UserRepository, TrackRepository
+from app.modules.musicocean_tg import TelegramMusicOceanClient
 
 
 class TelegramMusicOceanClientProvider(Provider):
@@ -26,7 +28,7 @@ class TelegramMusicOceanClientProvider(Provider):
 
         yield musicocean
 
-        #await client.close()
+        # await client.close()
 
 
 class DatabaseProvider(Provider):

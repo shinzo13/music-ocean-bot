@@ -7,6 +7,6 @@ def usage_guide_result():
         title="How to use advanced search?",
         description="Click here to see usage guide.",
         input_message_content=InputTextMessageContent(
-            message_text=f"<b>How to use advanced search?</b>\n\ni dont know" # TODO
+            message_text=f"<b>How to use advanced search?</b>\n\ni dont know"  # TODO
         )
     )]

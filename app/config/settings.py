@@ -1,15 +1,17 @@
 from typing import List
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic.types import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class DevSettings(BaseSettings):
     enabled: bool
     arl: str
 
+
 class LoggingSettings(BaseSettings):
     level: str
+
 
 class DatabaseSettings(BaseSettings):
     user: str
@@ -26,9 +28,11 @@ class DatabaseSettings(BaseSettings):
 class BotSettings(BaseSettings):
     token: SecretStr
 
+
 class TelegramSettings(BaseSettings):
     channel_id: int
     workers: List[SecretStr]
+
 
 class DeezerSettings(BaseSettings):
     login: SecretStr

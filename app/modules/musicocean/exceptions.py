@@ -1,6 +1,7 @@
 class MusicOceanException(Exception):
     pass
 
+
 class MusicOceanProviderException(MusicOceanException):
     pass
 

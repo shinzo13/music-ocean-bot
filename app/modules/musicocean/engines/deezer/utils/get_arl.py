@@ -1,10 +1,12 @@
-from playwright.async_api import async_playwright
 import asyncio
+
+from playwright.async_api import async_playwright
 
 from app.config.log import get_logger
 from app.config.settings import settings
 
 logger = get_logger(__name__)
+
 
 async def get_arl(email, password) -> str:
     logger.info("Getting Deezer ARL cookie via Playwright..")
@@ -39,4 +41,4 @@ async def get_arl(email, password) -> str:
         if arl_cookie:
             logger.info("Successfully fetched ARL cookie")
             return arl_cookie
-        raise Exception("Error getting arl cookie") #TODO exception class
+        raise Exception("Error getting arl cookie")  # TODO exception class

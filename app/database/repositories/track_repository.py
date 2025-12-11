@@ -1,22 +1,25 @@
 from typing import Optional
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.config.log import get_logger
 from app.database.models import Track
 from app.modules.musicocean.enums.engine import Engine
-from app.config.log import get_logger
 
 logger = get_logger(__name__)
+
 
 class TrackRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
     async def add_track(
-        self,
-        engine: Engine,
-        track_id: int,
-        telegram_file_id: str,
-        user_id: int
+            self,
+            engine: Engine,
+            track_id: int,
+            telegram_file_id: str,
+            user_id: int
     ) -> Track:
         track = Track(
             engine=engine,

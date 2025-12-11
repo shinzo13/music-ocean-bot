@@ -33,4 +33,4 @@ MEDIA_URL = "https://media.deezer.com/v1/get_url"
 DATA_PATTERN = r"window\.__DZR_APP_STATE__\s*=\s*(\{.*?\})\s*<\s*/\s*script>"
 
 # Format links
-COVER_URL ="https://api.deezer.com/album/{album_id}/image"
+COVER_URL = "https://api.deezer.com/album/{album_id}/image"

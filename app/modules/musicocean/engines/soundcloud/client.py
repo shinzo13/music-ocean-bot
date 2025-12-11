@@ -13,8 +13,8 @@ from app.modules.musicocean.engines.soundcloud.models import (
 from app.modules.musicocean.engines.soundcloud.models.soundcloud_artist import SoundCloudArtist
 from app.modules.musicocean.utils import write_id3
 
-class SoundCloudClient:
 
+class SoundCloudClient:
     session: ClientSession | None
     client_id: str | None
 
@@ -53,14 +53,13 @@ class SoundCloudClient:
             **kwargs
     ) -> dict:
         async with self.session.get(
-            f"{API_URL}/{method.value}{'/'+path if path else ''}?client_id={self.client_id}",
-            params=kwargs,
+                f"{API_URL}/{method.value}{'/' + path if path else ''}?client_id={self.client_id}",
+                params=kwargs,
         ) as resp:
             raw_data = await resp.json()
             if "error" in raw_data:
-                raise # TODO separated exceptions
+                raise  # TODO separated exceptions
             return raw_data
-
 
     async def search_tracks(self, query: str) -> list[SoundCloudTrackPreview]:
         raw_data = await self._api_request(
@@ -124,7 +123,7 @@ class SoundCloudClient:
             None
         )
         if not transcoding:
-            raise # TODO
+            raise  # TODO
         async with self.session.get(f"{transcoding['url']}?client_id={self.client_id}") as resp:
             stream_url = (await resp.json())["url"]
         async with self.session.get(stream_url) as resp:
@@ -137,16 +136,9 @@ class SoundCloudClient:
                 cover = await resp.read()
                 track.cover = cover
 
-
         track.content = write_id3(track, source)
 
         return track
 
-
-
-
     async def close(self):
         ...
-
-
-

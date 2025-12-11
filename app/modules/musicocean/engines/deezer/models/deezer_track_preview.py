@@ -1,7 +1,5 @@
-from typing import Optional
-
-from app.modules.musicocean.models import TrackPreview
 from app.modules.musicocean.engines.deezer.constants import COVER_URL
+from app.modules.musicocean.models import TrackPreview
 
 
 class DeezerTrackPreview(TrackPreview):

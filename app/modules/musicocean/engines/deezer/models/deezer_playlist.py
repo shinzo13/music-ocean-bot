@@ -1,5 +1,6 @@
 from app.modules.musicocean.models import Playlist
 
+
 class DeezerPlaylist(Playlist):
 
     @classmethod
