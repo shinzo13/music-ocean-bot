@@ -1,2 +1,5 @@
 from .soundcloud_track import SoundCloudTrack
 from .soundcloud_track_preview import SoundCloudTrackPreview
+from .soundcloud_album import SoundCloudAlbum
+from .soundcloud_playlist import SoundCloudPlaylist
+from .soundcloud_artist import SoundCloudArtist

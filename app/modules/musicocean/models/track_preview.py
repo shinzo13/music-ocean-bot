@@ -8,5 +8,5 @@ class TrackPreview(BaseModel):
     title: str
     artist_name: str
     # TODO album_title: str
-    cover_url: str
+    cover_url: Optional[str]
     preview_url: Optional[str]

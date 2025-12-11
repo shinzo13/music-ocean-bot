@@ -1,5 +1,3 @@
-from typing import Optional
-
 from app.modules.musicocean.engines.soundcloud.utils import format_cover_url
 from app.modules.musicocean.models import Track
 
@@ -13,5 +11,5 @@ class SoundCloudTrack(Track):
                 title=data["title"],
                 artist_name=data['user']['username'],
                 cover_url=format_cover_url(data["artwork_url"]),
-                duration=data["duration"],
+                duration=int(data["duration"]/1000),
             )
