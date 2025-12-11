@@ -22,12 +22,19 @@ async def idklol(
         musicocean: FromDishka[TelegramMusicOceanClient],
         track_repo: FromDishka[TrackRepository]
 ):
-    if chosen.result_id.startswith("cached"):
-        return None
-
     engine_prefix, entity_type, entity_id = chosen.result_id.split("_")
     entity_id = int(entity_id)
+
     if entity_type != "tr":
+        return None
+
+    db_track = await track_repo.get_track_by_id(entity_id)
+    if db_track:
+        await bot.edit_message_media(
+            media=InputMediaAudio(media=db_track.telegram_file_id),
+            inline_message_id=chosen.inline_message_id
+        )
+        logger.info(f"Successfully sent cached track #{chosen.result_id}")
         return None
 
     match engine_prefix:

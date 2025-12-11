@@ -19,7 +19,6 @@ async def inline_query(
     query: InlineQuery,
     user: DatabaseUser,
     musicocean: FromDishka[TelegramMusicOceanClient],
-    track_repo: FromDishka[TrackRepository]
 ):
     engine_prefix, entity_prefix, entity_id = query.query.split('::', maxsplit=2)
     logger.info(f"User #{query.from_user.id} searched for \"{query.query}\"")
@@ -54,4 +53,8 @@ async def inline_query(
         logger.debug("No data for that query")
         return
 
-    await query.answer(await get_track_results(user.selected_engine, matches, track_repo))
+    await query.answer(
+        await get_track_results(engine, matches),
+        cache_time=0,
+        is_personal=True
+    )

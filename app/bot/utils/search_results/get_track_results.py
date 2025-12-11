@@ -1,3 +1,5 @@
+import html
+
 from app.database.repositories import TrackRepository
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.models import TrackPreview, Album, Artist, Playlist
@@ -6,7 +8,7 @@ from aiogram.types import (
     InlineQueryResultCachedAudio,
     InlineQueryResultDocument,
     InlineKeyboardMarkup,
-    InlineKeyboardButton
+    InlineKeyboardButton, InputTextMessageContent, InlineQueryResultArticle
 )
 
 from app.config.log import get_logger
@@ -16,42 +18,30 @@ logger = get_logger(__name__)
 
 async def get_track_results(
     engine: Engine,
-    matches: list[TrackPreview],
-    track_repo: TrackRepository
+    matches: list[TrackPreview]
 ): # TODO annotation
 
     reply_markup = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(
-            text="downloading",
+            text="Downloading...",
             callback_data="x"
         )
     ]])
 
     results = []
     for track in matches:
-        db_track = await track_repo.get_track_by_id(track.id)
-        if db_track is not None:
-            res = InlineQueryResultCachedAudio(
-                id=f"cached_{ENGINE_PREFIXES[engine]}_tr_{track.id}",
-                audio_file_id=db_track.telegram_file_id
-            )
-        elif track.preview_url:
-            res = InlineQueryResultAudio(
-                id=f"{ENGINE_PREFIXES[engine]}_tr_{track.id}",
-                audio_url=track.preview_url,
-                title=track.title,
-                performer=track.artist_name, # not sure if needed
-                reply_markup=reply_markup,
-            )
-        else:
-            logger.debug(f"No preview_url for track #{track.id} ({engine})")
-            res = InlineQueryResultDocument(
-                id=f"{ENGINE_PREFIXES[engine]}_tr_{track.id}",
-                title=track.title,
-                document_url=track.cover_url,
-                mime_type="application/zip",
-                reply_markup=reply_markup
-            )
+        # TODO implement user settings and add sending-preview option here
+        logger.debug(f"{track.title=} {track.artist_name=}")
+        res = InlineQueryResultArticle(
+            id=f"{ENGINE_PREFIXES[engine]}_tr_{track.id}",
+            title=track.title,
+            description=track.artist_name,
+            thumbnail_url=track.cover_url,
+            input_message_content=InputTextMessageContent(
+                message_text=f"<i><b>🎧{html.escape(track.artist_name)} - {html.escape(track.title)}</b></i>"
+            ),
+            reply_markup=reply_markup
+        )
         results.append(res)
 
     return results
