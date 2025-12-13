@@ -7,7 +7,6 @@ from dishka import FromDishka
 from app.bot.utils.search_results import get_track_results, usage_guide_result
 from app.config.log import get_logger
 from app.database.models import User as DatabaseUser  # TODO costyl
-from app.database.repositories import TrackRepository
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 
@@ -22,7 +21,6 @@ async def inline_query(
         match: re.Match,
         user: DatabaseUser,
         musicocean: FromDishka[TelegramMusicOceanClient],
-        track_repo: FromDishka[TrackRepository]
 ):
     logger.info(f"User #{query.from_user.id} searched for \"{query.query}\"")
 

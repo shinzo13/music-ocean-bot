@@ -5,12 +5,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from dishka.integrations.aiogram import setup_dishka
 
-from app.bot.handlers.inline import (
-    default_search,
-    chosen,
-    advanced_search,
-    id_search
-)
+from app.bot.handlers import inline_search, process_track
 from app.bot.middlewares import MainMiddleware
 from app.config.log import setup_logging, get_logger
 from app.config.settings import settings
@@ -39,11 +34,8 @@ async def main():
     dp.update.outer_middleware(MainMiddleware())
 
     dp.include_routers(
-        id_search.router,
-        advanced_search.router,
-        default_search.router,
-        chosen.router,
-        # channel.router,
+        *inline_search.routers,
+        *process_track.routers,
     )
 
     try:
