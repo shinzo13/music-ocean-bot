@@ -5,7 +5,11 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from dishka.integrations.aiogram import setup_dishka
 
-from app.bot.handlers import inline_search, process_track
+from app.bot.handlers import (
+    inline_search,
+    process_track,
+    user_interface
+)
 from app.bot.middlewares import MainMiddleware
 from app.config.log import setup_logging, get_logger
 from app.config.settings import settings
@@ -36,6 +40,7 @@ async def main():
     dp.include_routers(
         *inline_search.routers,
         *process_track.routers,
+        *user_interface.routers
     )
 
     try:

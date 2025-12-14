@@ -2,6 +2,7 @@ from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload, attributes
 
 from app.config.log import get_logger
 from app.database.models import User
@@ -45,3 +46,16 @@ class UserRepository:
             select(User).where(User.user_id == user_id)
         )
         return result.scalar_one_or_none()
+
+    async def get_user_downloaded_tracks(self, user_id: int):
+        result = await self.session.execute(
+            select(User)
+            .options(selectinload(User.downloaded_tracks))
+            .where(User.user_id == user_id)
+        )
+        user = result.scalar_one_or_none()
+
+        if user is None:
+            return []
+
+        return user.downloaded_tracks
