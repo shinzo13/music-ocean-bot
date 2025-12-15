@@ -118,7 +118,11 @@ class DeezerClient:
         return await self._get_entity_tracks(EntityType.ALBUM, album_id)
 
     async def get_artist_tracks(self, artist_id: int):
-        return await self._get_entity_tracks(EntityType.ARTIST, artist_id)
+        # very different from other entities so cant use _get_entity_tracks
+        raw_data = await self._api_request(
+            DeezerAPIMethod.GET_ARTIST_TRACKS.format(artist_id=artist_id)
+        )
+        return [DeezerTrackPreview.from_dict(raw_track) for raw_track in raw_data]
 
     async def get_playlist_tracks(self, playlist_id: int):
         return await self._get_entity_tracks(EntityType.PLAYLIST, playlist_id)
