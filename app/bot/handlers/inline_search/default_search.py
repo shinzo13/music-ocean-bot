@@ -28,7 +28,7 @@ async def inline_query(
 
     match engine_prefix:
         case None:
-            engine = user.selected_engine
+            engine = user.settings.selected_engine
         case 'dz':
             engine = Engine.DEEZER
         case 'sc':
@@ -44,7 +44,7 @@ async def inline_query(
     logger.debug(f"Engine: {engine}, search query: \"{search_query}\"")
     matches = await musicocean.search_tracks(engine, search_query)
     await query.answer(
-        await get_track_results(engine, matches),
+        await get_track_results(engine, matches, user.settings.track_preview_covers),
         cache_time=0,
         is_personal=True
     )

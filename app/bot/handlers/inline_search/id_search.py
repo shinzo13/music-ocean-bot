@@ -4,6 +4,7 @@ from dishka import FromDishka
 
 from app.bot.utils.search_results import get_track_results
 from app.config.log import get_logger
+from app.database.models import User
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.exceptions import MusicOceanProviderDataException
 from app.modules.musicocean_tg import TelegramMusicOceanClient
@@ -17,6 +18,7 @@ router = Router()
 async def inline_query(
         query: InlineQuery,
         musicocean: FromDishka[TelegramMusicOceanClient],
+        user: User
 ):
     engine_prefix, entity_prefix, entity_id = query.query.split('::', maxsplit=2)
     logger.info(f"User #{query.from_user.id} searched for \"{query.query}\"")
@@ -51,8 +53,10 @@ async def inline_query(
         logger.debug("No data for that query")
         return
 
+    logger.debug(f"matches: {matches}")
+
     await query.answer(
-        await get_track_results(engine, matches),
+        await get_track_results(engine, matches, user.settings.track_preview_covers),
         cache_time=0,
         is_personal=True
     )

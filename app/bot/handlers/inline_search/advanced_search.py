@@ -35,7 +35,7 @@ async def inline_query(
 
     match engine_prefix:
         case None:
-            engine = user.selected_engine
+            engine = user.settings.selected_engine
         case "dz":
             engine = Engine.DEEZER
         case "sc":
