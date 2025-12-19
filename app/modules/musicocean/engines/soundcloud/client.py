@@ -94,21 +94,21 @@ class SoundCloudClient:
             method=SoundCloudAPIMethod.GET_ALBUM,
             path=str(album_id)
         )
-        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_album["tracks"]]
+        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_album["tracks"] if "title" in raw_track]
 
     async def get_artist_tracks(self, artist_id: int) -> list[SoundCloudTrackPreview]:
         raw_artist = await self._api_request(
             method=SoundCloudAPIMethod.GET_ARTIST,
             path=f"{artist_id}/tracks"
         )
-        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_artist["collection"]]
+        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_artist["collection"] if "title" in raw_track]
 
     async def get_playlist_tracks(self, playlist_id: int) -> list[SoundCloudTrackPreview]:
         raw_playlist = await self._api_request(
             method=SoundCloudAPIMethod.GET_PLAYLIST,
             path=str(playlist_id)
         )
-        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_playlist["tracks"]]
+        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_playlist["tracks"] if "title" in raw_track]
 
     async def download_track(self, track_id: int) -> SoundCloudTrack:
         raw_data = await self._api_request(
