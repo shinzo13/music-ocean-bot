@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 
 from aiohttp import ClientSession
 
@@ -11,6 +12,7 @@ from app.modules.musicocean.engines.soundcloud.models import (
     SoundCloudPlaylist
 )
 from app.modules.musicocean.engines.soundcloud.models.soundcloud_artist import SoundCloudArtist
+from app.modules.musicocean.enums import Engine
 from app.modules.musicocean.utils import write_id3
 
 
@@ -110,7 +112,7 @@ class SoundCloudClient:
         )
         return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_playlist["tracks"] if "title" in raw_track]
 
-    async def download_track(self, track_id: int) -> SoundCloudTrack:
+    async def download_track(self, track_id: int, watermark: Optional[str] = None) -> SoundCloudTrack:
         raw_data = await self._api_request(
             method=SoundCloudAPIMethod.GET_TRACK,
             path=str(track_id),
@@ -136,7 +138,12 @@ class SoundCloudClient:
                 cover = await resp.read()
                 track.cover = cover
 
-        track.content = write_id3(track, source)
+        track.content = write_id3(
+            track=track,
+            source=source,
+            engine=Engine.SOUNDCLOUD,
+            watermark=watermark
+        )
 
         return track
 

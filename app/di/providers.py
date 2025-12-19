@@ -14,7 +14,8 @@ class TelegramMusicOceanClientProvider(Provider):
     async def provide_deezer_client(self) -> AsyncIterator[TelegramMusicOceanClient]:
         musicocean = TelegramMusicOceanClient(
             channel_id=settings.telegram.channel_id,
-            bot_token=settings.bot.token.get_secret_value()
+            bot_token=settings.bot.token.get_secret_value(),
+            watermark=settings.tracks.watermark
         )
 
         await musicocean.setup_deezer(

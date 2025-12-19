@@ -13,7 +13,9 @@ from app.modules.musicocean.enums.engine import Engine
 
 
 class MusicOceanClient:
-    def __init__(self):
+    def __init__(self, watermark: Optional[str] = None):
+
+        self.watermark = watermark
 
         # TODO as fields
         self.ready = False
@@ -103,4 +105,4 @@ class MusicOceanClient:
             engine: Engine,
             track_id: int
     ) -> DeezerTrack | SoundCloudTrack:
-        return await self._get_engine(engine).download_track(track_id)
+        return await self._get_engine(engine).download_track(track_id, self.watermark)

@@ -10,8 +10,8 @@ from app.modules.musicocean.enums.engine import Engine
 
 # so fucking many abstractions
 class TelegramMusicOceanClient(MusicOceanClient):
-    def __init__(self, channel_id: int, bot_token: str):
-        super().__init__()
+    def __init__(self, channel_id: int, bot_token: str, watermark: Optional[str]):
+        super().__init__(watermark)
 
         # нуу дубликат но вроде же похуй да
         self.bot = Bot(

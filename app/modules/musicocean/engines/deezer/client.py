@@ -1,5 +1,6 @@
 import json
 import re
+from typing import Optional
 
 from aiohttp import ClientSession
 
@@ -10,6 +11,7 @@ from app.modules.musicocean.engines.deezer.exceptions import DeezerDataException
 from app.modules.musicocean.engines.deezer.models import DeezerTrack, DeezerTrackPreview, DeezerAlbum, DeezerPlaylist, \
     DeezerArtist
 from app.modules.musicocean.engines.deezer.utils import decrypt_track, get_arl
+from app.modules.musicocean.enums import Engine
 from app.modules.musicocean.enums.entity_type import EntityType
 from app.modules.musicocean.utils import write_id3
 
@@ -154,14 +156,18 @@ class DeezerClient:
         url = data['data'][0]['media'][0]['sources'][0]['url']
         return url
 
-    async def download_track(self, track_id: int) -> DeezerTrack:
+    async def download_track(
+            self,
+            track_id: int,
+            watermark: Optional[str] = None
+    ) -> DeezerTrack:
         track = await self._get_client_track(track_id)
 
         # TODO: country restriction handling
 
         track_url = await self._get_track_url(track.track_token)
         async with self.session.get(track_url) as resp:
-            track_bytes = await decrypt_track(resp, track.id)
+            source = await decrypt_track(resp, track.id)
 
         async with self.session.get(track.cover_url) as resp:
             resp.raise_for_status()
@@ -170,7 +176,9 @@ class DeezerClient:
         track.cover = cover
         track.content = write_id3(
             track=track,
-            source=track_bytes
+            source=source,
+            engine=Engine.SOUNDCLOUD,
+            watermark=watermark
         )
 
         return track

@@ -25,6 +25,10 @@ class DatabaseSettings(BaseSettings):
         return f"postgresql+asyncpg://{self.user}:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.db}"
 
 
+class TrackSettings(BaseSettings):
+    watermark: Optional[str]
+
+
 class BotSettings(BaseSettings):
     token: SecretStr
 
@@ -50,6 +54,7 @@ class Settings(BaseSettings):
     dev: DevSettings
 
     logging: LoggingSettings
+    tracks: TrackSettings
     bot: BotSettings
     telegram: TelegramSettings
     deezer: DeezerSettings
