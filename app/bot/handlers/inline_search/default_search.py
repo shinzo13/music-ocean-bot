@@ -27,11 +27,14 @@ async def inline_query(
 
     engine_prefix, search_query = match.groups()
 
-    try:
-        engine = prefix_to_engine(engine_prefix)
-    except ValueError:
-        await query.answer(usage_guide_result())
-        return
+    if not engine_prefix:
+        engine = user.settings.selected_engine
+    else:
+        try:
+            engine = prefix_to_engine(engine_prefix)
+        except ValueError:
+            await query.answer(usage_guide_result())
+            return
 
     logger.debug(f"Engine: {engine}, search query: \"{search_query}\"")
     matches = await musicocean.search_tracks(engine, search_query)

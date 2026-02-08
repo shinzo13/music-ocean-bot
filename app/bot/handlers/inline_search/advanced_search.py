@@ -34,11 +34,14 @@ async def inline_query(
     logger.info(f"User #{query.from_user.id} searched for \"{query.query}\"")
     engine_prefix, entity_prefix, search_query = match.groups()
 
-    try:
-        engine = prefix_to_engine(engine_prefix)
-    except ValueError:
-        await query.answer(usage_guide_result())
-        return
+    if not engine_prefix:
+        engine = user.settings.selected_engine
+    else:
+        try:
+            engine = prefix_to_engine(engine_prefix)
+        except ValueError:
+            await query.answer(usage_guide_result())
+            return
 
     bot_username = (await bot.get_me()).username
 
