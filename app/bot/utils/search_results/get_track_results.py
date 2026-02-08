@@ -5,10 +5,10 @@ from aiogram.types import (
     InlineKeyboardButton, InputTextMessageContent, InlineQueryResultArticle, InlineQueryResultAudio
 )
 
-from app.bot.constants import ENGINE_PREFIXES
 from app.config.log import get_logger
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.models import TrackPreview
+from app.modules.musicocean_tg.utils import engine_to_prefix
 
 logger = get_logger(__name__)
 
@@ -28,26 +28,27 @@ async def get_track_results(
 
     results = []
     for track in matches:
+        text = f"<i><b>♫ {html.escape(track.artist_name)}</b> - {html.escape(track.title)}</i>"
         if preview_covers or not track.preview_url:
             res = InlineQueryResultArticle(
-                id=f"{ENGINE_PREFIXES[engine]}_tr_{track.id}",
+                id=f"{engine_to_prefix(engine)}_tr_{track.id}",
                 title=track.title,
                 description=track.artist_name,
                 thumbnail_url=track.cover_url,
                 input_message_content=InputTextMessageContent(
-                    message_text=f"<i><b>🎧{html.escape(track.artist_name)} - {html.escape(track.title)}</b></i>"
+                    message_text=text
                 ),
                 reply_markup=reply_markup
             )
         else:
             res = InlineQueryResultAudio(
-                id=f"{ENGINE_PREFIXES[engine]}_tr_{track.id}",
+                id=f"{engine_to_prefix(engine)}_tr_{track.id}",
                 title=track.title,
                 thumbnail_url=track.cover_url,
                 audio_url=track.preview_url,
                 performer=track.artist_name,
                 input_message_content=InputTextMessageContent(
-                    message_text=f"<i><b>🎧{html.escape(track.artist_name)} - {html.escape(track.title)}</b></i>"
+                    message_text=text
                 ),
                 reply_markup=reply_markup
             )

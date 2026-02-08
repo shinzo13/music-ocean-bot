@@ -14,6 +14,7 @@ from app.config.log import get_logger
 from app.database.models import User as DatabaseUser
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
+from app.modules.musicocean_tg.utils import prefix_to_engine
 
 logger = get_logger(__name__)
 
@@ -33,20 +34,11 @@ async def inline_query(
     logger.info(f"User #{query.from_user.id} searched for \"{query.query}\"")
     engine_prefix, entity_prefix, search_query = match.groups()
 
-    match engine_prefix:
-        case None:
-            engine = user.settings.selected_engine
-        case "dz":
-            engine = Engine.DEEZER
-        case "sc":
-            engine = Engine.SOUNDCLOUD
-        case "yt":
-            engine = Engine.YOUTUBE
-        case "sp":
-            engine = Engine.SPOTIFY
-        case _:
-            await query.answer(usage_guide_result())
-            return
+    try:
+        engine = prefix_to_engine(engine_prefix)
+    except ValueError:
+        await query.answer(usage_guide_result())
+        return
 
     bot_username = (await bot.get_me()).username
 

@@ -5,9 +5,9 @@ from aiogram.types import (
     InputTextMessageContent
 )
 
-from app.bot.constants import ENGINE_PREFIXES
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.models import Artist
+from app.modules.musicocean_tg.utils import engine_to_prefix
 
 
 async def get_artist_results(
@@ -16,7 +16,7 @@ async def get_artist_results(
 ):
     return [
         InlineQueryResultArticle(
-            id=f"{ENGINE_PREFIXES[engine]}_ar_{artist.id}",
+            id=f"{engine_to_prefix(engine)}_ar_{artist.id}",
             title=artist.name,
             description=f"{artist.listeners} listeners",
             thumbnail_url=artist.photo_url,
@@ -26,7 +26,7 @@ async def get_artist_results(
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(
                     text="Search for track",
-                    switch_inline_query_current_chat=f"{ENGINE_PREFIXES[engine]}::ar::{artist.id}"
+                    switch_inline_query_current_chat=f"{engine_to_prefix(engine)}::ar::{artist.id}"
                 )]
             ])
 

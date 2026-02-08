@@ -2,12 +2,12 @@ from aiogram import Router, F
 from aiogram.types import InlineQuery
 from dishka import FromDishka
 
-from app.bot.utils.search_results import get_track_results
+from app.bot.utils.search_results import get_track_results, usage_guide_result
 from app.config.log import get_logger
 from app.database.models import User
-from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.exceptions import MusicOceanProviderDataException
 from app.modules.musicocean_tg import TelegramMusicOceanClient
+from app.modules.musicocean_tg.utils import prefix_to_engine
 
 logger = get_logger(__name__)
 
@@ -22,17 +22,12 @@ async def inline_query(
 ):
     engine_prefix, entity_prefix, entity_id = query.query.split('::', maxsplit=2)
     logger.info(f"User #{query.from_user.id} searched for \"{query.query}\"")
-    match engine_prefix:
-        case 'dz':
-            engine = Engine.DEEZER
-        case 'sc':
-            engine = Engine.SOUNDCLOUD
-        case 'yt':
-            engine = Engine.YOUTUBE
-        case 'sp':
-            engine = Engine.SPOTIFY
-        case _:
-            return  # TODO "wrong engine specified"
+
+    try:
+        engine = prefix_to_engine(engine_prefix)
+    except ValueError:
+        await query.answer(usage_guide_result())
+        return
 
     if not entity_id.isdigit():
         return  # TODO
