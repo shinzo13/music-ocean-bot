@@ -2,8 +2,9 @@ import re
 from typing import Optional
 
 from aiohttp import ClientSession
+from curl_cffi.requests import AsyncSession
 
-from app.modules.musicocean.engines.soundcloud.constants import API_URL
+from app.modules.musicocean.engines.soundcloud.constants import API_URL, HEADERS
 from app.modules.musicocean.engines.soundcloud.enums.api_method import SoundCloudAPIMethod
 from app.modules.musicocean.engines.soundcloud.models import (
     SoundCloudTrackPreview,
@@ -18,11 +19,13 @@ from app.modules.musicocean.utils import write_id3
 
 class SoundCloudClient:
     session: ClientSession | None
+    antibot_session: AsyncSession | None
     client_id: str | None
 
     def __init__(self):
         self.client_id = None
         self.session = None
+        self.antibot_session = None
 
     async def _get_client_id(self) -> str:
         async with self.session.get("https://soundcloud.com") as resp:
