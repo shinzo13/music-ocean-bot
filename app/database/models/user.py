@@ -1,4 +1,4 @@
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional
 
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import Boolean, BigInteger, JSON, TypeDecorator
@@ -9,14 +9,15 @@ from app.database.models.base import Base, TimestampMixin, IntIDMixin
 from app.modules.musicocean.enums.engine import Engine
 
 if TYPE_CHECKING:
-    from app.database.models import Track
+    from app.database.models import BaseTrack
 
 
 class UserSettings(BaseModel):
-    model_config = ConfigDict(use_enum_values=True)
+    #model_config = ConfigDict(use_enum_values=True)
 
     selected_engine: Engine = Engine.DEEZER
     track_preview_covers: bool = True
+    spotify_token: Optional[str] = None
 
 class User(Base, TimestampMixin, IntIDMixin):
     __tablename__ = "users"
@@ -31,4 +32,4 @@ class User(Base, TimestampMixin, IntIDMixin):
         default=UserSettings().model_dump(mode="json")
     )
 
-    downloaded_tracks: Mapped[List["Track"]] = relationship(back_populates="downloaded_by")
+    downloaded_tracks: Mapped[List["BaseTrack"]] = relationship(back_populates="downloaded_by")

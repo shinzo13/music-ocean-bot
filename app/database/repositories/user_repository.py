@@ -1,3 +1,5 @@
+import csv
+import io
 from typing import Optional
 
 from sqlalchemy import select
@@ -85,3 +87,31 @@ class UserRepository:
             return []
 
         return user.downloaded_tracks
+
+    async def export_to_csv(self) -> bytes:
+        result = await self.session.execute(select(User))
+        users = result.scalars().all()
+        output = io.StringIO()
+        writer = csv.writer(output)
+
+        writer.writerow([
+            'user_id',
+            'is_admin',
+            'is_banned',
+            'selected_engine',
+            'track_preview_covers'
+        ])
+
+        for user in users:
+            writer.writerow([
+                user.user_id,
+                user.is_admin,
+                user.is_banned,
+                user.settings.selected_engine.value,
+                user.settings.track_preview_covers
+            ])
+
+        csv_bytes = output.getvalue().encode('utf-8')
+        output.close()
+
+        return csv_bytes
