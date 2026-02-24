@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic.types import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class DevSettings(BaseSettings):
     enabled: bool
     arl: str
-
+    client_id: str
 
 class LoggingSettings(BaseSettings):
     level: str
@@ -34,6 +34,7 @@ class BotSettings(BaseSettings):
 
 
 class TelegramSettings(BaseSettings):
+    admins: list[int]
     channel_id: int
     workers: List[SecretStr]
 
@@ -41,6 +42,10 @@ class TelegramSettings(BaseSettings):
 class DeezerSettings(BaseSettings):
     login: SecretStr
     password: SecretStr
+
+class SpotifySettings(BaseSettings):
+    client_id: SecretStr
+    client_secret: SecretStr
 
 
 class Settings(BaseSettings):
@@ -58,6 +63,7 @@ class Settings(BaseSettings):
     bot: BotSettings
     telegram: TelegramSettings
     deezer: DeezerSettings
+    spotify: SpotifySettings
     database: DatabaseSettings
 
 
