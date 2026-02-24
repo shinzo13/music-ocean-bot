@@ -1,10 +1,11 @@
-from typing import Callable, Dict, Any
+from typing import Callable, Dict, Any, Optional
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message, User as TelegramUser
 from typing_extensions import Awaitable
 
 from app.config.log import get_logger
+from app.database.models import User as DatabaseUser
 from app.database.repositories import UserRepository
 
 logger = get_logger(__name__)
@@ -23,7 +24,7 @@ class MainMiddleware(BaseMiddleware):
         if tg_user is None:
             return await handler(event, data)
 
-        db_user = await user_repo.get_user_by_id(tg_user.id)
+        db_user: Optional[DatabaseUser] = await user_repo.get_user_by_id(tg_user.id)
         if db_user is None:
             db_user = await user_repo.add_user(user_id=tg_user.id)
 

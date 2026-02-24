@@ -38,6 +38,8 @@ async def inline_query(
 
     logger.debug(f"Engine: {engine}, search query: \"{search_query}\"")
     matches = await musicocean.search_tracks(engine, search_query)
+    res = await get_track_results(engine, matches, user.settings.track_preview_covers)
+    logger.debug(f"Got {len(res)} results")
     await query.answer(
         await get_track_results(engine, matches, user.settings.track_preview_covers),
         cache_time=0,
