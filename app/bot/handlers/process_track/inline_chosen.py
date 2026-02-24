@@ -20,26 +20,21 @@ async def idklol(
         musicocean: FromDishka[TelegramMusicOceanClient],
         track_repo: FromDishka[TrackRepository]
 ):
-    engine_prefix, entity_type, entity_id = chosen.result_id.split("_")
-    entity_id = int(entity_id)
+    if chosen.result_id == 'usage_guide':
+        return
+    # todo i hate stupid split i wanna regex in handler
+    engine_prefix, entity_type, entity_id = chosen.result_id.split("_", maxsplit=2)
 
     if entity_type != "tr":
-        return None
-
-    db_track = await track_repo.get_track_by_id(entity_id)
-    if db_track:
-        await bot.edit_message_media(
-            media=InputMediaAudio(media=db_track.telegram_file_id),
-            inline_message_id=chosen.inline_message_id
-        )
-        logger.info(f"Successfully sent cached track #{chosen.result_id}")
-        return None
+        return
 
     match engine_prefix:
         case "dz":
             engine = Engine.DEEZER
+            entity_id = int(entity_id)
         case "sc":
             engine = Engine.SOUNDCLOUD
+            entity_id = int(entity_id)
         case "yt":
             engine = Engine.YOUTUBE
         case "sp":
@@ -47,11 +42,21 @@ async def idklol(
         case _:
             raise "invalid engine"
 
+
+    db_track = await track_repo.get_track(entity_id, engine)
+    if db_track:
+        await bot.edit_message_media(
+            media=InputMediaAudio(media=db_track.telegram_file_id),
+            inline_message_id=chosen.inline_message_id
+        )
+        logger.info(f"Successfully sent cached track #{chosen.result_id}")
+        return
+
     file_id = await musicocean.download_track(
         engine=engine,
         track_id=entity_id,
     )
-
+    logger.debug(f"got file id: {file_id}")
     await bot.edit_message_media(
         media=InputMediaAudio(media=file_id),
         inline_message_id=chosen.inline_message_id
@@ -59,7 +64,7 @@ async def idklol(
     logger.info(f"Successfully sent track #{chosen.result_id}")
 
     # telegram caching causing this shi
-    db_track = await track_repo.get_track_by_id(entity_id)
+    db_track = await track_repo.get_track(entity_id, engine)
     if db_track is None:
         await track_repo.add_track(
             engine=engine,
@@ -68,4 +73,4 @@ async def idklol(
             user_id=chosen.from_user.id
         )
 
-    return None
+    return
