@@ -1,18 +1,30 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from app.bot.constants import SOUNDCLOUD_EMOJI_ID, DEEZER_EMOJI_ID, BACK_EMOJI_ID, YOUTUBE_EMOJI_ID
+from app.bot.utils.selected_option import option_selection
 from app.modules.musicocean.enums import Engine
 
 def engines_keyboard(engine: Engine):
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
-            text=f"{'✨ ' if engine==Engine.DEEZER else ''}Deezer",
-            callback_data="set_engine_dz"
+            text=option_selection("Deezer", engine==Engine.DEEZER),
+            callback_data="set_engine_dz",
+            icon_custom_emoji_id=DEEZER_EMOJI_ID,
         )],
         [InlineKeyboardButton(
-            text=f"{'✨ ' if engine==Engine.SOUNDCLOUD else ''}SoundCloud",
-            callback_data="set_engine_sc"
+            text=option_selection("SoundCloud", engine==Engine.SOUNDCLOUD),
+            callback_data="set_engine_sc",
+            icon_custom_emoji_id=SOUNDCLOUD_EMOJI_ID,
         )],
-#        [InlineKeyboardButton(text="YouTube", callback_data="set_engine_dz")],
+        [InlineKeyboardButton(
+            text=option_selection("YTMusic", engine == Engine.YOUTUBE),
+            callback_data="set_engine_yt",
+            icon_custom_emoji_id=YOUTUBE_EMOJI_ID,
+        )],
 #        [InlineKeyboardButton(text="Spotify", callback_data="set_engine_dz")]
-        [InlineKeyboardButton(text="⬅️ Back", callback_data="settings")]
+        [InlineKeyboardButton(
+            text="Back",
+            callback_data="settings",
+            icon_custom_emoji_id=BACK_EMOJI_ID,
+        )]
     ])
