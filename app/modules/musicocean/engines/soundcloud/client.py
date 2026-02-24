@@ -15,7 +15,7 @@ from app.modules.musicocean.engines.soundcloud.models import (
 from app.modules.musicocean.engines.soundcloud.models.soundcloud_artist import SoundCloudArtist
 from app.modules.musicocean.enums import Engine
 from app.modules.musicocean.utils import write_id3
-
+from app.config.settings import settings
 
 class SoundCloudClient:
     session: ClientSession | None
@@ -28,6 +28,10 @@ class SoundCloudClient:
         self.antibot_session = None
 
     async def _get_client_id(self) -> str:
+        if settings.dev.enabled and settings.dev.client_id:
+            return settings.dev.client_id
+
+
         async with self.session.get("https://soundcloud.com") as resp:
             text = await resp.text()
             matches = re.findall(
@@ -48,23 +52,41 @@ class SoundCloudClient:
         return client_id.group(1)
 
     async def setup(self):
-        self.session = ClientSession(raise_for_status=True)
+        self.session = ClientSession(
+            raise_for_status=True,
+            headers=HEADERS
+        )
+        self.antibot_session = AsyncSession(
+            headers=HEADERS,
+            impersonate="firefox133"
+        )
         self.client_id = await self._get_client_id()
 
     async def _api_request(
             self,
             method: SoundCloudAPIMethod,
             path: str | None = None,
+            antibot: bool = False,
             **kwargs
     ) -> dict:
-        async with self.session.get(
-                f"{API_URL}/{method.value}{'/' + path if path else ''}?client_id={self.client_id}",
+        url = f"{API_URL}/{method.value}{'/' + path if path else ''}?client_id={self.client_id}"
+
+        if not antibot:
+            async with self.session.get(
+                url=url,
                 params=kwargs,
-        ) as resp:
-            raw_data = await resp.json()
-            if "error" in raw_data:
-                raise  # TODO separated exceptions
-            return raw_data
+            ) as resp:
+                raw_data = await resp.json()
+        else:
+            resp = await self.antibot_session.get(
+                url=url,
+                params=kwargs,
+            )
+            raw_data = resp.json()
+
+        if "error" in raw_data:
+            raise  # TODO separated exceptions
+        return raw_data
 
     async def search_tracks(self, query: str) -> list[SoundCloudTrackPreview]:
         raw_data = await self._api_request(
@@ -94,6 +116,13 @@ class SoundCloudClient:
         )
         return [SoundCloudArtist.from_dict(raw_artist) for raw_artist in raw_data["collection"]]
 
+    async def get_album(self, album_id: int) -> SoundCloudAlbum:
+        raw_album = await self._api_request(
+            method=SoundCloudAPIMethod.GET_ALBUM,
+            path=str(album_id)
+        )
+        return SoundCloudAlbum.from_dict(raw_album)
+
     async def get_album_tracks(self, album_id: int) -> list[SoundCloudTrackPreview]:
         raw_album = await self._api_request(
             method=SoundCloudAPIMethod.GET_ALBUM,
@@ -101,12 +130,27 @@ class SoundCloudClient:
         )
         return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_album["tracks"] if "title" in raw_track]
 
+    async def get_artist(self, artist_id: int) -> SoundCloudArtist:
+        raw_artist = await self._api_request(
+            method=SoundCloudAPIMethod.GET_ARTIST,
+            path=str(artist_id)
+        )
+        return SoundCloudArtist.from_dict(raw_artist)
+
     async def get_artist_tracks(self, artist_id: int) -> list[SoundCloudTrackPreview]:
         raw_artist = await self._api_request(
             method=SoundCloudAPIMethod.GET_ARTIST,
-            path=f"{artist_id}/tracks"
+            path=f"{artist_id}/tracks",
+            antibot=True # okay i really don't understand SC's logic
         )
         return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_artist["collection"] if "title" in raw_track]
+
+    async def get_playlist(self, playlist_id: int) -> SoundCloudPlaylist:
+        raw_playlist = await self._api_request(
+            method=SoundCloudAPIMethod.GET_PLAYLIST,
+            path=str(playlist_id)
+        )
+        return SoundCloudArtist.from_dict(raw_playlist)
 
     async def get_playlist_tracks(self, playlist_id: int) -> list[SoundCloudTrackPreview]:
         raw_playlist = await self._api_request(
@@ -141,7 +185,7 @@ class SoundCloudClient:
                 cover = await resp.read()
                 track.cover = cover
 
-        track.content = write_id3(
+        track.content = await write_id3(
             track=track,
             source=source,
             engine=Engine.SOUNDCLOUD,

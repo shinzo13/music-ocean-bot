@@ -65,9 +65,24 @@ class DeezerClient:
                 raise  # TODO separated DeezerAPIException
             return raw_data["data"]
 
-    # kinda similar to _api_request() but it has custom path and certain output type
-    # so its better to make another function for that..
-    # or maybe i can make base _api_request base func and then _api_method and this one?? TODO
+    async def _get_entity(
+            self,
+            entity_type: EntityType,
+            entity_id: int
+    ) -> dict:
+        async with self.session.get(
+                f"{API_URL}/{entity_type.value}/{entity_id}"
+        ) as resp:
+            raw_data = await resp.json()
+            if "error" in raw_data:
+                match raw_data["error"]["type"]:
+                    case "DataException":
+                        raise DeezerDataException("No data for entity was found")
+                    case _:  # TODO other
+                        raise DeezerException(raw_data["error"]["message"])
+
+            return raw_data
+
     async def _get_entity_tracks(
             self,
             entity_type: EntityType,
@@ -116,8 +131,18 @@ class DeezerClient:
         )
         return [DeezerArtist.from_dict(raw_artist) for raw_artist in raw_data]
 
+    async def get_album(self, album_id: int):
+        return DeezerAlbum.from_dict(
+            await self._get_entity(EntityType.ALBUM, album_id)
+        )
+
     async def get_album_tracks(self, album_id: int):
         return await self._get_entity_tracks(EntityType.ALBUM, album_id)
+
+    async def get_artist(self, artist_id: int):
+        return DeezerArtist.from_dict(
+            await self._get_entity(EntityType.ARTIST, artist_id)
+        )
 
     async def get_artist_tracks(self, artist_id: int):
         # very different from other entities so cant use _get_entity_tracks
@@ -125,6 +150,11 @@ class DeezerClient:
             DeezerAPIMethod.GET_ARTIST_TRACKS.format(artist_id=artist_id)
         )
         return [DeezerTrackPreview.from_dict(raw_track) for raw_track in raw_data]
+
+    async def get_playlist(self, playlist_id: int):
+        return  DeezerPlaylist.from_dict(
+            await self._get_entity(EntityType.PLAYLIST, playlist_id)
+        )
 
     async def get_playlist_tracks(self, playlist_id: int):
         return await self._get_entity_tracks(EntityType.PLAYLIST, playlist_id)
@@ -174,7 +204,7 @@ class DeezerClient:
             cover = await resp.read()
 
         track.cover = cover
-        track.content = write_id3(
+        track.content = await write_id3(
             track=track,
             source=source,
             engine=Engine.SOUNDCLOUD,
