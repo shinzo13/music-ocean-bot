@@ -26,6 +26,13 @@ class TelegramMusicOceanClientProvider(Provider):
 
         await musicocean.setup_soundcloud()
 
+        await musicocean.setup_youtube()
+
+        await musicocean.setup_spotify(
+            client_id=settings.spotify.client_id.get_secret_value(),
+            client_secret=settings.spotify.client_secret.get_secret_value(),
+        )
+
         await musicocean.checkup()
 
         yield musicocean
