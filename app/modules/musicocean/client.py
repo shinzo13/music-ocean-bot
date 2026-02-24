@@ -134,3 +134,13 @@ class MusicOceanClient:
             track_id: int
     ) -> DeezerTrack | SoundCloudTrack:
         return await self._get_engine(engine).download_track(track_id, self.watermark)
+
+    async def get_last_track(self, user_access_token: str) -> SpotifyTrackPreview | None:
+        if not self.spotify:
+            raise "spotify is not setup"
+        return await self.spotify.get_last_track(user_access_token)
+
+    async def get_recently_played(self, user_access_token: str) -> list[SpotifyTrackPreview]:
+        if not self.spotify:
+            raise "spotify is not setup"
+        return await self.spotify.get_recently_played(user_access_token)
