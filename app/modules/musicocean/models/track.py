@@ -11,7 +11,7 @@ class Track(BaseModel):
     """
 
     # Necessary
-    id: int
+    id: int | str
     title: str
     artist_name: str
     # TODO album_title: str

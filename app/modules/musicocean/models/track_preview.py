@@ -4,9 +4,9 @@ from pydantic import BaseModel
 
 
 class TrackPreview(BaseModel):
-    id: int
+    id: int | str
     title: str
     artist_name: str
     # TODO album_title: str
     cover_url: Optional[str]
-    preview_url: Optional[str]
+    preview_url: Optional[str] = None
