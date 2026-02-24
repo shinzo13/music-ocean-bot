@@ -3,19 +3,20 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
 from app.bot.keyboards import home_keyboard
+from app.database.models import User
 
 router = Router()
 
 @router.message(CommandStart(deep_link=False))
-async def main_menu(message: Message):
+async def main_menu(message: Message, user: User):
     await message.answer(
-        text="Welcome to Music Ocean!",
-        reply_markup=home_keyboard()
+        text=f"Welcome to Music Ocean!",
+        reply_markup=home_keyboard(user.is_admin)
     )
 
 @router.callback_query(F.data=="main_menu")
-async def main_menu(callback: CallbackQuery):
+async def main_menu(callback: CallbackQuery, user: User):
     await callback.message.edit_text(
         text="Welcome to Music Ocean!",
-        reply_markup=home_keyboard()
+        reply_markup=home_keyboard(user.is_admin)
     )

@@ -8,12 +8,14 @@ from dishka.integrations.aiogram import setup_dishka
 from app.bot.handlers import (
     inline_search,
     process_track,
-    user_interface
+    user_interface,
+    track_info,
+    admin_panel
 )
 from app.bot.middlewares import MainMiddleware
 from app.config.log import setup_logging, get_logger
 from app.config.settings import settings
-from app.database.core import create_engine
+from app.database.core import create_engine, add_env_admins
 from app.database.models.base import Base
 from app.di.container import setup_container
 
@@ -31,6 +33,7 @@ async def main():
     engine = create_engine(settings.database.url)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    await add_env_admins(engine, settings.telegram.admins)
 
     container = setup_container()
     setup_dishka(container=container, router=dp, auto_inject=True)
@@ -40,7 +43,9 @@ async def main():
     dp.include_routers(
         *inline_search.routers,
         *process_track.routers,
-        *user_interface.routers
+        *user_interface.routers,
+        *track_info.routers,
+        *admin_panel.routers
     )
 
     try:
