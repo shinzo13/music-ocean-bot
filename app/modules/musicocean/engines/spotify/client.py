@@ -85,7 +85,7 @@ class SpotifyClient:
         return {"Authorization": f"Bearer {self._access_token}"}
 
 
-    async def exchange_code(self, code: str, redirect_uri: str) -> dict:
+    async def exchange_code(self, code: str, redirect_uri: str) -> tuple[str, str]:
         credentials = base64.b64encode(
             f"{self.client_id}:{self.client_secret}".encode()
         ).decode()
@@ -104,10 +104,7 @@ class SpotifyClient:
         ) as resp:
             data = await resp.json()
 
-        return {
-            "access_token": data["access_token"],
-            "refresh_token": data["refresh_token"],
-        }
+        return data["access_token"], data["refresh_token"]
 
     async def refresh_user_token(self, refresh_token: str) -> str:
         credentials = base64.b64encode(

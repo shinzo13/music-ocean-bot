@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from app.bot.constants import ENGINE_EMOJI_ID, APPEARANCE_EMOJI_ID, BACK_EMOJI_ID
+from app.bot.constants import ENGINE_EMOJI_ID, APPEARANCE_EMOJI_ID, BACK_EMOJI_ID, MUSIC_EMOJI_ID
 
 
 def settings_keyboard():
@@ -9,6 +9,11 @@ def settings_keyboard():
             text="Music engine",
             callback_data="default_engine",
             icon_custom_emoji_id=ENGINE_EMOJI_ID
+        )],
+        [InlineKeyboardButton(
+            text="Spotify scrobbling",
+            callback_data="spotify_scrobbling",
+            icon_custom_emoji_id=MUSIC_EMOJI_ID
         )],
         [InlineKeyboardButton(
             text="Track previews",

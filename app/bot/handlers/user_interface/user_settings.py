@@ -1,7 +1,8 @@
-from aiogram import Router, F
+from aiogram import Router, F, Bot
 from aiogram.types import CallbackQuery
 from dishka import FromDishka
 
+from app.bot.keyboards.scrobbling import scrobbling_setup_keyboard, oauth_scrobbling_keyboard
 from app.bot.keyboards.track_preview_keyboard import track_preview_keyboard
 from app.database.models import User
 from app.bot.keyboards import engines_keyboard, settings_keyboard
@@ -84,3 +85,20 @@ async def set_previews_handler(
     )
 
     await callback.answer("✅ Track preview options changed successfully.")
+
+@router.callback_query(F.data == "spotify_scrobbling")
+async def spotify_scrobbling_handler(
+        callback: CallbackQuery,
+        user: User
+):
+    if user.settings.spotify.enabled:
+        await callback.message.edit_text(
+            "already" # TODO
+        )
+        return
+
+    await callback.message.edit_text(
+        f"<b>Spotify scrobbling</b>\n\nLog in into your Spotify account and get ability to quickly download tracks from your player.",
+        reply_markup=oauth_scrobbling_keyboard(user.id)
+    )
+
