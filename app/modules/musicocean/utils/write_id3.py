@@ -4,7 +4,7 @@ from typing import Optional
 from app.modules.musicocean.enums import Engine
 from app.modules.musicocean.models import Track
 
-def write_id3(
+async def write_id3(
         track: Track,
         source: bytes,
         engine: Engine,
