@@ -12,12 +12,22 @@ if TYPE_CHECKING:
     from app.database.models import BaseTrack
 
 
+class SpotifySettings(BaseModel):
+    enabled: bool = False
+    connection_code: Optional[str] = None
+    access_token: Optional[str] = None
+    refresh_token: Optional[str] = None
+
 class UserSettings(BaseModel):
-    #model_config = ConfigDict(use_enum_values=True)
 
     selected_engine: Engine = Engine.DEEZER
     track_preview_covers: bool = True
-    spotify_token: Optional[str] = None
+
+    spotify: Mapped[SpotifySettings] = mapped_column(
+        PydanticModel(SpotifySettings),
+        nullable=False,
+        default=SpotifySettings().model_dump(mode="json")
+    )
 
 class User(Base, TimestampMixin, IntIDMixin):
     __tablename__ = "users"
