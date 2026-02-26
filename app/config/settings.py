@@ -32,6 +32,8 @@ class TrackSettings(BaseSettings):
 class BotSettings(BaseSettings):
     token: SecretStr
 
+class ServerSettings(BaseSettings):
+    domain: str
 
 class TelegramSettings(BaseSettings):
     admins: list[int]
@@ -61,6 +63,7 @@ class Settings(BaseSettings):
     logging: LoggingSettings
     tracks: TrackSettings
     bot: BotSettings
+    server: ServerSettings
     telegram: TelegramSettings
     deezer: DeezerSettings
     spotify: SpotifySettings
