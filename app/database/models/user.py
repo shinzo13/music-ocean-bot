@@ -23,11 +23,7 @@ class UserSettings(BaseModel):
     selected_engine: Engine = Engine.DEEZER
     track_preview_covers: bool = True
 
-    spotify: Mapped[SpotifySettings] = mapped_column(
-        PydanticModel(SpotifySettings),
-        nullable=False,
-        default=SpotifySettings().model_dump(mode="json")
-    )
+    spotify: SpotifySettings = SpotifySettings()
 
 class User(Base, TimestampMixin, IntIDMixin):
     __tablename__ = "users"
