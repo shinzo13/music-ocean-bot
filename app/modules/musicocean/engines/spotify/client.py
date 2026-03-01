@@ -103,6 +103,7 @@ class SpotifyClient:
             },
         ) as resp:
             data = await resp.json()
+            logger.debug(f"Spotify exchange response: {data}")
 
         return data["access_token"], data["refresh_token"]
 
