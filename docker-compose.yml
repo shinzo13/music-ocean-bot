@@ -1,7 +1,7 @@
 services:
   bot:
     build: .
-    command: python -m app
+    command: uv run python -m app
     env_file:
       - .env
     depends_on:
@@ -10,7 +10,7 @@ services:
 
   server:
     build: .
-    command: python -m app.server
+    command: uv run python -m app.server
     ports:
       - "443:443"
     env_file:
