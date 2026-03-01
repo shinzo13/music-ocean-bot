@@ -26,7 +26,9 @@ async def inline_query(
             (await bot.get_me()).username
         ))
 
-    track = await musicocean.get_spotify_last_track(
+    # todo saving updated refresh_token
+    # but probably in other way..
+    track, _ = await musicocean.get_spotify_last_track(
         user.settings.spotify.access_token,
         user.settings.spotify.refresh_token
     )
@@ -39,5 +41,6 @@ async def inline_query(
             Engine.SPOTIFY,
             [track],
             user.settings.track_preview_covers
-        )
+        ),
+        cache_time=0
     )
