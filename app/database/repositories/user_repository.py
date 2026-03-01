@@ -66,13 +66,13 @@ class UserRepository:
         if track_preview_covers is not None:
             user.settings.track_preview_covers = track_preview_covers
         if spotify__enabled is not None:
-            user.settings.spotify__enabled = spotify__enabled
+            user.settings.spotify.enabled = spotify__enabled
         if spotify__connection_code is not None:
-            user.settings.spotify__connection_code = spotify__connection_code
+            user.settings.spotify.connection_code = spotify__connection_code
         if spotify__access_token is not None:
-            user.settings.spotify__access_token = spotify__access_token
+            user.settings.spotify.access_token = spotify__access_token
         if spotify__refresh_token is not None:
-            user.settings.spotify__refresh_token = spotify__refresh_token
+            user.settings.spotify.refresh_token = spotify__refresh_token
 
         flag_modified(user, 'settings')
         await self.session.commit()
