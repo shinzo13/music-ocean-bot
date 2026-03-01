@@ -64,7 +64,7 @@ async def spotify_connected_handler(
     )
 
     await user_repo.update_user_settings(
-        user_id=user.id,
+        user_id=user.user_id,
         spotify__enabled=True,
         spotify__access_token=access_token,
         spotify__refresh_token=refresh_token
