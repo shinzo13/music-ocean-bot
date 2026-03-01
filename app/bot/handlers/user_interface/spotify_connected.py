@@ -5,6 +5,7 @@ import re
 
 from dishka import FromDishka
 
+from app.bot.keyboards.scrobbling import oauth_scrobbling_keyboard
 from app.bot.utils.get_engine_emoji import get_engine_emoji
 from app.config import settings
 from app.database.models import User
@@ -14,6 +15,25 @@ from app.modules.musicocean_tg.utils import prefix_to_engine
 
 router = Router()
 
+
+@router.message(
+    CommandStart(
+        deep_link=True,
+        #magic=F.args=="setup_scrobbling"
+    )
+)
+async def spotify_connected(
+        message: Message,
+        user: User
+):
+    await message.delete()
+    if user.settings.spotify.enabled:
+        await message.answer("already connected tf are you doing")
+        return
+    await message.answer(
+        "login",
+        reply_markup=oauth_scrobbling_keyboard(user.id)
+    )
 
 @router.message(
     CommandStart(

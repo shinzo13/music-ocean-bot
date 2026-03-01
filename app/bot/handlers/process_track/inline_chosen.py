@@ -20,7 +20,8 @@ async def idklol(
         musicocean: FromDishka[TelegramMusicOceanClient],
         track_repo: FromDishka[TrackRepository]
 ):
-    if chosen.result_id == 'usage_guide':
+    # todo
+    if chosen.result_id in ['usage_guide', "setup_scrobbling"]:
         return
     # todo i hate stupid split i wanna regex in handler
     engine_prefix, entity_type, entity_id = chosen.result_id.split("_", maxsplit=2)
