@@ -15,9 +15,6 @@ logger = get_logger(__name__)
 
 
 async def main():
-    engine = create_engine(settings.database.url)
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
 
     container = setup_container()
     setup_dishka(container=container, app=app, auto_inject=True)
