@@ -23,7 +23,7 @@ async def spotify_callback(
         spotify__connection_code=code
     )
 
-    bot_username = request.app["bot_username"]
+    bot_username = settings.bot.username
     raise web.HTTPFound(location=f"https://t.me/{bot_username}?start=spotify_connected")
 
 app = web.Application()

@@ -20,7 +20,7 @@ async def main():
         await conn.run_sync(Base.metadata.create_all)
 
     container = setup_container()
-    setup_dishka(container=container, app=app)
+    setup_dishka(container=container, app=app, auto_inject=True)
 
     runner = web.AppRunner(app)
     try:
