@@ -33,10 +33,10 @@ async def setup_scrobbling_handler(
     if user.settings.spotify.enabled:
         await message.answer("already connected tf are you doing")
         return
-    logger.debug(f"{user.id=}")
+    logger.debug(f"{user=}")
     await message.answer(
         "login",
-        reply_markup=oauth_scrobbling_keyboard(user.id)
+        reply_markup=oauth_scrobbling_keyboard(message.from_user.id)
     )
 
 @router.message(
