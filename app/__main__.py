@@ -16,7 +16,7 @@ from app.bot.handlers import (
 from app.bot.middlewares import MainMiddleware
 from app.config.log import setup_logging, get_logger
 from app.config.settings import settings
-from app.database.core import create_engine, add_env_admins
+from app.database.core import create_engine, add_env_admins, initialize_dynamic_settings
 from app.database.models.base import Base
 from app.di.container import setup_container
 
@@ -29,12 +29,17 @@ async def main():
         token=settings.bot.token.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.HTML)
     )
-    settings.bot.username = (await bot.get_me()).username
     dp = Dispatcher()
 
     engine = create_engine(settings.database.url)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    bot_username = (await bot.get_me()).username
+    await initialize_dynamic_settings(
+        engine,
+        bot_username=bot_username
+    )
     await add_env_admins(engine, settings.telegram.admins)
 
     container = setup_container()

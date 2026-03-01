@@ -3,14 +3,15 @@ from aiohttp import web
 from dishka.integrations.aiohttp import FromDishka
 
 from app.config import settings
-from app.database.repositories import UserRepository
+from app.database.repositories import UserRepository, DynamicSettingsRepository
 
 router = web.RouteTableDef()
 
 @router.get('/spotify')
 async def spotify_callback(
         request: web.Request,
-        user_repo: FromDishka[UserRepository]
+        user_repo: FromDishka[UserRepository],
+        dynamic_settings_repo: FromDishka[DynamicSettingsRepository],
 ):
     code = request.rel_url.query.get("code")
     state = request.rel_url.query.get("state")
@@ -23,7 +24,7 @@ async def spotify_callback(
         spotify__connection_code=code
     )
 
-    bot_username = settings.bot.username
+    bot_username = (await dynamic_settings_repo.get()).bot_username
     raise web.HTTPFound(location=f"https://t.me/{bot_username}?start=spotify_connected")
 
 app = web.Application()

@@ -30,7 +30,6 @@ class TrackSettings(BaseSettings):
 
 
 class BotSettings(BaseSettings):
-    username: str = "" # is assigned at runtime
     token: SecretStr
 
 class ServerSettings(BaseSettings):
