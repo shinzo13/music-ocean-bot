@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from app.config.settings import settings
 from app.database.core import create_engine, create_session_factory
-from app.database.repositories import UserRepository, TrackRepository
+from app.database.repositories import UserRepository, TrackRepository, DynamicSettingsRepository
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 
 
@@ -61,3 +61,7 @@ class DatabaseProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def get_track_repository(self, session: AsyncSession) -> TrackRepository:
         return TrackRepository(session)
+
+    @provide(scope=Scope.REQUEST)
+    def get_dynamic_settings_repository(self, session: AsyncSession) -> DynamicSettingsRepository:
+        return DynamicSettingsRepository(session)
