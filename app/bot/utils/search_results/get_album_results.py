@@ -5,6 +5,7 @@ from aiogram.types import (
     InputTextMessageContent
 )
 
+from app.bot.keyboards.entity_keyboard import entity_keyboard
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.models import Album
 from app.modules.musicocean_tg.utils import engine_to_prefix
@@ -24,16 +25,12 @@ async def get_album_results(
             input_message_content=InputTextMessageContent(
                 message_text=f'<b>{album.title}</b>\n<i>{album.artist_name}</i><a href="{album.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
             ),
-            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(
-                    text="Search for track",
-                    switch_inline_query_current_chat=f"{engine_to_prefix(engine)}::al::{album.id}"
-                )],
-                [InlineKeyboardButton(
-                    text="Download all tracks",
-                    url=f"https://t.me/{bot_username}?start={engine_to_prefix(engine)}_al_{album.id}"
-                )]
-            ])
+            reply_markup=entity_keyboard(
+                engine=engine,
+                bot_username=bot_username,
+                entity_id=album.id,
+                prefix="al"
+            )
 
         )
         for album in matches

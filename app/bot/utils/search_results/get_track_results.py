@@ -5,6 +5,7 @@ from aiogram.types import (
     InlineKeyboardButton, InputTextMessageContent, InlineQueryResultArticle, InlineQueryResultAudio
 )
 
+from app.bot.constants import LOADING_EMOJI_ID
 from app.config.log import get_logger
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.models import TrackPreview
@@ -22,7 +23,8 @@ async def get_track_results(
     reply_markup = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(
             text="Downloading...",
-            callback_data="x"
+            callback_data="x",
+            icon_custom_emoji_id=LOADING_EMOJI_ID
         )
     ]])
 

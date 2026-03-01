@@ -5,6 +5,7 @@ from aiogram.types import (
     InputTextMessageContent
 )
 
+from app.bot.keyboards.entity_keyboard import entity_keyboard
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.models import Playlist
 from app.modules.musicocean_tg.utils import engine_to_prefix
@@ -24,16 +25,12 @@ async def get_playlist_results(
             input_message_content=InputTextMessageContent(
                 message_text=f'<b>{playlist.title}</b>\n<i>{playlist.track_count} tracks</i><a href="{playlist.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
             ),
-            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(
-                    text="Search for track",
-                    switch_inline_query_current_chat=f"{engine_to_prefix(engine)}::pl::{playlist.id}"
-                )],
-                [InlineKeyboardButton(
-                    text="Download all tracks",
-                    url=f"https://t.me/{bot_username}?start={engine_to_prefix(engine)}_pl_{playlist.id}"
-                )]
-            ])
+            reply_markup=entity_keyboard(
+                engine=engine,
+                bot_username=bot_username,
+                entity_id=playlist.id,
+                prefix="pl"
+            )
 
         )
         for playlist in matches
