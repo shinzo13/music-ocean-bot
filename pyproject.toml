@@ -12,7 +12,6 @@ dependencies = [
     "brotli>=1.2.0",
     "curl-cffi>=0.14.0",
     "dishka~=1.7.2",
-    "playwright>=1.55.0",
     "pycryptodome~=3.23.0",
     "pydantic>=2.11.10",
     "pydantic-settings>=2.12.0",
