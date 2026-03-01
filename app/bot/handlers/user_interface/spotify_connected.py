@@ -22,7 +22,7 @@ router = Router()
         magic=F.args=="setup_scrobbling"
     )
 )
-async def spotify_connected(
+async def setup_scrobbling_handler(
         message: Message,
         user: User
 ):
@@ -38,10 +38,10 @@ async def spotify_connected(
 @router.message(
     CommandStart(
         deep_link=True,
-        magic=F.args=="spotify_connect"
+        magic=F.args=="spotify_connected"
     )
 )
-async def spotify_connected(
+async def spotify_connected_handler(
         message: Message,
         user: User,
         musicocean: FromDishka[TelegramMusicOceanClient],
