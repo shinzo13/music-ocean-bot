@@ -3,9 +3,8 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiohttp import web
 from dishka.integrations.aiogram import setup_dishka as setup_dishka_aiogram
-from dishka.integrations.aiohttp import setup_dishka as setup_dishka_aiohttp
+
 
 from app.bot.handlers import (
     inline_search,
@@ -20,7 +19,6 @@ from app.config.settings import settings
 from app.database.core import create_engine, add_env_admins
 from app.database.models.base import Base
 from app.di.container import setup_container
-from app.server.callback_endpoint import app, ssl_context
 
 setup_logging(level=settings.logging.level)
 logger = get_logger(__name__)
@@ -41,7 +39,6 @@ async def main():
 
     container = setup_container()
     setup_dishka_aiogram(container=container, router=dp, auto_inject=True)
-    setup_dishka_aiohttp(container=container, app=app, auto_inject=True)
 
     dp.update.outer_middleware(MainMiddleware())
 
