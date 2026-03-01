@@ -12,7 +12,7 @@ from app.bot.handlers import (
     process_track,
     user_interface,
     track_info,
-    admin_panel
+    admin_panel, shared
 )
 from app.bot.middlewares import MainMiddleware
 from app.config.log import setup_logging, get_logger
@@ -46,6 +46,7 @@ async def main():
     dp.update.outer_middleware(MainMiddleware())
 
     dp.include_routers(
+        *shared.routers,
         *inline_search.routers,
         *process_track.routers,
         *user_interface.routers,
