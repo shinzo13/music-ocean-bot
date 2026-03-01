@@ -19,7 +19,7 @@ router = Router()
 @router.message(
     CommandStart(
         deep_link=True,
-        #magic=F.args=="setup_scrobbling"
+        magic=F.args=="setup_scrobbling"
     )
 )
 async def spotify_connected(
