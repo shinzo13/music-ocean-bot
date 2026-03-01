@@ -20,7 +20,7 @@ from app.config.settings import settings
 from app.database.core import create_engine, add_env_admins
 from app.database.models.base import Base
 from app.di.container import setup_container
-from app.server.callback_endpoint import app
+from app.server.callback_endpoint import app, ssl_context
 
 setup_logging(level=settings.logging.level)
 logger = get_logger(__name__)
@@ -31,6 +31,7 @@ async def main():
         token=settings.bot.token.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.HTML)
     )
+    bot_username = (await bot.get_me()).username
     dp = Dispatcher()
 
     engine = create_engine(settings.database.url)
@@ -52,11 +53,17 @@ async def main():
         *admin_panel.routers
     )
 
+    app["bot_username"] = bot_username
     runner = web.AppRunner(app)
 
     try:
         await runner.setup()
-        await web.TCPSite(runner, "0.0.0.0", 8080).start()
+        await web.TCPSite(
+            runner,
+            "0.0.0.0",
+            443,
+            ssl_context=ssl_context
+        ).start()
         await dp.start_polling(bot)
     finally:
         await container.close()

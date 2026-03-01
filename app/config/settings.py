@@ -34,6 +34,8 @@ class BotSettings(BaseSettings):
 
 class ServerSettings(BaseSettings):
     domain: str
+    certfile_path: str
+    keyfile_path: str
 
 class TelegramSettings(BaseSettings):
     admins: list[int]
