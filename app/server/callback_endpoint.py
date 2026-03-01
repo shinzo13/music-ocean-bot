@@ -3,7 +3,10 @@ from aiohttp import web
 from dishka.integrations.aiohttp import FromDishka
 
 from app.config import settings
+from app.config.log import get_logger
 from app.database.repositories import UserRepository, DynamicSettingsRepository
+
+logger = get_logger(__name__)
 
 router = web.RouteTableDef()
 
@@ -19,10 +22,12 @@ async def spotify_callback(
     if not code or not state:
         return web.Response(status=400)
 
-    await user_repo.update_user_settings(
+    user = await user_repo.update_user_settings(
         user_id=int(state),
         spotify__connection_code=code
     )
+
+    logger.debug(f"{user=}")
 
     bot_username = (await dynamic_settings_repo.get()).bot_username
     raise web.HTTPFound(location=f"https://t.me/{bot_username}?start=spotify_connected")
