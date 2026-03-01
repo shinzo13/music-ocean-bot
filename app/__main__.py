@@ -31,7 +31,7 @@ async def main():
         token=settings.bot.token.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.HTML)
     )
-    bot_username = (await bot.get_me()).username
+    settings.bot.username = (await bot.get_me()).username
     dp = Dispatcher()
 
     engine = create_engine(settings.database.url)
@@ -54,17 +54,7 @@ async def main():
         *admin_panel.routers
     )
 
-    app["bot_username"] = bot_username
-    runner = web.AppRunner(app)
-
     try:
-        await runner.setup()
-        await web.TCPSite(
-            runner,
-            "0.0.0.0",
-            443,
-            ssl_context=ssl_context
-        ).start()
         await dp.start_polling(bot)
     finally:
         await container.close()
