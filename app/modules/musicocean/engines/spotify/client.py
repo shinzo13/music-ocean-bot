@@ -267,12 +267,14 @@ class SpotifyClient:
         data, user_access_token = await self._user_get(
             user_access_token, refresh_token, "me/player/currently-playing"
         )
+        logger.debug(f"now playing: {data}")
         if data and data.get("item") and data.get("is_playing"):
             return SpotifyTrackPreview.from_dict(data["item"]), user_access_token
 
         data, user_access_token = await self._user_get(
             user_access_token, refresh_token, "me/player/recently-played", limit=1
         )
+        logger.debug(f"recently played: {data}")
         if not data or not data.get("items"):
             return None, user_access_token
 
