@@ -32,6 +32,11 @@ class TrackSettings(BaseSettings):
 class BotSettings(BaseSettings):
     token: SecretStr
 
+class ServerSettings(BaseSettings):
+    domain: str
+    certfile_path: str
+    keyfile_path: str
+
 class TelegramSettings(BaseSettings):
     admins: list[int]
     channel_id: int
@@ -60,6 +65,7 @@ class Settings(BaseSettings):
     logging: LoggingSettings
     tracks: TrackSettings
     bot: BotSettings
+    server: ServerSettings
     telegram: TelegramSettings
     deezer: DeezerSettings
     spotify: SpotifySettings

@@ -50,5 +50,24 @@ async def spotify_connected_handler(
         musicocean: FromDishka[TelegramMusicOceanClient],
         user_repo: FromDishka[UserRepository]
 ):
-    ...
-# TODO
+    await message.delete()
+    if user.settings.spotify.enabled:
+        await message.answer("already connected tf are you doing")
+        return
+    if not user.settings.spotify.connection_code:
+        await message.answer("smth went wrong")
+        return
+
+    access_token, refresh_token = await musicocean.exchange_spotify_code(
+        user.settings.spotify.connection_code,
+        f"https://{settings.server.domain}/spotify"
+    )
+
+    await user_repo.update_user_settings(
+        user_id=user.user_id,
+        spotify__enabled=True,
+        spotify__access_token=access_token,
+        spotify__refresh_token=refresh_token
+    )
+
+    await message.answer("ok")

@@ -97,7 +97,6 @@ async def spotify_scrobbling_handler(
         )
         return
 
-    # TODO change text
     await callback.message.edit_text(
         f"<b>Spotify scrobbling</b>\n\nLog in into your Spotify account and get ability to quickly download tracks from your player.",
         reply_markup=oauth_scrobbling_keyboard(user.user_id)
