@@ -30,7 +30,7 @@ async def setup_scrobbling_handler(
         user: User
 ):
     await message.delete()
-    if user.settings.spotify.enabled:
+    if user.settings.lastfm.enabled:
         await message.answer("already connected tf are you doing")
         return
     await message.answer(
@@ -41,20 +41,20 @@ async def setup_scrobbling_handler(
 @router.message(
     CommandStart(
         deep_link=True,
-        magic=F.args=="spotify_connected"
+        magic=F.args=="lastfm_auth"
     )
 )
-async def spotify_connected_handler(
+async def lastfm_auth_handler(
         message: Message,
         user: User,
         musicocean: FromDishka[TelegramMusicOceanClient],
         user_repo: FromDishka[UserRepository]
 ):
     await message.delete()
-    if user.settings.spotify.enabled:
+    if user.settings.lastfm.enabled:
         await message.answer("already connected tf are you doing")
         return
-    if not user.settings.spotify.connection_code:
+    if not user.settings.lastfm.connection_code:
         await message.answer("smth went wrong")
         return
 
@@ -65,8 +65,8 @@ async def spotify_connected_handler(
 
     await user_repo.update_user_settings(
         user_id=user.user_id,
-        spotify__enabled=True,
-        spotify__access_token=access_token,
+        lastfm__enabled=True,
+        lastfm__auth_token=access_token,
         spotify__refresh_token=refresh_token
     )
 

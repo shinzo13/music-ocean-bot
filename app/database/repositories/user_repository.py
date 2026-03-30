@@ -52,10 +52,9 @@ class UserRepository:
             user_id: int,
             selected_engine: Optional[Engine] = None,
             track_preview_covers: Optional[bool] = None,
-            spotify__enabled: Optional[bool] = None,
-            spotify__connection_code: Optional[str] = None,
-            spotify__access_token: Optional[str] = None,
-            spotify__refresh_token: Optional[str] = None,
+            lastfm__enabled: Optional[bool] = None,
+            lastfm__auth_token: Optional[str] = None,
+            lastfm__session_key: Optional[str] = None
     ) -> Optional[User]:
         user = await self.get_user_by_id(user_id)
         if user is None:
@@ -65,14 +64,12 @@ class UserRepository:
             user.settings.selected_engine = selected_engine
         if track_preview_covers is not None:
             user.settings.track_preview_covers = track_preview_covers
-        if spotify__enabled is not None:
-            user.settings.spotify.enabled = spotify__enabled
-        if spotify__connection_code is not None:
-            user.settings.spotify.connection_code = spotify__connection_code
-        if spotify__access_token is not None:
-            user.settings.spotify.access_token = spotify__access_token
-        if spotify__refresh_token is not None:
-            user.settings.spotify.refresh_token = spotify__refresh_token
+        if lastfm__enabled is not None:
+            user.settings.lastfm.enabled = lastfm__enabled
+        if lastfm__auth_token is not None:
+            user.settings.lastfm.connection_code = lastfm__auth_token
+        if lastfm__session_key is not None:
+            user.settings.lastfm.session_key = lastfm__session_key
 
         flag_modified(user, 'settings')
         await self.session.commit()

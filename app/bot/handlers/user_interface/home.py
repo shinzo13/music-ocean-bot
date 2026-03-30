@@ -10,13 +10,13 @@ router = Router()
 @router.message(CommandStart(deep_link=False))
 async def main_menu(message: Message, user: User):
     await message.answer(
-        text=f"Welcome to Music Ocean!",
+        text=f"Welcome to <b>Music Ocean!</b> 🌊",
         reply_markup=home_keyboard(user.is_admin)
     )
 
 @router.callback_query(F.data=="main_menu")
 async def main_menu(callback: CallbackQuery, user: User):
     await callback.message.edit_text(
-        text="Welcome to Music Ocean!",
+        text="Welcome to <b>Music Ocean!</b> 🌊",
         reply_markup=home_keyboard(user.is_admin)
     )

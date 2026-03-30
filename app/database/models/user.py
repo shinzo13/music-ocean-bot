@@ -12,18 +12,17 @@ if TYPE_CHECKING:
     from app.database.models import BaseTrack
 
 
-class SpotifySettings(BaseModel):
+class LastfmSettings(BaseModel):
     enabled: bool = False
-    connection_code: Optional[str] = None
-    access_token: Optional[str] = None
-    refresh_token: Optional[str] = None
+    auth_token: Optional[str] = None
+    session_key: Optional[str] = None
 
 class UserSettings(BaseModel):
 
     selected_engine: Engine = Engine.DEEZER
     track_preview_covers: bool = True
 
-    spotify: SpotifySettings = SpotifySettings()
+    lastfm: LastfmSettings = LastfmSettings()
 
 class User(Base, TimestampMixin, IntIDMixin):
     __tablename__ = "users"
