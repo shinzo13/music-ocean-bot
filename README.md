@@ -1,7 +1,5 @@
 # 🌊 Music Ocean Bot
 
----
-
 [![Python](https://img.shields.io/badge/python-3.12-blue?logo=python)](https://python.org)
 [![aiogram](https://img.shields.io/badge/aiogram-3.x-2CA5E0?logo=telegram)](https://aiogram.dev)
 [![Status](https://img.shields.io/badge/status-WIP-orange)](https://github.com/)
