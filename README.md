@@ -1,14 +1,16 @@
-# Music Ocean Bot
+# 🌊 Music Ocean Bot
 
 ---
 
-<img src="https://img.shields.io/badge/python-3.12-blue?logo=python" />
-<img src="https://img.shields.io/badge/aiogram-3.x-2CA5E0?logo=telegram" />
-<img src="https://img.shields.io/badge/status-WIP-orange" />
+[![Python](https://img.shields.io/badge/python-3.12-blue?logo=python)](https://python.org)
+[![aiogram](https://img.shields.io/badge/aiogram-3.x-2CA5E0?logo=telegram)](https://aiogram.dev)
+[![Status](https://img.shields.io/badge/status-WIP-orange)](https://github.com/)
 
 Telegram inline-moded bot for fast searching & downloading music from different sources.
 
 Project demo: [@koshke2bot](koshke2bot.t.me)
+
+<img src="assets/usage_example.gif"  width="400" alt="demo"/>
 
 ## Features
 - Supported musical services: **Spotify**, **YTMusic**, **SoundCloud**, **Deezer**.
