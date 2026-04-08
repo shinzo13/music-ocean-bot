@@ -163,6 +163,7 @@ class SoundCloudClient:
         raw_data = await self._api_request(
             method=SoundCloudAPIMethod.GET_TRACK,
             path=str(track_id),
+            antibot=True
         )
 
         track = SoundCloudTrack.from_dict(raw_data)
