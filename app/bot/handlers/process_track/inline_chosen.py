@@ -53,10 +53,10 @@ async def idklol(
         logger.info(f"Successfully sent cached track #{chosen.result_id}")
         return
 
-    file_id = await musicocean.download_track(
+    file_id = (await musicocean.download_track(
         engine=engine,
         track_id=entity_id,
-    )
+    )).file_id
     logger.debug(f"got file id: {file_id}")
     await bot.edit_message_media(
         media=InputMediaAudio(media=file_id),
