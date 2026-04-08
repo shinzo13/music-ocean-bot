@@ -51,6 +51,8 @@ class SpotifySettings(BaseSettings):
     client_id: SecretStr
     client_secret: SecretStr
 
+class LastfmSettings(BaseSettings):
+    api_key: SecretStr
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -69,6 +71,7 @@ class Settings(BaseSettings):
     telegram: TelegramSettings
     deezer: DeezerSettings
     spotify: SpotifySettings
+    lastfm: LastfmSettings
     database: DatabaseSettings
 
 

@@ -154,35 +154,6 @@ class SpotifyClient:
 
         return data
 
-    async def _user_get(
-        self,
-        user_access_token: str,
-        refresh_token: str,
-        path: str,
-        **params,
-    ) -> tuple[dict | None, str]:
-        async with self.session.get(
-            f"{SPOTIFY_API_BASE}/{path}",
-            headers={"Authorization": f"Bearer {user_access_token}"},
-            params={k: v for k, v in params.items() if v is not None},
-        ) as resp:
-            if resp.status == 204:
-                return None, user_access_token
-            data = await resp.json()
-
-        if "error" in data and data["error"].get("status") == 401:
-            logger.info("Spotify user token expired, refreshing...")
-            user_access_token = await self.refresh_user_token(refresh_token)
-            async with self.session.get(
-                f"{SPOTIFY_API_BASE}/{path}",
-                headers={"Authorization": f"Bearer {user_access_token}"},
-                params={k: v for k, v in params.items() if v is not None},
-            ) as resp:
-                if resp.status == 204:
-                    return None, user_access_token
-                data = await resp.json()
-
-        return data, user_access_token
 
     async def _search(self, query: str, search_type: SpotifySearchType) -> list[dict]:
         data = await self._get(
@@ -258,47 +229,6 @@ class SpotifyClient:
     async def get_artist_tracks(self, artist_id: str) -> list[SpotifyTrackPreview]:
         data = await self._get(f"artists/{artist_id}/top-tracks", limit=10)
         return [SpotifyTrackPreview.from_dict(item) for item in data["tracks"]]
-
-    async def get_last_track(
-        self,
-        user_access_token: str,
-        refresh_token: str,
-    ) -> tuple[SpotifyTrackPreview | None, str]:
-        data, user_access_token = await self._user_get(
-            user_access_token, refresh_token, "me/player/currently-playing"
-        )
-        logger.debug(f"now playing: {data}")
-        if data and data.get("item") and data.get("is_playing"):
-            return SpotifyTrackPreview.from_dict(data["item"]), user_access_token
-
-        data, user_access_token = await self._user_get(
-            user_access_token, refresh_token, "me/player/recently-played", limit=1
-        )
-        logger.debug(f"recently played: {data}")
-        if not data or not data.get("items"):
-            return None, user_access_token
-
-        last = data["items"][0]
-        played_at = datetime.fromisoformat(last["played_at"].replace("Z", "+00:00"))
-        if datetime.now(timezone.utc) - played_at > timedelta(minutes=5):
-            return None, user_access_token
-
-        return SpotifyTrackPreview.from_dict(last["track"]), user_access_token
-
-    async def get_recently_played(
-        self,
-        user_access_token: str,
-        refresh_token: str,
-    ) -> tuple[list[SpotifyTrackPreview], str]:
-        data, user_access_token = await self._user_get(
-            user_access_token, refresh_token, "me/player/recently-played", limit=50
-        )
-        if not data or not data.get("items"):
-            return [], user_access_token
-        return (
-            [SpotifyTrackPreview.from_dict(item["track"]) for item in data["items"]],
-            user_access_token,
-        )
 
     async def download_track(
         self,

@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from app.bot.constants import SPOTIFY_EMOJI_ID
-from app.bot.utils.get_spotify_auth_url import get_spotify_auth_url
+from app.bot.utils.get_lastfm_auth_url import get_lastfm_auth_url
 
 
 def scrobbling_setup_keyboard(bot_username: str):
@@ -14,7 +14,7 @@ def scrobbling_setup_keyboard(bot_username: str):
     ]])
 
 def oauth_scrobbling_keyboard(user_id: int):
-    url = get_spotify_auth_url(user_id)
+    url = get_lastfm_auth_url(user_id)
     return InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(
             text="Log in to Spotify",

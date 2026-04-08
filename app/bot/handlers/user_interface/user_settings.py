@@ -91,7 +91,7 @@ async def spotify_scrobbling_handler(
         callback: CallbackQuery,
         user: User
 ):
-    if user.settings.spotify.enabled:
+    if user.settings.lastfm.enabled:
         await callback.message.edit_text(
             "already" # TODO
         )

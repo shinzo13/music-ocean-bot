@@ -21,17 +21,12 @@ async def inline_query(
         musicocean: FromDishka[TelegramMusicOceanClient],
 ):
     logger.info(f"User #{query.from_user.id}: empty search query")
-    if not user.settings.spotify.enabled:
+    if not user.settings.lastfm.enabled:
         await query.answer(setup_scrobbling_result(
             (await bot.get_me()).username
         ))
 
-    # todo saving updated refresh_token
-    # but probably in other way..
-    track, _ = await musicocean.get_spotify_last_track(
-        user.settings.spotify.access_token,
-        user.settings.spotify.refresh_token
-    )
+    return # todo lastfm
 
     if not track:
         return
