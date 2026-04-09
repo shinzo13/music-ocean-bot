@@ -18,7 +18,19 @@ Project demo: [@koshke2bot](koshke2bot.t.me)
 - **ID3 tags** support: all downloaded media has proper ready-to-go ID3 tags.
 - 
 
-## Installation
+## Setup
+
+### Telegram
+Firstly, you need to set up your Telegram environment:
+1. Create **main bot** in [@BotFather](https://t.me/BotFather).
+2. Change these bot's settings: 
+   - `Inline Mode`: `on`
+   - `Inline Feedback`: `100%`
+   - `Group privacy`: `off`
+3. Create **channel** that will act like database to the bot. You should give it admin rights to post messages.
+4. _Optionally (but highly recommended)_, you can create **_"workers"_** that will help the main bot to download large albums & playlists. Each TG bot has a ratelimit of 20 messages per minute to 1 chat, so the more workers you have the more tracks at one time you can download!
+
+### .env configuration
 ```bash
 cp .env.example .env
 # fill the .env file
@@ -43,9 +55,8 @@ Here is some notes about several `.env` variables:
 | `SPOTIFY__CLIENT_SECRET` | _`client_secret` of registered Spotify app. Can be obtained on [Spotify for Developers](https://developer.spotify.com/dashboard) dashboard._ |
 
 
-### Running application:
+### Run
 ```bash
-# заполни .env
 docker compose up --build
 ```
 
