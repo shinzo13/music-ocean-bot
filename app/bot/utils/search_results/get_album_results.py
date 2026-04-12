@@ -1,3 +1,5 @@
+import html
+
 from aiogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -25,7 +27,7 @@ async def get_album_results(
             description=album.artist_name,
             thumbnail_url=album.cover_url,
             input_message_content=InputTextMessageContent(
-                message_text=f'{emoji}<b>{album.title}</b>\n<i>{album.artist_name}</i><a href="{album.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
+                message_text=f'{emoji}<b>{html.escape(album.title)}</b>\n<i>{html.escape(album.artist_name)}</i><a href="{album.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
             ),
             reply_markup=entity_keyboard(
                 engine=engine,

@@ -1,3 +1,5 @@
+import html
+
 from aiogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -22,7 +24,7 @@ async def get_artist_results(
             description=f"{artist.listeners} listeners",
             thumbnail_url=artist.photo_url,
             input_message_content=InputTextMessageContent(
-                message_text=f'<b>{artist.name}</b>\n<i>{artist.listeners} listeners</i><a href="{artist.photo_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
+                message_text=f'<b>{html.escape(artist.name)}</b>\n<i>{artist.listeners} listeners</i><a href="{artist.photo_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
             ),
             reply_markup=entity_keyboard(
                 engine=engine,

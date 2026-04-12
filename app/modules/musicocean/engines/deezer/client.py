@@ -122,7 +122,7 @@ class DeezerClient:
             method=DeezerAPIMethod.SEARCH_PLAYLISTS,
             q=query
         )
-        return [DeezerPlaylist.from_api(raw_playlist) for raw_playlist in raw_data]
+        return [DeezerPlaylist.from_dict(raw_playlist) for raw_playlist in raw_data]
 
     async def search_artists(self, query: str) -> list[DeezerArtist]:
         raw_data = await self._api_request(

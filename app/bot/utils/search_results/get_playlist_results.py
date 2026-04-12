@@ -1,3 +1,5 @@
+import html
+
 from aiogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -23,7 +25,7 @@ async def get_playlist_results(
             description=f"{playlist.track_count} tracks",  # TODO maybe author instead
             thumbnail_url=playlist.cover_url,
             input_message_content=InputTextMessageContent(
-                message_text=f'<b>{playlist.title}</b>\n<i>{playlist.track_count} tracks</i><a href="{playlist.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
+                message_text=f'<b>{html.escape(playlist.title)}</b>\n<i>{playlist.track_count} tracks</i><a href="{playlist.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
             ),
             reply_markup=entity_keyboard(
                 engine=engine,
