@@ -7,6 +7,7 @@ from dishka import FromDishka
 
 from app.bot.utils.get_engine_emoji import get_engine_emoji
 from app.database.repositories import TrackRepository
+from app.modules.musicocean.enums import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 from app.modules.musicocean_tg.utils import prefix_to_engine
 
@@ -16,7 +17,7 @@ router = Router()
 @router.message(
     CommandStart(
         deep_link=True,
-        magic=F.args.regexp(r'^(dz|sc|yt|sp)_(al|pl|ar)_(\d+)$').as_("deeplink_match")
+        magic=F.args.regexp(r'^(dz|sc|yt|sp)_(al|pl|ar)_([\w-]+)$').as_("deeplink_match")
     )
 )
 async def handle_deeplink(
@@ -27,13 +28,16 @@ async def handle_deeplink(
 ):
     engine_prefix = deeplink_match.group(1)
     entity_type = deeplink_match.group(2)
-    entity_id = int(deeplink_match.group(3))
+    entity_id = deeplink_match.group(3)
 
     try:
         engine = prefix_to_engine(engine_prefix)
     except ValueError:
         await message.answer("invalid link")
         return
+
+    if engine in (Engine.DEEZER, Engine.SOUNDCLOUD):
+        entity_id = int(entity_id)
 
     engine_emoji = get_engine_emoji(engine)
 
@@ -71,6 +75,3 @@ async def handle_deeplink(
                 telegram_file_id=track.file_id,
                 user_id=message.from_user.id,
             )
-
-
-
