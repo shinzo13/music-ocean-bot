@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from aiohttp import ClientSession
 
 from app.config.log import get_logger
+from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
 from app.modules.musicocean.engines.spotify.constants import (
     SPOTIFY_API_BASE,
     SPOTIFY_TOKEN_URL
@@ -28,7 +29,7 @@ from app.modules.musicocean.engines.youtube.models.youtube_track import YoutubeT
 logger = get_logger(__name__)
 
 
-class SpotifyClient:
+class SpotifyClient(BaseEngineClient):
 
     def __init__(
         self,

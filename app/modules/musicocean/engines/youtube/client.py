@@ -8,8 +8,12 @@ from aiohttp import ClientSession
 from pytubefix import AsyncYouTube
 
 from app.config.log import get_logger
+from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
 from app.modules.musicocean.engines.youtube.constants import HEADERS, YTM_DOMAIN, YTM_BASE_API
 from app.modules.musicocean.engines.youtube.enums.api_method import YoutubeAPIMethod
+from app.modules.musicocean.engines.youtube.models.youtube_album import YoutubeAlbum
+from app.modules.musicocean.engines.youtube.models.youtube_artist import YoutubeArtist
+from app.modules.musicocean.engines.youtube.models.youtube_playlist import YoutubePlaylist
 from app.modules.musicocean.engines.youtube.models.youtube_track import YoutubeTrack
 from app.modules.musicocean.engines.youtube.models.youtube_track_preview import YoutubeTrackPreview
 from app.modules.musicocean.engines.youtube.utils import initialize_context
@@ -20,7 +24,7 @@ from app.modules.musicocean.utils import write_id3
 
 logger = get_logger(__name__)
 
-class YoutubeClient:
+class YoutubeClient(BaseEngineClient):
     session: ClientSession | None
 
     def __init__(self):
@@ -104,6 +108,32 @@ class YoutubeClient:
             return None
         return matches[0]
 
+    async def search_albums(self, query: str) -> list[YoutubeAlbum]:
+        pass
+
+    async def search_playlists(self, query: str) -> list[YoutubePlaylist]:
+        pass
+
+    async def search_artists(self, query: str) -> list[YoutubeArtist]:
+        pass
+
+    async def get_album(self, album_id: int):
+        pass
+
+    async def get_playlist(self, playlist_id: int):
+        pass
+
+    async def get_album_tracks(self, album_id: int):
+        pass
+
+    async def get_artist(self, artist_id: int):
+        pass
+
+    async def get_artist_tracks(self, artist_id: int):
+        pass
+
+    async def get_playlist_tracks(self, playlist_id: int):
+        pass
 
     async def download_track(
             self,
@@ -138,3 +168,6 @@ class YoutubeClient:
         # )
 
         return track
+
+    async def close(self):
+        pass

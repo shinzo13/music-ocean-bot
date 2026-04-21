@@ -11,6 +11,7 @@ from app.modules.musicocean.engines.deezer.exceptions import DeezerDataException
 from app.modules.musicocean.engines.deezer.models import DeezerTrack, DeezerTrackPreview, DeezerAlbum, DeezerPlaylist, \
     DeezerArtist
 from app.modules.musicocean.engines.deezer.utils import decrypt_track, get_arl
+from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
 from app.modules.musicocean.enums import Engine
 from app.modules.musicocean.enums.entity_type import EntityType
 from app.modules.musicocean.utils import write_id3
@@ -18,7 +19,7 @@ from app.modules.musicocean.utils import write_id3
 logger = get_logger(__name__)
 
 
-class DeezerClient:
+class DeezerClient(BaseEngineClient):
     def __init__(
             self,
             login: str,
@@ -176,7 +177,7 @@ class DeezerClient:
                     'license_token': self.license_token,
                     'media': [{'type': "FULL", "formats": [{
                         "cipher": "BF_CBC_STRIPE",
-                        "format": "MP3_128"  # TODO
+                        "format": "MP3_320"  # TODO
                     }]}],
                     'track_tokens': [track_token]
                 }

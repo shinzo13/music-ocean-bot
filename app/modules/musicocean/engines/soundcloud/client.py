@@ -4,6 +4,7 @@ from typing import Optional
 from aiohttp import ClientSession
 from curl_cffi.requests import AsyncSession
 
+from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
 from app.modules.musicocean.engines.soundcloud.constants import API_URL, HEADERS
 from app.modules.musicocean.engines.soundcloud.enums.api_method import SoundCloudAPIMethod
 from app.modules.musicocean.engines.soundcloud.models import (
@@ -17,7 +18,7 @@ from app.modules.musicocean.enums import Engine
 from app.modules.musicocean.utils import write_id3
 from app.config.settings import settings
 
-class SoundCloudClient:
+class SoundCloudClient(BaseEngineClient):
     session: ClientSession | None
     antibot_session: AsyncSession | None
     client_id: str | None
