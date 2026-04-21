@@ -1,8 +1,6 @@
 import html
 
 from aiogram.types import (
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
     InlineQueryResultArticle,
     InputTextMessageContent
 )
@@ -10,13 +8,13 @@ from aiogram.types import (
 from app.bot.keyboards.entity_keyboard import entity_keyboard
 from app.bot.utils.get_engine_emoji import get_engine_emoji
 from app.modules.musicocean.enums.engine import Engine
-from app.modules.musicocean.models import Album
+from app.modules.musicocean.engines.shared.models import BaseAlbum
 from app.modules.musicocean_tg.utils import engine_to_prefix
 
 
 async def get_album_results(
         engine: Engine,
-        matches: list[Album],
+        matches: list[BaseAlbum],
         bot_username: str
 ):
     emoji = get_engine_emoji(engine)

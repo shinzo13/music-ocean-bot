@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class Album(BaseModel):
+class BaseAlbum(BaseModel):
     id: int | str
     title: str
     artist_name: str

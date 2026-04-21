@@ -1,10 +1,10 @@
 from typing import Optional
 
 from app.modules.musicocean.engines.deezer.constants import COVER_URL
-from app.modules.musicocean.models import Track
+from app.modules.musicocean.engines.shared.models import BaseTrack
 
 
-class DeezerTrack(Track):
+class DeezerTrack(BaseTrack):
     track_token: Optional[str] = None
     duration: Optional[int] = None
 

@@ -1,8 +1,8 @@
 from app.modules.musicocean.engines.soundcloud.utils import format_cover_url
-from app.modules.musicocean.models import TrackPreview
+from app.modules.musicocean.engines.shared.models import BaseTrackPreview
 
 
-class SoundCloudTrackPreview(TrackPreview):
+class SoundCloudTrackPreview(BaseTrackPreview):
 
     @classmethod
     def from_dict(cls, data: dict):

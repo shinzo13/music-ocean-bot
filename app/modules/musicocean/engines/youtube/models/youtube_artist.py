@@ -1,5 +1,5 @@
-from app.modules.musicocean.models import Artist
+from app.modules.musicocean.engines.shared.models import BaseArtist
 
 
-class YoutubeArtist(Artist):
+class YoutubeArtist(BaseArtist):
     ...

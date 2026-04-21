@@ -1,7 +1,7 @@
-from app.modules.musicocean.models import Artist
+from app.modules.musicocean.engines.shared.models import BaseArtist
 
 
-class SpotifyArtist(Artist):
+class SpotifyArtist(BaseArtist):
     id: str
 
     @classmethod

@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class Playlist(BaseModel):
+class BasePlaylist(BaseModel):
     id: int | str
     title: str
     cover_url: str

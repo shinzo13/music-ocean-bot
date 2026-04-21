@@ -1,8 +1,8 @@
 from app.modules.musicocean.engines.deezer.constants import COVER_URL
-from app.modules.musicocean.models import TrackPreview
+from app.modules.musicocean.engines.shared.models import BaseTrackPreview
 
 
-class DeezerTrackPreview(TrackPreview):
+class DeezerTrackPreview(BaseTrackPreview):
 
     @classmethod
     def from_dict(cls, data: dict):

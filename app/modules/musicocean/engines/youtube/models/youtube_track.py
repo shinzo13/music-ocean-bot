@@ -1,6 +1,6 @@
-from app.modules.musicocean.models import Track
+from app.modules.musicocean.engines.shared.models import BaseTrack
 
 
-class YoutubeTrack(Track):
+class YoutubeTrack(BaseTrack):
     id: str
 

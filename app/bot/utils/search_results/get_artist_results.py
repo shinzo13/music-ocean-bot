@@ -1,21 +1,19 @@
 import html
 
 from aiogram.types import (
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
     InlineQueryResultArticle,
     InputTextMessageContent
 )
 
 from app.bot.keyboards.entity_keyboard import entity_keyboard
 from app.modules.musicocean.enums.engine import Engine
-from app.modules.musicocean.models import Artist
+from app.modules.musicocean.engines.shared.models import BaseArtist
 from app.modules.musicocean_tg.utils import engine_to_prefix
 
 
 async def get_artist_results(
         engine: Engine,
-        matches: list[Artist]
+        matches: list[BaseArtist]
 , bot_username=None):
     return [
         InlineQueryResultArticle(

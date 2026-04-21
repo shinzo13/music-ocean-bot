@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 # TODO!! use Track only as MO-ready class, delete in-engine fields
 
-class Track(BaseModel):
+class BaseTrack(BaseModel):
     """
     Basic Track model. Contains all the information needed to properly download a track.
     """

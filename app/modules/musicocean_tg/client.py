@@ -9,7 +9,7 @@ from aiogram.types import BufferedInputFile, URLInputFile, Message
 from app.database.repositories import TrackRepository
 from app.modules.musicocean.client import MusicOceanClient
 from app.modules.musicocean.enums.engine import Engine
-from app.modules.musicocean.models import TrackPreview
+from app.modules.musicocean.engines.shared.models import BaseTrackPreview
 from app.modules.musicocean_tg.models.cached_track import CachedTrack
 from app.modules.musicocean_tg.utils import engine_to_prefix
 from app.modules.musicocean_tg.worker import TelegramWorker
@@ -80,7 +80,7 @@ class TelegramMusicOceanClient(MusicOceanClient):
     async def download_tracks(
             self,
             engine: Engine,
-            tracks: list[TrackPreview],
+            tracks: list[BaseTrackPreview],
             track_repo: TrackRepository
     ) -> AsyncGenerator[CachedTrack, None]:
         #tracks.reverse()

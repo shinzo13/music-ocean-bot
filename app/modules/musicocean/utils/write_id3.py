@@ -2,10 +2,10 @@ import struct
 from typing import Optional
 
 from app.modules.musicocean.enums import Engine
-from app.modules.musicocean.models import Track
+from app.modules.musicocean.engines.shared.models import BaseTrack
 
 async def write_id3(
-        track: Track,
+        track: BaseTrack,
         source: bytes,
         engine: Engine,
         watermark: Optional[str]

@@ -1,8 +1,8 @@
 from app.modules.musicocean.engines.soundcloud.utils import format_cover_url
-from app.modules.musicocean.models import Artist
+from app.modules.musicocean.engines.shared.models import BaseArtist
 
 
-class SoundCloudArtist(Artist):
+class SoundCloudArtist(BaseArtist):
 
     @classmethod
     def from_dict(cls, data: dict):

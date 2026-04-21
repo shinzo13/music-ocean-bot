@@ -1,7 +1,7 @@
-from app.modules.musicocean.models import Artist
+from app.modules.musicocean.engines.shared.models import BaseArtist
 
 
-class DeezerArtist(Artist):
+class DeezerArtist(BaseArtist):
 
     @classmethod
     def from_dict(cls, data: dict):

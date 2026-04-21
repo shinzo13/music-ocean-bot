@@ -1,5 +1,5 @@
-from app.modules.musicocean.models import Playlist
+from app.modules.musicocean.engines.shared.models import BasePlaylist
 
 
-class YoutubePlaylist(Playlist):
+class YoutubePlaylist(BasePlaylist):
     ...

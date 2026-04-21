@@ -1,9 +1,9 @@
 from typing import Optional
 
-from app.modules.musicocean.models import TrackPreview
+from app.modules.musicocean.engines.shared.models import BaseTrackPreview
 
 
-class YoutubeTrackPreview(TrackPreview):
+class YoutubeTrackPreview(BaseTrackPreview):
     id: str
     title: str
     artist_name: str

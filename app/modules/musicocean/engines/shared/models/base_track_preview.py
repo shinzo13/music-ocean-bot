@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class TrackPreview(BaseModel):
+class BaseTrackPreview(BaseModel):
     id: int | str
     title: str
     artist_name: str

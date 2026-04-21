@@ -1,7 +1,7 @@
-from app.modules.musicocean.models import TrackPreview
+from app.modules.musicocean.engines.shared.models import BaseTrackPreview
 
 
-class SpotifyTrackPreview(TrackPreview):
+class SpotifyTrackPreview(BaseTrackPreview):
     id: str
 
     @classmethod
