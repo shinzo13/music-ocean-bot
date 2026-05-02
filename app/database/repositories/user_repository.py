@@ -1,6 +1,6 @@
 import csv
 import io
-from typing import Optional
+from typing import Optional, Generator, AsyncGenerator
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,10 +32,10 @@ class UserRepository:
         logger.info(f"Added user: {user}")
         return user
 
-    async def update_user(self, user_id: int, **kwargs) -> Optional[User]:
+    async def update_user(self, user_id: int, **kwargs) -> User:
         user = await self.get_user_by_id(user_id)
         if user is None:
-            return None
+            raise
 
         for key, value in kwargs.items():
             if key == "settings":
@@ -55,10 +55,10 @@ class UserRepository:
             lastfm__enabled: Optional[bool] = None,
             lastfm__auth_token: Optional[str] = None,
             lastfm__session_key: Optional[str] = None
-    ) -> Optional[User]:
+    ) -> User:
         user = await self.get_user_by_id(user_id)
         if user is None:
-            return None
+            raise
 
         if selected_engine is not None:
             user.settings.selected_engine = selected_engine
@@ -96,6 +96,18 @@ class UserRepository:
 
         return user.downloaded_tracks
 
+    async def get_all_users(self, for_mailing: bool = False) -> AsyncGenerator[User | int, None]:
+        if not for_mailing:
+            result = await self.session.execute(select(User))
+        else:
+            result = await self.session.execute(
+                select(User.user_id)
+                .where(User.is_dm==True)
+            )
+        for user in result.scalars().all():
+            yield user
+
+
     async def export_to_csv(self) -> bytes:
         result = await self.session.execute(select(User))
         users = result.scalars().all()
@@ -104,6 +116,7 @@ class UserRepository:
 
         writer.writerow([
             'user_id',
+            'is_dm'
             'is_admin',
             'is_banned',
             'selected_engine',
@@ -113,6 +126,7 @@ class UserRepository:
         for user in users:
             writer.writerow([
                 user.user_id,
+                user.is_dm,
                 user.is_admin,
                 user.is_banned,
                 user.settings.selected_engine.value,

@@ -24,12 +24,14 @@ class MainMiddleware(BaseMiddleware):
         if tg_user is None:
             return await handler(event, data)
 
-        db_user: Optional[DatabaseUser] = await user_repo.get_user_by_id(tg_user.id)
-        if db_user is None:
-            db_user = await user_repo.add_user(user_id=tg_user.id)
+        db_user: DatabaseUser =  await user_repo.get_user_by_id(tg_user.id) \
+                                 or await user_repo.add_user(user_id=tg_user.id)
 
         if db_user.is_banned:
             return None
+
+        if not db_user.is_dm:
+            await user_repo.update_user(db_user.user_id, is_dm=True)
 
         data["user"] = db_user
 
