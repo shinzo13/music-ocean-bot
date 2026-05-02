@@ -36,7 +36,7 @@ async def main():
         await conn.run_sync(Base.metadata.create_all)
 
     bot_username = (await bot.get_me()).username
-    await initialize_dynamic_settings(
+    await initialize_dynamic_settings( # todo not sure is this still needed
         engine,
         bot_username=bot_username
     )

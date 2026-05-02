@@ -1,22 +1,8 @@
 services:
   bot:
     build: .
-    command: uv run python -m app
     env_file:
       - .env
-    depends_on:
-      - postgres
-    restart: no
-
-  server:
-    build: .
-    command: uv run python -m app.server
-    ports:
-      - "443:443"
-    env_file:
-      - .env
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - postgres
     restart: no
