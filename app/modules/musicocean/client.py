@@ -15,6 +15,7 @@ from app.modules.musicocean.engines.spotify.client import SpotifyClient
 from app.modules.musicocean.engines.spotify.models import SpotifyTrackPreview
 from app.modules.musicocean.engines.youtube.client import YoutubeClient
 from app.modules.musicocean.enums.engine import Engine
+from app.modules.musicocean.lastfm.client import LastFMClient
 
 
 class MusicOceanClient:
@@ -29,6 +30,8 @@ class MusicOceanClient:
         self.soundcloud = None
         self.youtube = None
         self.spotify = None
+
+        self.lastfm: Optional[LastFMClient] = None
 
     async def setup_deezer(self, login: str, password: str) -> None:
         self.deezer = DeezerClient(
@@ -54,6 +57,12 @@ class MusicOceanClient:
             yt=self.youtube
         )
         await self.spotify.setup()
+
+    async def setup_lastfm(self, api_token: str) -> None:
+        if not self.youtube:
+            raise "setup yt first"
+        self.lastfm = LastFMClient(api_token)
+        await self.lastfm.setup()
 
     def _get_engine(self, engine: Engine):
         match engine:
