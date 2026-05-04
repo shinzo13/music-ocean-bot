@@ -1,0 +1,3 @@
+from .scrobbling_approve_keyboard import scrobbling_approve_keyboard
+from .scrobbling_cancel_keyboard import scrobbling_cancel_keyboard
+from .scrobbling_setup_keyboard import scrobbling_setup_keyboard

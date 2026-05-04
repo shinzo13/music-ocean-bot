@@ -33,6 +33,10 @@ class TelegramMusicOceanClientProvider(Provider):
             client_secret=settings.spotify.client_secret.get_secret_value(),
         )
 
+        await musicocean.setup_lastfm(
+            api_token=settings.lastfm.api_key.get_secret_value(),
+        )
+
         await musicocean.checkup()
 
         yield musicocean
