@@ -14,8 +14,7 @@ if TYPE_CHECKING:
 
 class LastfmSettings(BaseModel):
     enabled: bool = False
-    auth_token: Optional[str] = None
-    session_key: Optional[str] = None
+    username: Optional[str] = None
 
 class UserSettings(BaseModel):
 

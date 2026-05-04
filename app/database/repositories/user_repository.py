@@ -53,8 +53,7 @@ class UserRepository:
             selected_engine: Optional[Engine] = None,
             track_preview_covers: Optional[bool] = None,
             lastfm__enabled: Optional[bool] = None,
-            lastfm__auth_token: Optional[str] = None,
-            lastfm__session_key: Optional[str] = None
+            lastfm__username: Optional[str] = None
     ) -> User:
         user = await self.get_user_by_id(user_id)
         if user is None:
@@ -66,10 +65,8 @@ class UserRepository:
             user.settings.track_preview_covers = track_preview_covers
         if lastfm__enabled is not None:
             user.settings.lastfm.enabled = lastfm__enabled
-        if lastfm__auth_token is not None:
-            user.settings.lastfm.connection_code = lastfm__auth_token
-        if lastfm__session_key is not None:
-            user.settings.lastfm.session_key = lastfm__session_key
+        if lastfm__username is not None:
+            user.settings.lastfm.username = lastfm__username
 
         flag_modified(user, 'settings')
         await self.session.commit()
