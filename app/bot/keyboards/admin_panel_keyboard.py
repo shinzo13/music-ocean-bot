@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from app.bot.constants import DATABASE_EMOJI_ID, BACK_EMOJI_ID
+from app.bot.constants import DATABASE_EMOJI_ID, BACK_EMOJI_ID, MAILING_EMOJI_ID
 from app.bot.callbacks.admin_panel_callback import AdminPanelCallback, AdminPanelPath
 from app.bot.callbacks.main_menu_callback import MainMenuCallback, MainMenuPath
 
@@ -14,7 +14,8 @@ def admin_panel_keyboard():
         )],
         [InlineKeyboardButton(
             text="Mailing",
-            callback_data=AdminPanelCallback(path=AdminPanelPath.EXPORT_USERS).pack(),
+            callback_data=AdminPanelCallback(path=AdminPanelPath.MAILING).pack(),
+            icon_custom_emoji_id=MAILING_EMOJI_ID
         )],
         # TODO promote/ban user button
         [InlineKeyboardButton(

@@ -17,7 +17,7 @@ def mailing_message_keyboard():
 def mailing_approve_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
-            text="Approve",
+            text="Send",
             callback_data=MailingCallback(approved=True).pack(),
         )],
         [InlineKeyboardButton(
