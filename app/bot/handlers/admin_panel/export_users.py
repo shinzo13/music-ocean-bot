@@ -3,13 +3,15 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, BufferedInputFile
 from dishka import FromDishka
 from datetime import datetime
+
+from app.bot.callbacks.admin_panel_callback import AdminPanelCallback, AdminPanelPath
 from app.bot.keyboards import home_keyboard
 from app.database.models import User
 from app.database.repositories import UserRepository
 
 router = Router()
 
-@router.callback_query(F.data=="users")
+@router.callback_query(AdminPanelCallback.filter(F.path==AdminPanelPath.EXPORT_USERS))
 async def main_menu(callback: CallbackQuery, user_repo: FromDishka[UserRepository]):
     csv_bytes = await user_repo.export_to_csv()
     timestamp = datetime.now().strftime("%Y-%m-%d")

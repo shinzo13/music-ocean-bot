@@ -29,3 +29,5 @@ DEEZER_EMOJI = emoji_pattern.format(emoji_id=DEEZER_EMOJI_ID)
 SOUNDCLOUD_EMOJI = emoji_pattern.format(emoji_id=SOUNDCLOUD_EMOJI_ID)
 YOUTUBE_EMOJI = emoji_pattern.format(emoji_id=YOUTUBE_EMOJI_ID)
 SPOTIFY_EMOJI = emoji_pattern.format(emoji_id=SPOTIFY_EMOJI_ID)
+
+PROFILE_EMOJI = emoji_pattern.format(emoji_id=PROFILE_EMOJI_ID)
