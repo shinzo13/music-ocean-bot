@@ -8,6 +8,7 @@ from app.modules.musicocean.engines.deezer.models import (
     DeezerArtist,
     DeezerPlaylist
 )
+from app.modules.musicocean.engines.shared.models import BaseTrackPreview
 from app.modules.musicocean.engines.soundcloud import SoundCloudClient
 from app.modules.musicocean.engines.soundcloud.models import SoundCloudTrack, SoundCloudTrackPreview, SoundCloudAlbum, \
     SoundCloudPlaylist, SoundCloudArtist
@@ -79,6 +80,10 @@ class MusicOceanClient:
         if not select_engine:
             raise "engine is not setup blablabla"  # TODO
         return select_engine
+
+    async def get_track(self, engine: Engine, track_id: int | str) -> BaseTrackPreview:
+        return await self._get_engine(engine).get_track(track_id)
+
 
     async def search_tracks(
             self,

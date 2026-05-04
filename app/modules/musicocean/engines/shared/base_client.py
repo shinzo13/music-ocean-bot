@@ -12,6 +12,10 @@ class BaseEngineClient(ABC):
         pass
 
     @abstractmethod
+    async def get_track(self, track_id: int | str) -> list[BaseTrackPreview]:
+        pass
+
+    @abstractmethod
     async def search_tracks(self, query: str) -> list[BaseTrackPreview]:
         pass
 
@@ -28,32 +32,32 @@ class BaseEngineClient(ABC):
         pass
 
     @abstractmethod
-    async def get_album(self, album_id: int):
+    async def get_album(self, album_id: int | str):
         pass
 
     @abstractmethod
-    async def get_playlist(self, playlist_id: int):
+    async def get_playlist(self, playlist_id: int | str):
         pass
     @abstractmethod
-    async def get_album_tracks(self, album_id: int):
-        pass
-
-    @abstractmethod
-    async def get_artist(self, artist_id: int):
+    async def get_album_tracks(self, album_id: int | str):
         pass
 
     @abstractmethod
-    async def get_artist_tracks(self, artist_id: int):
+    async def get_artist(self, artist_id: int | str):
         pass
 
     @abstractmethod
-    async def get_playlist_tracks(self, playlist_id: int):
+    async def get_artist_tracks(self, artist_id: int | str):
+        pass
+
+    @abstractmethod
+    async def get_playlist_tracks(self, playlist_id: int | str):
         pass
 
     @abstractmethod
     async def download_track(
             self,
-            track_id: int,
+            track_id: int | str,
             watermark: Optional[str] = None
     ) -> BaseTrack:
         pass

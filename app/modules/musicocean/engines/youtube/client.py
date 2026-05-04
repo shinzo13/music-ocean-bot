@@ -70,7 +70,20 @@ class YoutubeClient(BaseEngineClient):
             # ...
             return raw_data
 
-    async def search_tracks(self, query: str, ignore_spelling=True):
+    async def get_track(self, track_id: str) -> YoutubeTrackPreview:
+        yt = AsyncYouTube.from_id(track_id)
+        return YoutubeTrackPreview(
+            id=track_id,
+            title=await yt.title(),
+            artist_name=(await yt.author()).removesuffix(' - Topic'),
+            cover_url=await yt.thumbnail_url()
+        )
+
+    async def search_tracks(
+            self,
+            query: str,
+            ignore_spelling=True
+    ) -> list[YoutubeTrackPreview]:
         raw_data = await self._api_request(
             YoutubeAPIMethod.SEARCH,
             {
@@ -139,7 +152,7 @@ class YoutubeClient(BaseEngineClient):
             self,
             track_id: str,
             watermark: Optional[str] = None
-    ):
+    ) -> YoutubeTrack:
         yt = AsyncYouTube.from_id(track_id)
         cover_url = await yt.thumbnail_url()
         async with self.session.get(cover_url) as resp:

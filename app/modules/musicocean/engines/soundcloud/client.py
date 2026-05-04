@@ -89,6 +89,13 @@ class SoundCloudClient(BaseEngineClient):
             raise  # TODO separated exceptions
         return raw_data
 
+    async def get_track(self, query: str) -> SoundCloudTrackPreview:
+        raw_track = await self._api_request(
+            method=SoundCloudAPIMethod.GET_TRACK,
+            q=query
+        )
+        return SoundCloudTrackPreview.from_dict(raw_track)
+
     async def search_tracks(self, query: str) -> list[SoundCloudTrackPreview]:
         raw_data = await self._api_request(
             method=SoundCloudAPIMethod.SEARCH_TRACKS,

@@ -104,6 +104,13 @@ class DeezerClient(BaseEngineClient):
             raw_data = [raw_track | {entity_type.value: {"id": entity_id}} for raw_track in raw_data["data"]]
             return [DeezerTrackPreview.from_dict(raw_track) for raw_track in raw_data]
 
+    async def get_track(self, query: str) -> DeezerTrackPreview:
+        raw_track = await self._api_request(
+            method=DeezerAPIMethod.GET_TRACK,
+            q=query
+        )
+        return DeezerTrackPreview.from_dict(raw_track)
+
     async def search_tracks(self, query: str) -> list[DeezerTrackPreview]:
         raw_data = await self._api_request(
             method=DeezerAPIMethod.SEARCH_TRACKS,
