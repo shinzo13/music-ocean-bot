@@ -1,11 +1,12 @@
 from typing import Optional
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientResponseError
 
 from app.modules.musicocean.enums import Engine
-from app.modules.musicocean.lastfm.constants import BASE_URL, HEADERS
+from app.modules.musicocean.lastfm.constants import BASE_URL, HEADERS, GET_TRACK_RETRY_COUNT
 from app.modules.musicocean.lastfm.enums.lastfm_api_method import LastFMApiMethod
-from app.modules.musicocean.lastfm.exceptions import LastFMNoDataException, LastFMNoProvidersException
+from app.modules.musicocean.lastfm.exceptions import LastFMNoDataException, LastFMNoProvidersException, \
+    LastFMServerException
 from app.modules.musicocean.lastfm.models.lastfm_track_data import LastFMTrackData
 from app.modules.musicocean.lastfm.models.lastfm_track_preview import LastFMTrackPreview
 from app.modules.musicocean.lastfm.utils.get_track_id import get_youtube_id, get_spotify_id
@@ -20,7 +21,7 @@ class LastFMClient:
     async def setup(self):
         self.session = ClientSession(
             headers=HEADERS,
-            raise_for_status=True
+            raise_for_status=False
         )
 
     async def _api_request(
@@ -63,8 +64,17 @@ class LastFMClient:
             self,
             track_data: LastFMTrackData
     ) -> tuple[Engine, LastFMTrackPreview]:
-        async with self.session.get(track_data.lastfm_url) as resp:
-            html = await resp.text()
+        html = None
+        # lastfm kinda likes to answer with 502 gateway for no reason
+        for _ in range(GET_TRACK_RETRY_COUNT):
+            try:
+                async with self.session.get(track_data.lastfm_url) as resp:
+                    html = await resp.text()
+            except ClientResponseError:
+                continue
+        if not html:
+            raise LastFMServerException()
+
         yt_track_id = get_youtube_id(html)
         if yt_track_id is not None:
             return Engine.YOUTUBE, LastFMTrackPreview.from_track_data(yt_track_id, track_data)

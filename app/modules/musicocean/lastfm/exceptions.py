@@ -4,3 +4,5 @@ class LastFMNoDataException(Exception):
 class LastFMNoProvidersException(Exception):
     pass
 
+class LastFMServerException(Exception):
+    pass

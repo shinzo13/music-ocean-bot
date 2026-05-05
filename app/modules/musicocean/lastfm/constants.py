@@ -11,3 +11,5 @@ HEADERS = {
 }
 
 BASE_URL = "https://ws.audioscrobbler.com/2.0/"
+
+GET_TRACK_RETRY_COUNT = 3
