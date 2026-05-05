@@ -2,6 +2,7 @@ from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import with_polymorphic
 
 from app.config.log import get_logger
 from app.database.models.base_track import BaseTrack
@@ -76,7 +77,9 @@ class TrackRepository:
             self,
             file_id: str
     ) -> Optional[DeezerTrack | SoundCloudTrack | YoutubeTrack | SpotifyTrack]:
+        wp = with_polymorphic(BaseTrack, "*")
         result = await self.session.execute(
-            select(BaseTrack).where(BaseTrack.telegram_file_id == file_id)
+            select(wp)
+            .where(BaseTrack.telegram_file_id == file_id)
         )
         return result.scalar_one_or_none()
