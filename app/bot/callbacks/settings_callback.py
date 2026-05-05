@@ -4,6 +4,7 @@ from aiogram.filters.callback_data import CallbackData
 
 
 class SettingsPath(StrEnum):
+    LOCALE = auto()
     ENGINE = auto()
     PREVIEWS = auto()
     SCROBBLING = auto()
