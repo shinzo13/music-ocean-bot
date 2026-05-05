@@ -23,9 +23,11 @@ async def inline_query(
 ):
     logger.info(f"User #{query.from_user.id}: empty search query")
     if not user.settings.lastfm.enabled:
-        await query.answer(setup_scrobbling_result(
-            (await bot.get_me()).username
-        ))
+        await query.answer(
+            setup_scrobbling_result((await bot.get_me()).username),
+            cache_time=0
+        )
+        return
 
     try:
         track_data = await musicocean.lastfm.get_recent_track_data(
@@ -42,7 +44,7 @@ async def inline_query(
     except LastFMNoProvidersException:
         logger.info(f"Falling back to YT matching while getting scrobbled track {track_data.title}")
         track = await musicocean.youtube.search_exact_match(
-            track_data.title, 
+            track_data.title,
             track_data.artist_name
         )
         if not track:
