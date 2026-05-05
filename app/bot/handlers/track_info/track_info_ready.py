@@ -5,15 +5,15 @@ from dishka import FromDishka
 
 from app.bot.keyboards import track_info_keyboard
 from app.bot.utils.get_engine_emoji import get_engine_emoji
+from app.config.log import get_logger
 from app.database.models import User
 from app.database.repositories import TrackRepository
 from app.modules.musicocean.enums import Engine
-from app.config.log import get_logger
 
 logger = get_logger(__name__)
 
-
 router = Router()
+
 
 @router.message(F.audio)
 async def track_info_ready(
@@ -47,13 +47,13 @@ async def track_info_ready(
     if user.is_admin:
         bot_user = await bot.get_chat(track.user_id)
         downloaded_by = (
-            '@'+bot_user.username if bot_user.username else
+            '@' + bot_user.username if bot_user.username else
             f"<a href='tg://user?id={bot_user.id}'>{bot_user.first_name} {bot_user.last_name}</a>"
         ) if bot_user else f"<code>#{track.user_id}</code>"
-        
+
         info += '\n' + i18n.get(
             'track-info-admin',
-            track_id=str(track.track_id), # fluent adds stupid spaces to int
+            track_id=str(track.track_id),  # fluent adds stupid spaces to int
             downloaded_by=downloaded_by
         )
 

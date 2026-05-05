@@ -7,8 +7,8 @@ from aiogram.types import (
 
 from app.bot.keyboards.entity_keyboard import entity_keyboard
 from app.bot.utils.get_engine_emoji import get_engine_emoji
-from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.engines.shared.models import BaseAlbum
+from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg.utils import engine_to_prefix
 
 

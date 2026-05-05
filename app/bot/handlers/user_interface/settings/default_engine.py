@@ -1,28 +1,25 @@
-from sys import prefix
-
 from aiogram import Router, F
-from aiogram.filters.callback_data import CallbackData
 from aiogram.types import CallbackQuery
 from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.callbacks.default_engine_callback import DefaultEngineCallback
 from app.bot.callbacks.settings_callback import SettingsCallback, SettingsPath
-from app.database.models import User
 from app.bot.keyboards import engines_keyboard
+from app.database.models import User
 from app.database.repositories import UserRepository
-from app.modules.musicocean.enums import Engine
 from app.modules.musicocean_tg.utils import prefix_to_engine
-
 
 router = Router()
 
-@router.callback_query(SettingsCallback.filter(F.path==SettingsPath.ENGINE))
+
+@router.callback_query(SettingsCallback.filter(F.path == SettingsPath.ENGINE))
 async def default_engine_handler(callback: CallbackQuery, user: User, i18n: I18nContext):
     await callback.message.edit_text(
         text=i18n.get('choose-engine'),
         reply_markup=engines_keyboard(user.settings.selected_engine)
     )
+
 
 @router.callback_query(DefaultEngineCallback.filter())
 async def set_engine_handler(

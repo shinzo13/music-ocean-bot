@@ -1,6 +1,5 @@
 from aiogram import Router, F
 from aiogram.filters import CommandStart
-from aiogram.filters.callback_data import CallbackData
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message
@@ -11,14 +10,14 @@ from app.bot.callbacks.settings_callback import SettingsCallback, SettingsPath
 from app.bot.callbacks.setup_scrobbling_callback import SetupScrobblingCallback
 from app.bot.keyboards.scrobbling import scrobbling_setup_keyboard, scrobbling_cancel_keyboard
 from app.bot.keyboards.scrobbling.scrobbling_approve_keyboard import scrobbling_approve_keyboard
+from app.config.log import get_logger
 from app.database.models import User
 from app.database.repositories import UserRepository
-from app.modules.musicocean.exceptions import MusicOceanException
 from app.modules.musicocean.lastfm.exceptions import LastFMNoDataException
 from app.modules.musicocean_tg import TelegramMusicOceanClient
-from app.config.log import get_logger
 
 logger = get_logger(__name__)
+
 
 class ScrobblingSetupState(StatesGroup):
     lastfm_username = State()
@@ -28,7 +27,7 @@ class ScrobblingSetupState(StatesGroup):
 router = Router()
 
 
-@router.callback_query(SettingsCallback.filter(F.path==SettingsPath.SCROBBLING))
+@router.callback_query(SettingsCallback.filter(F.path == SettingsPath.SCROBBLING))
 async def spotify_scrobbling_handler(
         callback: CallbackQuery,
         user: User,
@@ -44,6 +43,7 @@ async def spotify_scrobbling_handler(
             i18n.get('scrobbling-description'),
             reply_markup=scrobbling_setup_keyboard()
         )
+
 
 @router.message(
     CommandStart(
@@ -68,7 +68,6 @@ async def spotify_scrobbling_handler(
         )
 
 
-
 @router.callback_query(SetupScrobblingCallback.filter(F.init))
 async def setup_scrobbling_handler_init(
         query: CallbackQuery,
@@ -79,6 +78,7 @@ async def setup_scrobbling_handler_init(
     await query.message.edit_text(
         i18n.get('scrobbling-enter-username')
     )
+
 
 @router.message(ScrobblingSetupState.lastfm_username and F.text)
 async def setup_scrobbling_handler_username(
@@ -100,10 +100,10 @@ async def setup_scrobbling_handler_username(
 
     try:
         track_data = await musicocean.lastfm.get_recent_track_data(lastfm_username)
-    except LastFMNoDataException: #todo
+    except LastFMNoDataException:  # todo
         await message.answer(
             i18n.get('scrobbling-no-data'),
-            reply_markup = scrobbling_cancel_keyboard()
+            reply_markup=scrobbling_cancel_keyboard()
         )
         return
 
@@ -117,6 +117,7 @@ async def setup_scrobbling_handler_username(
     )
     await state.update_data(lastfm_username=lastfm_username)
     await state.set_state(ScrobblingSetupState.approving)
+
 
 @router.callback_query(SetupScrobblingCallback.filter(~F.init))
 async def setup_scrobbling_handler_approve(

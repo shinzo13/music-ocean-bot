@@ -1,10 +1,10 @@
 import asyncio
 import time
+from asyncio import TimeoutError
 from collections import deque
 from typing import Optional
 
 from aiogram import Bot
-from asyncio import TimeoutError
 
 from app.config import log
 

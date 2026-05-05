@@ -1,6 +1,4 @@
-import asyncio
-
-#from playwright.async_api import async_playwright
+# from playwright.async_api import async_playwright
 
 from app.config.log import get_logger
 from app.config.settings import settings

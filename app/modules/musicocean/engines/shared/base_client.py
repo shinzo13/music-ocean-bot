@@ -38,6 +38,7 @@ class BaseEngineClient(ABC):
     @abstractmethod
     async def get_playlist(self, playlist_id: int | str):
         pass
+
     @abstractmethod
     async def get_album_tracks(self, album_id: int | str):
         pass
@@ -62,8 +63,6 @@ class BaseEngineClient(ABC):
     ) -> BaseTrack:
         pass
 
-
     @abstractmethod
     async def close(self):
         pass
-

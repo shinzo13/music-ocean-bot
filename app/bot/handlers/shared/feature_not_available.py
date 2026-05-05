@@ -4,6 +4,7 @@ from aiogram_i18n import I18nContext
 
 router = Router()
 
+
 @router.callback_query(F.data == "feature_not_available")
 async def spotify_scrobbling_handler(
         callback: CallbackQuery,

@@ -1,8 +1,8 @@
-from aiogram import Router, F, Bot
-from aiogram.filters import CommandStart
-from aiogram.types import Message
 import re
 
+from aiogram import Router, F
+from aiogram.filters import CommandStart
+from aiogram.types import Message
 from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
@@ -45,7 +45,7 @@ async def handle_deeplink(
 
     match entity_type:
         case "al":
-            group_tracks = True # todo!! maybe..
+            group_tracks = True  # todo!! maybe..
             album = await musicocean.get_album(engine, entity_id)
             tracks = await musicocean.get_album_tracks(engine, entity_id)
             text = i18n.get(

@@ -15,7 +15,7 @@ from app.modules.musicocean.lastfm.utils.get_track_id import get_youtube_id, get
 class LastFMClient:
 
     def __init__(self, api_key: str):
-        self.session: Optional[ClientSession]  = None
+        self.session: Optional[ClientSession] = None
         self.api_key = api_key
 
     async def setup(self):
@@ -30,12 +30,12 @@ class LastFMClient:
             **kwargs
     ) -> dict:
         async with self.session.get(
-            url = BASE_URL,
-            params = kwargs | {
-                "method": method,
-                "api_key": self.api_key,
-                "format": "json"
-            }
+                url=BASE_URL,
+                params=kwargs | {
+                    "method": method,
+                    "api_key": self.api_key,
+                    "format": "json"
+                }
         ) as resp:
             return await resp.json()
 
@@ -84,8 +84,6 @@ class LastFMClient:
             return Engine.SPOTIFY, LastFMTrackPreview.from_track_data(sp_track_id, track_data)
 
         raise LastFMNoProvidersException()
-
-
 
     async def get_top_artists(self, username: str):
         data = await self._api_request(

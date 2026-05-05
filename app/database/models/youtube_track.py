@@ -5,8 +5,6 @@ from app.database.models.base_track import BaseTrack
 from app.modules.musicocean.enums import Engine
 
 
-
-
 class YoutubeTrack(BaseTrack):
     __tablename__ = "youtube_tracks"
 

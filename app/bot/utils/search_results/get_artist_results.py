@@ -6,15 +6,15 @@ from aiogram.types import (
 )
 
 from app.bot.keyboards.entity_keyboard import entity_keyboard
-from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.engines.shared.models import BaseArtist
+from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg.utils import engine_to_prefix
 
 
 async def get_artist_results(
         engine: Engine,
         matches: list[BaseArtist]
-, bot_username=None):
+        , bot_username=None):
     return [
         InlineQueryResultArticle(
             id=f"{engine_to_prefix(engine)}_ar_{artist.id}",

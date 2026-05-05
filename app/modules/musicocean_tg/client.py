@@ -6,14 +6,14 @@ from aiogram.enums.parse_mode import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import BufferedInputFile, URLInputFile, Message
 
+from app.config import log
 from app.database.repositories import TrackRepository
 from app.modules.musicocean.client import MusicOceanClient
-from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.engines.shared.models import BaseTrackPreview
+from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg.models.cached_track import CachedTrack
 from app.modules.musicocean_tg.utils import engine_to_prefix
 from app.modules.musicocean_tg.worker import TelegramWorker
-from app.config import log
 
 logger = log.get_logger(__name__)
 
@@ -83,7 +83,7 @@ class TelegramMusicOceanClient(MusicOceanClient):
             tracks: list[BaseTrackPreview],
             track_repo: TrackRepository
     ) -> AsyncGenerator[CachedTrack, None]:
-        #tracks.reverse()
+        # tracks.reverse()
 
         cached = {
             t.id: await track_repo.get_track(t.id, engine)
@@ -94,7 +94,7 @@ class TelegramMusicOceanClient(MusicOceanClient):
             if cached[track_id]:
                 return CachedTrack(
                     track_id=track_id,
-                    file_id=cached[track_id].telegram_file_id # noqa
+                    file_id=cached[track_id].telegram_file_id  # noqa
                 )
             worker = await self._acquire_worker()
             msg = await self._upload_track(engine, track_id, worker)

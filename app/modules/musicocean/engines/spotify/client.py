@@ -1,7 +1,6 @@
 import base64
 import time
 from typing import Optional
-from datetime import datetime, timedelta, timezone
 
 from aiohttp import ClientSession
 
@@ -32,10 +31,10 @@ logger = get_logger(__name__)
 class SpotifyClient(BaseEngineClient):
 
     def __init__(
-        self,
-        client_id: str,
-        client_secret: str,
-        yt: YoutubeClient,
+            self,
+            client_id: str,
+            client_secret: str,
+            yt: YoutubeClient,
     ):
         self.client_id = client_id
         self.client_secret = client_secret
@@ -59,12 +58,12 @@ class SpotifyClient(BaseEngineClient):
         ).decode()
 
         async with self.session.post(
-            SPOTIFY_TOKEN_URL,
-            headers={
-                "Authorization": f"Basic {credentials}",
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            data={"grant_type": "client_credentials"},
+                SPOTIFY_TOKEN_URL,
+                headers={
+                    "Authorization": f"Basic {credentials}",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                data={"grant_type": "client_credentials"},
         ) as resp:
             data = await resp.json()
 
@@ -85,23 +84,22 @@ class SpotifyClient(BaseEngineClient):
     def _auth_headers(self) -> dict:
         return {"Authorization": f"Bearer {self._access_token}"}
 
-
     async def exchange_code(self, code: str, redirect_uri: str) -> tuple[str, str]:
         credentials = base64.b64encode(
             f"{self.client_id}:{self.client_secret}".encode()
         ).decode()
 
         async with self.session.post(
-            SPOTIFY_TOKEN_URL,
-            headers={
-                "Authorization": f"Basic {credentials}",
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            data={
-                "grant_type": "authorization_code",
-                "code": code,
-                "redirect_uri": redirect_uri,
-            },
+                SPOTIFY_TOKEN_URL,
+                headers={
+                    "Authorization": f"Basic {credentials}",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                data={
+                    "grant_type": "authorization_code",
+                    "code": code,
+                    "redirect_uri": redirect_uri,
+                },
         ) as resp:
             data = await resp.json()
             logger.debug(f"Spotify exchange response: {data}")
@@ -114,15 +112,15 @@ class SpotifyClient(BaseEngineClient):
         ).decode()
 
         async with self.session.post(
-            SPOTIFY_TOKEN_URL,
-            headers={
-                "Authorization": f"Basic {credentials}",
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            data={
-                "grant_type": "refresh_token",
-                "refresh_token": refresh_token,
-            },
+                SPOTIFY_TOKEN_URL,
+                headers={
+                    "Authorization": f"Basic {credentials}",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                data={
+                    "grant_type": "refresh_token",
+                    "refresh_token": refresh_token,
+                },
         ) as resp:
             data = await resp.json()
 
@@ -136,9 +134,9 @@ class SpotifyClient(BaseEngineClient):
     async def _get(self, path: str, **params) -> dict:
         await self._ensure_token()
         async with self.session.get(
-            f"{SPOTIFY_API_BASE}/{path}",
-            headers=self._auth_headers,
-            params={k: v for k, v in params.items() if v is not None},
+                f"{SPOTIFY_API_BASE}/{path}",
+                headers=self._auth_headers,
+                params={k: v for k, v in params.items() if v is not None},
         ) as resp:
             data = await resp.json()
 
@@ -154,7 +152,6 @@ class SpotifyClient(BaseEngineClient):
             raise SpotifyException(f"Spotify API error {status}: {message}")
 
         return data
-
 
     async def _search(self, query: str, search_type: SpotifySearchType) -> list[dict]:
         data = await self._get(
@@ -232,9 +229,9 @@ class SpotifyClient(BaseEngineClient):
         return [SpotifyTrackPreview.from_dict(item) for item in data["tracks"]]
 
     async def download_track(
-        self,
-        track_id: str,
-        watermark: Optional[str] = None,
+            self,
+            track_id: str,
+            watermark: Optional[str] = None,
     ) -> YoutubeTrack:
         track = await self.get_track(track_id)
         match = await self.yt.search_exact_match(track.title, track.artist_name)

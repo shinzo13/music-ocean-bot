@@ -1,5 +1,5 @@
-from aiogram_i18n.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram_i18n import LazyProxy
+from aiogram_i18n.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from app.bot.constants import SEARCH_EMOJI_ID, LOCKED_EMOJI_ID, DOWNLOAD_EMOJI_ID
 from app.modules.musicocean.enums import Engine
@@ -11,7 +11,7 @@ def entity_keyboard(
         bot_username: str,
         entity_id: int,
         prefix: str,
-        download_all: bool =  True,
+        download_all: bool = True,
         download_all_available: bool = True,
 
 ) -> InlineKeyboardMarkup:
@@ -33,4 +33,4 @@ def entity_keyboard(
                 callback_data="feature_not_available",
                 icon_custom_emoji_id=LOCKED_EMOJI_ID
             )])
-    return InlineKeyboardMarkup(inline_keyboard=kb) # noqa
+    return InlineKeyboardMarkup(inline_keyboard=kb)  # noqa

@@ -1,22 +1,18 @@
-from aiogram import Router, F, Bot
-from aiogram.filters.callback_data import CallbackData
+from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.callbacks.locales_callback import LocalesCallback
 from app.bot.callbacks.settings_callback import SettingsCallback, SettingsPath
-from app.bot.callbacks.track_previews_callback import TrackPreviewsCallback
 from app.bot.keyboards.locales_keyboard import locales_keyboard
-from app.bot.keyboards.track_preview_keyboard import track_preview_keyboard
 from app.database.models import User
 from app.database.repositories import UserRepository
 
-
-
 router = Router()
 
-@router.callback_query(SettingsCallback.filter(F.path==SettingsPath.LOCALE))
+
+@router.callback_query(SettingsCallback.filter(F.path == SettingsPath.LOCALE))
 async def track_preview_appearance_handler(
         callback: CallbackQuery,
         user: User,
@@ -27,6 +23,7 @@ async def track_preview_appearance_handler(
         reply_markup=locales_keyboard(user.settings.locale)
     )
 
+
 @router.callback_query(LocalesCallback.filter())
 async def set_previews_handler(
         query: CallbackQuery,
@@ -35,7 +32,7 @@ async def set_previews_handler(
         user_repo: FromDishka[UserRepository],
         i18n: I18nContext
 ):
-    if callback_data.code==user.settings.locale:
+    if callback_data.code == user.settings.locale:
         await query.answer(i18n.get('option-already-selected'), show_alert=True)
         return
 

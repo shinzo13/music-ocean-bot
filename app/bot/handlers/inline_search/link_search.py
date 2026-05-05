@@ -1,21 +1,17 @@
 import re
 
-from aiogram import Router, F, Bot
+from aiogram import Router, F
 from aiogram.types import InlineQuery
 from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.utils.search_results import (
-    get_album_results,
-    get_artist_results,
-    get_playlist_results,
-    usage_guide_result, get_track_results, not_supported_result
+    get_track_results, not_supported_result
 )
 from app.config.log import get_logger
 from app.database.models import User as DatabaseUser
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
-from app.modules.musicocean_tg.utils import prefix_to_engine
 
 logger = get_logger(__name__)
 
@@ -25,6 +21,7 @@ DEEZER_REGEX = re.compile(r"https?://(?:www\.)?deezer\.com/\w+/(track|album|play
 SPOTIFY_REGEX = re.compile(r"https?://open\.spotify\.com/(track|album|playlist|artist)/([A-Za-z0-9]+)")
 SOUNDCLOUD_REGEX = re.compile(r"https?://(?:www\.)?soundcloud\.com/[\w-]+/[\w-]+")
 YOUTUBE_REGEX = re.compile(r"https?://(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]+)")
+
 
 @router.inline_query(
     F.query.regexp(DEEZER_REGEX).as_('match') | \
@@ -41,7 +38,6 @@ async def inline_query(
     entity_type, entity_id = match.groups()
     if engine == Engine.DEEZER:
         entity_id = int(entity_id)
-
 
     match entity_type:
         case "track":
@@ -64,6 +60,7 @@ async def inline_query(
         cache_time=0
     )
 
+
 @router.inline_query(F.query.regexp(YOUTUBE_REGEX).as_('match'))
 async def inline_query(
         query: InlineQuery,
@@ -81,6 +78,7 @@ async def inline_query(
         ),
         cache_time=0
     )
+
 
 @router.inline_query(F.query.regexp(SOUNDCLOUD_REGEX))
 async def inline_query(query: InlineQuery, i18n: I18nContext):

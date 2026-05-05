@@ -11,26 +11,32 @@ Project demo: [@koshke2bot](koshke2bot.t.me)
 <img src="assets/usage_example.gif"  width="400" alt="demo"/>
 
 ## Features
+
 - Supported musical services: **Spotify**, **YTMusic**, **SoundCloud**, **Deezer**.
 - **Last.fm scrobbling** _(beta)_: instantly downloading the track user is listening to.
 - Entity searching: search **tracks**, **albums**, **artists** or even **playlists**.
 - **Database cache**: once any track downloaded, it can be easily accessed again without repeating the download.
 - **ID3 tags** support: all downloaded media has proper ready-to-go ID3 tags.
-- 
+
 
 ## Setup
 
 ### Telegram
+
 Firstly, you need to set up your Telegram environment:
+
 1. Create **main bot** in [@BotFather](https://t.me/BotFather).
-2. Change these bot's settings: 
-   - `Inline Mode`: `on`
-   - `Inline Feedback`: `100%`
-   - `Group privacy`: `off`
+2. Change these bot's settings:
+    - `Inline Mode`: `on`
+    - `Inline Feedback`: `100%`
+    - `Group privacy`: `off`
 3. Create **channel** that will act like database to the bot. You should give it admin rights to post messages.
-4. _Optionally (but highly recommended)_, you can create **_"workers"_** that will help the main bot to download large albums & playlists. Each TG bot has a ratelimit of 20 messages per minute to 1 chat, so the more workers you have the more tracks at one time you can download!
+4. _Optionally (but highly recommended)_, you can create **_"workers"_** that will help the main bot to download large
+   albums & playlists. Each TG bot has a ratelimit of 20 messages per minute to 1 chat, so the more workers you have the
+   more tracks at one time you can download!
 
 ### .env configuration
+
 ```bash
 cp .env.example .env
 # fill the .env file
@@ -38,24 +44,23 @@ cp .env.example .env
 
 Here is some notes about several `.env` variables:
 
-
-| Variable | Description                                                                                                                                |
-|---|--------------------------------------------------------------------------------------------------------------------------------------------|
-| `LOGGING__LEVEL` | _Logging level. `INFO` for default._                                                                                                       |
-| `TRACKS__WATERMARK` | _Optional. String watermark that will be injected in all the downloaded media_                                                             |
-| `BOT__TOKEN` | _Telegram bot token. Can be obtained via [@BotFather](https://t.me/BotFather)._                                                            |
-| `SERVER__DOMAIN` | _Domain of the server that is being used as endpoint._                                                                                     |
-| `SERVER__CERTFILE_PATH` | _Path to the certificate file on your host._                                                                                               |
-| `TELEGRAM__ADMINS` | _List of Telegram ID's of users being administrators._                                                                                     |
-| `TELEGRAM__CHANNEL_ID` | _Telegram ID of the channel that will act like media database._                                                                            |
-| `TELEGRAM__WORKERS` | _Optional. List of Telegram ID's of bots that will help the main one with downloading media._                                              |
-| `DEEZER__LOGIN` | _[Deezer](deezer.com) account login_                                                                                                       |
-| `DEEZER__PASSWORD` | _[Deezer](deezer.com) account password_                                                                                                    |
-| `SPOTIFY__CLIENT_ID` | _`client_id` of registered Spotify app. Can be obtained on [Spotify for Developers](https://developer.spotify.com/dashboard) dashboard._   |
+| Variable                 | Description                                                                                                                                  |
+|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| `LOGGING__LEVEL`         | _Logging level. `INFO` for default._                                                                                                         |
+| `TRACKS__WATERMARK`      | _Optional. String watermark that will be injected in all the downloaded media_                                                               |
+| `BOT__TOKEN`             | _Telegram bot token. Can be obtained via [@BotFather](https://t.me/BotFather)._                                                              |
+| `SERVER__DOMAIN`         | _Domain of the server that is being used as endpoint._                                                                                       |
+| `SERVER__CERTFILE_PATH`  | _Path to the certificate file on your host._                                                                                                 |
+| `TELEGRAM__ADMINS`       | _List of Telegram ID's of users being administrators._                                                                                       |
+| `TELEGRAM__CHANNEL_ID`   | _Telegram ID of the channel that will act like media database._                                                                              |
+| `TELEGRAM__WORKERS`      | _Optional. List of Telegram ID's of bots that will help the main one with downloading media._                                                |
+| `DEEZER__LOGIN`          | _[Deezer](deezer.com) account login_                                                                                                         |
+| `DEEZER__PASSWORD`       | _[Deezer](deezer.com) account password_                                                                                                      |
+| `SPOTIFY__CLIENT_ID`     | _`client_id` of registered Spotify app. Can be obtained on [Spotify for Developers](https://developer.spotify.com/dashboard) dashboard._     |
 | `SPOTIFY__CLIENT_SECRET` | _`client_secret` of registered Spotify app. Can be obtained on [Spotify for Developers](https://developer.spotify.com/dashboard) dashboard._ |
 
-
 ### Run
+
 ```bash
 docker compose up --build
 ```
@@ -63,29 +68,37 @@ docker compose up --build
 ## Usage
 
 ### User manual
-Bot's main menu accessed via `/start` command. `Profile` and `Settings` tabs can be found there. 
+
+Bot's main menu accessed via `/start` command. `Profile` and `Settings` tabs can be found there.
 
 In order to search music, just write `@botname <YOUR QUERY>` in the message input field.
 
 There are several available search options:
+
 - **Default search**: `@botname <TRACK QUERY>`, ex. `@koshke2bot Back in black`
 - **Engine-specified search**: `@botname <dz/sc/yt/sp> <QUERY>`, ex. `@koshke2bot dz:goth tv`
-- **Entity search**: `@botname <album/artist/playlist> <QUERY>`, ex. `@koshke2bot album:Who really cares` or just `@koshke2bot al:Who really cares`
+- **Entity search**: `@botname <album/artist/playlist> <QUERY>`, ex. `@koshke2bot album:Who really cares` or just
+  `@koshke2bot al:Who really cares`
 - **Combined search**: you can combine engine and entity specification, ex. `@koshke2bot sc:pl:Jazz`
-- **In-entity search**: automatically pasted via `Search tracks` button, looks like `@botname al_id:1ch95c`. Do not modify it!
+- **In-entity search**: automatically pasted via `Search tracks` button, looks like `@botname al_id:1ch95c`. Do not
+  modify it!
 
 In the `Settings` tab, you can set up following options:
+
 - **Default engine** used to search and download music
 - **Track previews** that can appear as _album covers_ as well as _MP3-previews_
-- **Last.fm scrobbling**: you can connect your Spotify & Last.fm accounts in order to instantly download music you are listening now to / listened recently.
+- **Last.fm scrobbling**: you can connect your Spotify & Last.fm accounts in order to instantly download music you are
+  listening now to / listened recently.
 
 ### Administrating manual
 
 `Admin panel` is accessible via main menu for users with administrator rights. There you cand find:
+
 - Downloading users database as `.csv`
 - Editing users rights / banning users
 - Mailing
 - Bot usage statistics
 
-The other admin tool available is getting the track info. Simply send downloaded media to the bot to get information about who, when and how downloaded it.
+The other admin tool available is getting the track info. Simply send downloaded media to the bot to get information
+about who, when and how downloaded it.
 

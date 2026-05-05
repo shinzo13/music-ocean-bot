@@ -6,7 +6,6 @@ from aiogram.enums import ParseMode
 from aiogram_i18n.cores import FluentRuntimeCore
 from dishka.integrations.aiogram import setup_dishka as setup_dishka_aiogram
 
-
 from app.bot.handlers import (
     inline_search,
     process_track,
@@ -38,7 +37,7 @@ async def main():
         await conn.run_sync(Base.metadata.create_all)
 
     bot_username = (await bot.get_me()).username
-    await initialize_dynamic_settings( # todo not sure is this still needed
+    await initialize_dynamic_settings(  # todo not sure is this still needed
         engine,
         bot_username=bot_username
     )
@@ -49,7 +48,7 @@ async def main():
 
     dp.update.outer_middleware(DatabaseMiddleware())
 
-    #DatabaseI18nMiddleware(
+    # DatabaseI18nMiddleware(
     LocaleMiddleware(
         core=FluentRuntimeCore(path="app/locales/{locale}"),
         manager=PatchedManager(),

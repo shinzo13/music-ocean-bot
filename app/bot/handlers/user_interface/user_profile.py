@@ -3,7 +3,6 @@ from aiogram.types import CallbackQuery
 from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
-from app.bot.constants import PROFILE_EMOJI
 from app.bot.callbacks.main_menu_callback import MainMenuCallback, MainMenuPath
 from app.bot.keyboards import profile_keyboard
 from app.database.models import User
@@ -11,7 +10,8 @@ from app.database.repositories import UserRepository
 
 router = Router()
 
-@router.callback_query(MainMenuCallback.filter(F.path==MainMenuPath.PROFILE))
+
+@router.callback_query(MainMenuCallback.filter(F.path == MainMenuPath.PROFILE))
 async def user_profile(
         callback: CallbackQuery,
         user: User,

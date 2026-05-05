@@ -1,7 +1,7 @@
 from aiogram_i18n import LazyProxy
-from aiogram_i18n.types import InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup
+from aiogram_i18n.types import InlineQueryResultArticle, InputTextMessageContent
 
-from app.bot.constants import SPOTIFY_LOGO_URL, SPOTIFY_BANNER_URL
+from app.bot.constants import SPOTIFY_LOGO_URL
 from app.bot.keyboards.scrobbling import scrobbling_inline_setup_keyboard
 
 

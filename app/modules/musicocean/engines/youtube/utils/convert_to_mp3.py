@@ -1,5 +1,6 @@
-import av
 import io
+
+import av
 
 
 def convert_to_mp3(source: bytes) -> bytes:

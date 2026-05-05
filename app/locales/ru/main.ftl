@@ -16,8 +16,8 @@ usage-guide-text = мяууу мрр
 profile-text =
     <b>👤 {$user}</b>
 
-    <b>• Зарегистрирован</b>: <code>{$registered}</code>
-    <b>• Скачано треков</b>: <code>{$tracks_downloaded}</code>
+        <b>• Зарегистрирован</b>: <code>{$registered}</code>
+        <b>• Скачано треков</b>: <code>{$tracks_downloaded}</code>
 
 ## settings
 settings-text = Настройки
@@ -70,10 +70,10 @@ mailing-finished = Рассылка завершена ({ $succeed }/{ $all } у
 track-info =
     <blockquote><b><i>{ $artist_name } - { $title }</i></b></blockquote>
 
-    • <b>Движок</b>: {$engine_emoji}  <code>{$engine_name}</code>
+        • <b>Движок</b>: {$engine_emoji}  <code>{$engine_name}</code>
 track-info-admin =
     • <b>ID трека</b>: <code>{ $track_id }</code>
-    • <b>Скачал</b>: { $downloaded_by }
+        • <b>Скачал</b>: { $downloaded_by }
 track-not-found = Этот трек не скачивался через Music Ocean.
 btn-album = Альбом
 btn-artist = Исполнитель
@@ -105,9 +105,9 @@ btn-downloading = Скачиваю...
 ## entities
 entity-album =
     <b>{$title}</b>
-    <i>{$artist_name}</i>
-    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+        <i>{$artist_name}</i>
+        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
 entity-playlist =
     <b>{$title}</b>
-    <i>{$track_count}</i>
-    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+        <i>{$track_count}</i>
+        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>

@@ -84,7 +84,6 @@ class MusicOceanClient:
     async def get_track(self, engine: Engine, track_id: int | str) -> BaseTrackPreview:
         return await self._get_engine(engine).get_track(track_id)
 
-
     async def search_tracks(
             self,
             engine: Engine,

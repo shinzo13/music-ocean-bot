@@ -9,5 +9,6 @@ class SettingsPath(StrEnum):
     PREVIEWS = auto()
     SCROBBLING = auto()
 
+
 class SettingsCallback(CallbackData, prefix='settings'):
     path: SettingsPath

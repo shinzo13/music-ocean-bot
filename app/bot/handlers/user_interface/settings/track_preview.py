@@ -1,5 +1,4 @@
-from aiogram import Router, F, Bot
-from aiogram.filters.callback_data import CallbackData
+from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram_i18n import I18nContext
 from dishka import FromDishka
@@ -10,11 +9,10 @@ from app.bot.keyboards.track_preview_keyboard import track_preview_keyboard
 from app.database.models import User
 from app.database.repositories import UserRepository
 
-
-
 router = Router()
 
-@router.callback_query(SettingsCallback.filter(F.path==SettingsPath.PREVIEWS))
+
+@router.callback_query(SettingsCallback.filter(F.path == SettingsPath.PREVIEWS))
 async def track_preview_appearance_handler(
         callback: CallbackQuery,
         user: User,
@@ -25,6 +23,7 @@ async def track_preview_appearance_handler(
         reply_markup=track_preview_keyboard(i18n, user.settings.track_preview_covers)
     )
 
+
 @router.callback_query(TrackPreviewsCallback.filter())
 async def set_previews_handler(
         query: CallbackQuery,
@@ -33,7 +32,7 @@ async def set_previews_handler(
         user_repo: FromDishka[UserRepository],
         i18n: I18nContext
 ):
-    if callback_data.show_covers==user.settings.track_preview_covers:
+    if callback_data.show_covers == user.settings.track_preview_covers:
         await query.answer(i18n.get('previews-already-selected'), show_alert=True)
         return
 

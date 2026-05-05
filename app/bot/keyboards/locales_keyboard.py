@@ -1,16 +1,16 @@
-from aiogram_i18n.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram_i18n import LazyProxy
+from aiogram_i18n.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from app.bot.constants import BACK_EMOJI_ID
 from app.bot.callbacks.locales_callback import LocalesCallback
 from app.bot.callbacks.main_menu_callback import MainMenuCallback, MainMenuPath
+from app.bot.constants import BACK_EMOJI_ID
 from app.bot.utils.selected_option import option_selection
 
 
 def locales_keyboard(current: str):
-    return InlineKeyboardMarkup(inline_keyboard=[ # noqa
+    return InlineKeyboardMarkup(inline_keyboard=[  # noqa
         [InlineKeyboardButton(
-            text=option_selection('🇬🇧 English', current=='en'),
+            text=option_selection('🇬🇧 English', current == 'en'),
             callback_data=LocalesCallback(code='en').pack()
         )],
         [InlineKeyboardButton(

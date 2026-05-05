@@ -6,8 +6,8 @@ from app.database.models import User as DatabaseUser
 
 class PatchedManager(BaseManager):
     def __init__(
-        self,
-        default_locale: str | None = 'en',
+            self,
+            default_locale: str | None = 'en',
     ):
         super().__init__(default_locale=default_locale)
 

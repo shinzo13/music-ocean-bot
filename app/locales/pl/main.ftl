@@ -16,8 +16,8 @@ usage-guide-text = tutaj będzie tekst tutorialu
 profile-text =
     <b>👤 {$user}</b>
 
-    <b>• Zarejestrowany</b>: <code>{$registered}</code>
-    <b>• Pobrano utworów</b>: <code>{$tracks_downloaded}</code>
+        <b>• Zarejestrowany</b>: <code>{$registered}</code>
+        <b>• Pobrano utworów</b>: <code>{$tracks_downloaded}</code>
 
 ## settings
 settings-text = Ustawienia
@@ -70,10 +70,10 @@ mailing-finished = Mailing zakończony ({ $succeed }/{ $all } pomyślnie).
 track-info =
     <blockquote><b><i>{ $artist_name } - { $title }</i></b></blockquote>
 
-    • <b>Platforma</b>: {$engine_emoji}  <code>{$engine_name}</code>
+        • <b>Platforma</b>: {$engine_emoji}  <code>{$engine_name}</code>
 track-info-admin =
     • <b>ID utworu</b>: <code>{ $track_id }</code>
-    • <b>Pobrano przez</b>: { $downloaded_by }
+        • <b>Pobrano przez</b>: { $downloaded_by }
 track-not-found = Ten utwór nie był pobierany przez Music Ocean.
 btn-album = Album
 btn-artist = Wykonawca
@@ -105,9 +105,9 @@ btn-downloading = Pobieranie...
 ## entities
 entity-album =
     <b>{$title}</b>
-    <i>{$artist_name}</i>
-    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+        <i>{$artist_name}</i>
+        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
 entity-playlist =
     <b>{$title}</b>
-    <i>{$track_count}</i>
-    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+        <i>{$track_count}</i>
+        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>

@@ -1,11 +1,11 @@
 from typing import List, TYPE_CHECKING, Optional
 
-from pydantic import BaseModel, ConfigDict
-from sqlalchemy import Boolean, BigInteger, JSON, TypeDecorator
+from pydantic import BaseModel
+from sqlalchemy import Boolean, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database.models.pydantic_model import PydanticModel
 from app.database.models.base import Base, TimestampMixin, IntIDMixin
+from app.database.models.pydantic_model import PydanticModel
 from app.modules.musicocean.enums.engine import Engine
 
 if TYPE_CHECKING:
@@ -16,12 +16,14 @@ class LastfmSettings(BaseModel):
     enabled: bool = False
     username: Optional[str] = None
 
+
 class UserSettings(BaseModel):
     locale: Optional[str] = None
     selected_engine: Engine = Engine.DEEZER
     track_preview_covers: bool = True
 
     lastfm: LastfmSettings = LastfmSettings()
+
 
 class User(Base, TimestampMixin, IntIDMixin):
     __tablename__ = "users"

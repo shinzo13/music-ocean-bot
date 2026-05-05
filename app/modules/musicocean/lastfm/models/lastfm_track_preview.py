@@ -1,4 +1,4 @@
-from app.modules.musicocean.engines.shared.models import BaseTrack, BaseTrackPreview
+from app.modules.musicocean.engines.shared.models import BaseTrackPreview
 from app.modules.musicocean.lastfm.models.lastfm_track_data import LastFMTrackData
 
 

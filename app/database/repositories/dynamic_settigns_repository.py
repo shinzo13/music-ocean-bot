@@ -27,7 +27,7 @@ class DynamicSettingsRepository:
                 try:
                     setattr(config, key, value)
                 except KeyError:
-                    raise # todo
+                    raise  # todo
 
         await self.session.commit()
         await self.session.refresh(config)

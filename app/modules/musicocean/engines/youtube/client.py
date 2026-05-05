@@ -1,8 +1,7 @@
 import io
 import json
 import re
-import time
-from typing import BinaryIO, Optional
+from typing import Optional
 
 from aiohttp import ClientSession
 from pytubefix import AsyncYouTube
@@ -17,12 +16,10 @@ from app.modules.musicocean.engines.youtube.models.youtube_playlist import Youtu
 from app.modules.musicocean.engines.youtube.models.youtube_track import YoutubeTrack
 from app.modules.musicocean.engines.youtube.models.youtube_track_preview import YoutubeTrackPreview
 from app.modules.musicocean.engines.youtube.utils import initialize_context
-from app.modules.musicocean.engines.youtube.utils.convert_to_mp3 import convert_to_mp3
 from app.modules.musicocean.engines.youtube.utils.parsers.parse_search_response import parse_search_response
-from app.modules.musicocean.enums import Engine
-from app.modules.musicocean.utils import write_id3
 
 logger = get_logger(__name__)
+
 
 class YoutubeClient(BaseEngineClient):
     session: ClientSession | None
@@ -49,7 +46,7 @@ class YoutubeClient(BaseEngineClient):
     async def setup(self):
         self.context = initialize_context()
         self.session = ClientSession(
-            cookies = {"SOCS": "CAI"},
+            cookies={"SOCS": "CAI"},
             headers=HEADERS,
         )
         visitor_id = await self._get_visitor_id()
@@ -62,8 +59,8 @@ class YoutubeClient(BaseEngineClient):
     ) -> dict:
         payload.update(self.context)
         async with self.session.post(
-            f"{YTM_BASE_API}/{method}?alt=json",
-            json=payload
+                f"{YTM_BASE_API}/{method}?alt=json",
+                json=payload
         ) as resp:
             resp.raise_for_status()
             raw_data = await resp.json()
@@ -104,7 +101,7 @@ class YoutubeClient(BaseEngineClient):
             YoutubeTrackPreview(
                 id=raw_track.get("video_id"),
                 title=raw_track.get("title"),
-                artist_name=raw_track.get("artist","?"),
+                artist_name=raw_track.get("artist", "?"),
                 cover_url=raw_track.get("thumbnail")
             )
             for raw_track in raw_tracks

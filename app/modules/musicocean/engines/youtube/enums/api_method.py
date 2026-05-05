@@ -1,4 +1,5 @@
-from enum import StrEnum, auto
+from enum import StrEnum
+
 
 class YoutubeAPIMethod(StrEnum):
     SEARCH = 'search'

@@ -16,8 +16,8 @@ usage-guide-text = usage guide will be here
 profile-text =
     <b>👤 {$user}</b>
 
-    <b>• Registered</b>: <code>{$registered}</code>
-    <b>• Tracks downloaded</b>: <code>{$tracks_downloaded}</code>
+        <b>• Registered</b>: <code>{$registered}</code>
+        <b>• Tracks downloaded</b>: <code>{$tracks_downloaded}</code>
 
 ## settings
 settings-text = Settings
@@ -71,10 +71,10 @@ mailing-finished = Mailing finished ({ $succeed }/{ $all } succeeded).
 track-info =
     <blockquote><b><i>{ $artist_name } - { $title }</i></b></blockquote>
 
-    • <b>Engine</b>: {$engine_emoji}  <code>{$engine_name}</code>
+        • <b>Engine</b>: {$engine_emoji}  <code>{$engine_name}</code>
 track-info-admin =
     • <b>Track ID</b>: <code>{ $track_id }</code>
-    • <b>Downloaded by</b>: { $downloaded_by }
+        • <b>Downloaded by</b>: { $downloaded_by }
 track-not-found = This track was not downloaded via Music Ocean.
 btn-album = Album
 btn-artist = Artist
@@ -106,9 +106,9 @@ btn-downloading = Downloading...
 ## entities
 entity-album =
     <b>{$title}</b>
-    <i>{$artist_name}</i>
-    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+        <i>{$artist_name}</i>
+        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
 entity-playlist =
     <b>{$title}</b>
-    <i>{$track_count}</i>
-    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+        <i>{$track_count}</i>
+        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>

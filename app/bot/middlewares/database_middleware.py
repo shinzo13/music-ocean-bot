@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Any, Optional
+from typing import Callable, Dict, Any
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message, User as TelegramUser
@@ -24,8 +24,8 @@ class DatabaseMiddleware(BaseMiddleware):
         if tg_user is None:
             return await handler(event, data)
 
-        db_user: DatabaseUser =  await user_repo.get_user_by_id(tg_user.id) \
-                                 or await user_repo.add_user(user_id=tg_user.id)
+        db_user: DatabaseUser = await user_repo.get_user_by_id(tg_user.id) \
+                                or await user_repo.add_user(user_id=tg_user.id)
 
         if not db_user.settings.locale:
             logger.debug(f"set lang: {tg_user.language_code}")

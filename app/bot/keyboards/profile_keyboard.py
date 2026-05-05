@@ -1,12 +1,12 @@
-from aiogram_i18n.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram_i18n import LazyProxy
+from aiogram_i18n.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from app.bot.constants import BACK_EMOJI_ID
 from app.bot.callbacks.main_menu_callback import MainMenuCallback, MainMenuPath
+from app.bot.constants import BACK_EMOJI_ID
 
 
 def profile_keyboard():
-    return InlineKeyboardMarkup(inline_keyboard=[[ # noqa
+    return InlineKeyboardMarkup(inline_keyboard=[[  # noqa
         InlineKeyboardButton(
             text=LazyProxy('btn-back'),
             callback_data=MainMenuCallback(path=MainMenuPath.SELF).pack(),

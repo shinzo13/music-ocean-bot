@@ -1,8 +1,9 @@
-from sqlalchemy import BigInteger, Enum, ForeignKey, String
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.models.base_track import BaseTrack
 from app.modules.musicocean.enums import Engine
+
 
 class SpotifyTrack(BaseTrack):
     __tablename__ = "spotify_tracks"

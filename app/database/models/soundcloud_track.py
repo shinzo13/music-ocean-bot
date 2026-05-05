@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Enum, ForeignKey
+from sqlalchemy import BigInteger, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.models.base_track import BaseTrack

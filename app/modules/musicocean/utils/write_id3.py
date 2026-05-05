@@ -1,8 +1,9 @@
 import struct
 from typing import Optional
 
-from app.modules.musicocean.enums import Engine
 from app.modules.musicocean.engines.shared.models import BaseTrack
+from app.modules.musicocean.enums import Engine
+
 
 async def write_id3(
         track: BaseTrack,
@@ -41,12 +42,12 @@ def frame(tag, data):
 def text(s):
     return b"\x03" + s.encode('utf-8')
 
+
 def comment(desc: str, value: str):
     return (b"\x03" +
             b'eng' +
             desc.encode('utf-8') + b"\x00" +
             value.encode('utf-8'))
-
 
 
 def picture(img):

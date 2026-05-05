@@ -1,5 +1,5 @@
-from app.modules.musicocean.engines.soundcloud.utils import format_cover_url
 from app.modules.musicocean.engines.shared.models import BaseAlbum
+from app.modules.musicocean.engines.soundcloud.utils import format_cover_url
 
 
 class SoundCloudAlbum(BaseAlbum):

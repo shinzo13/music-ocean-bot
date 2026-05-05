@@ -4,6 +4,7 @@ from typing import Optional
 from aiohttp import ClientSession
 from curl_cffi.requests import AsyncSession
 
+from app.config.settings import settings
 from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
 from app.modules.musicocean.engines.soundcloud.constants import API_URL, HEADERS
 from app.modules.musicocean.engines.soundcloud.enums.api_method import SoundCloudAPIMethod
@@ -16,7 +17,7 @@ from app.modules.musicocean.engines.soundcloud.models import (
 from app.modules.musicocean.engines.soundcloud.models.soundcloud_artist import SoundCloudArtist
 from app.modules.musicocean.enums import Engine
 from app.modules.musicocean.utils import write_id3
-from app.config.settings import settings
+
 
 class SoundCloudClient(BaseEngineClient):
     session: ClientSession | None
@@ -31,7 +32,6 @@ class SoundCloudClient(BaseEngineClient):
     async def _get_client_id(self) -> str:
         if settings.dev.enabled and settings.dev.client_id:
             return settings.dev.client_id
-
 
         async with self.session.get("https://soundcloud.com") as resp:
             text = await resp.text()
@@ -74,8 +74,8 @@ class SoundCloudClient(BaseEngineClient):
 
         if not antibot:
             async with self.session.get(
-                url=url,
-                params=kwargs,
+                    url=url,
+                    params=kwargs,
             ) as resp:
                 raw_data = await resp.json()
         else:
@@ -136,7 +136,8 @@ class SoundCloudClient(BaseEngineClient):
             method=SoundCloudAPIMethod.GET_ALBUM,
             path=str(album_id)
         )
-        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_album["tracks"] if "title" in raw_track]
+        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_album["tracks"] if
+                "title" in raw_track]
 
     async def get_artist(self, artist_id: int) -> SoundCloudArtist:
         raw_artist = await self._api_request(
@@ -149,9 +150,10 @@ class SoundCloudClient(BaseEngineClient):
         raw_artist = await self._api_request(
             method=SoundCloudAPIMethod.GET_ARTIST,
             path=f"{artist_id}/tracks",
-            antibot=True # okay i really don't understand SC's logic
+            antibot=True  # okay i really don't understand SC's logic
         )
-        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_artist["collection"] if "title" in raw_track]
+        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_artist["collection"] if
+                "title" in raw_track]
 
     async def get_playlist(self, playlist_id: int) -> SoundCloudPlaylist:
         raw_playlist = await self._api_request(
@@ -165,7 +167,8 @@ class SoundCloudClient(BaseEngineClient):
             method=SoundCloudAPIMethod.GET_PLAYLIST,
             path=str(playlist_id)
         )
-        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_playlist["tracks"] if "title" in raw_track]
+        return [SoundCloudTrackPreview.from_dict(raw_track) for raw_track in raw_playlist["tracks"] if
+                "title" in raw_track]
 
     async def download_track(self, track_id: int, watermark: Optional[str] = None) -> SoundCloudTrack:
         raw_data = await self._api_request(

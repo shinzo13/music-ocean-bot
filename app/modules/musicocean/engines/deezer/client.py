@@ -160,7 +160,7 @@ class DeezerClient(BaseEngineClient):
         return [DeezerTrackPreview.from_dict(raw_track) for raw_track in raw_data]
 
     async def get_playlist(self, playlist_id: int):
-        return  DeezerPlaylist.from_dict(
+        return DeezerPlaylist.from_dict(
             await self._get_entity(EntityType.PLAYLIST, playlist_id)
         )
 

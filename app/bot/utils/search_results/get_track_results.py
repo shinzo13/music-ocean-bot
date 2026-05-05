@@ -7,8 +7,8 @@ from aiogram.types import (
 
 from app.bot.constants import LOADING_EMOJI_ID
 from app.config.log import get_logger
-from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.engines.shared.models import BaseTrackPreview
+from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg.utils import engine_to_prefix
 
 logger = get_logger(__name__)

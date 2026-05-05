@@ -1,10 +1,10 @@
 import csv
 import io
-from typing import Optional, Generator, AsyncGenerator
+from typing import Optional, AsyncGenerator
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload, attributes
+from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.attributes import flag_modified
 
 from app.config.log import get_logger
@@ -102,11 +102,10 @@ class UserRepository:
         else:
             result = await self.session.execute(
                 select(User.user_id)
-                .where(User.is_dm==True)
+                .where(User.is_dm == True)
             )
         for user in result.scalars().all():
             yield user
-
 
     async def export_to_csv(self) -> bytes:
         result = await self.session.execute(select(User))

@@ -1,4 +1,5 @@
 import re
+
 from bs4 import BeautifulSoup
 
 
@@ -19,6 +20,7 @@ def get_youtube_id(html: str) -> str | None:
         "a.play-this-track-playlink--youtube",
         r"(?:v=|youtu\.be/|embed/)([a-zA-Z0-9_-]{11})"
     )
+
 
 def get_spotify_id(html: str) -> str | None:
     return _get_track_id(

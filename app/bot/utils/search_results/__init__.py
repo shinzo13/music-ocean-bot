@@ -2,6 +2,6 @@ from .get_album_results import get_album_results
 from .get_artist_results import get_artist_results
 from .get_playlist_results import get_playlist_results
 from .get_track_results import get_track_results
-from .usage_guide_result import usage_guide_result
-from .setup_scrobbling_result import setup_scrobbling_result
 from .not_supported_result import not_supported_result
+from .setup_scrobbling_result import setup_scrobbling_result
+from .usage_guide_result import usage_guide_result
