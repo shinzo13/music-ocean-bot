@@ -3,6 +3,7 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram_i18n.cores import FluentRuntimeCore
 from dishka.integrations.aiogram import setup_dishka as setup_dishka_aiogram
 
 
@@ -13,7 +14,8 @@ from app.bot.handlers import (
     track_info,
     admin_panel, shared
 )
-from app.bot.middlewares import MainMiddleware
+from app.bot.middlewares import DatabaseMiddleware
+from app.bot.middlewares.locale_middleware import LocaleMiddleware, PatchedManager
 from app.config.log import setup_logging, get_logger
 from app.config.settings import settings
 from app.database.core import create_engine, add_env_admins, initialize_dynamic_settings
@@ -45,7 +47,14 @@ async def main():
     container = setup_container()
     setup_dishka_aiogram(container=container, router=dp, auto_inject=True)
 
-    dp.update.outer_middleware(MainMiddleware())
+    dp.update.outer_middleware(DatabaseMiddleware())
+
+    #DatabaseI18nMiddleware(
+    LocaleMiddleware(
+        core=FluentRuntimeCore(path="app/locales/{locale}"),
+        manager=PatchedManager(),
+        default_locale="en"
+    ).setup(dp)
 
     dp.include_routers(
         *shared.routers,

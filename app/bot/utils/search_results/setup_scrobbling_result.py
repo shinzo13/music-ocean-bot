@@ -1,18 +1,19 @@
-from aiogram.types import InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup
+from aiogram_i18n import LazyProxy
+from aiogram_i18n.types import InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup
 
 from app.bot.constants import SPOTIFY_LOGO_URL, SPOTIFY_BANNER_URL
-from app.bot.keyboards.scrobbling import scrobbling_setup_keyboard
+from app.bot.keyboards.scrobbling import scrobbling_inline_setup_keyboard
 
 
 def setup_scrobbling_result(bot_username: str):
     return [InlineQueryResultArticle(
         id="setup_scrobbling",
-        title="Spotify scrobbling",
-        description="Setup scrobbling to download tracks you are listening now to!",
+        title=LazyProxy('setup-scrobbling-title'),
+        description=LazyProxy('setup-scrobbling-description'),
         input_message_content=InputTextMessageContent(
-            message_text=f"<b>Spotify scrobbling!!</b>\n\nLog in into your Spotify account and get ability to quickly download tracks from your player.<a href='{SPOTIFY_BANNER_URL}'>︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>"  # TODO
+            message_text=LazyProxy('setup-scrobbling-message')
         ),
-        reply_markup=scrobbling_setup_keyboard(bot_username),
+        reply_markup=scrobbling_inline_setup_keyboard(bot_username),
         thumbnail_url=SPOTIFY_LOGO_URL,
         thumbnail_width=565,
         thumbnail_height=565

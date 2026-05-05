@@ -17,7 +17,7 @@ class LastfmSettings(BaseModel):
     username: Optional[str] = None
 
 class UserSettings(BaseModel):
-
+    locale: Optional[str] = None
     selected_engine: Engine = Engine.DEEZER
     track_preview_covers: bool = True
 

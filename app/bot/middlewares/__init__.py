@@ -1,1 +1,1 @@
-from .main_middleware import MainMiddleware
+from .database_middleware import DatabaseMiddleware

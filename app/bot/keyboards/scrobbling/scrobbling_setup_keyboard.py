@@ -1,20 +1,22 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram_i18n.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram_i18n import LazyProxy
 
 from app.bot.callbacks.main_menu_callback import MainMenuCallback, MainMenuPath
 from app.bot.callbacks.setup_scrobbling_callback import SetupScrobblingCallback
 from app.bot.constants import SPOTIFY_EMOJI_ID, BACK_EMOJI_ID
 
 
-def scrobbling_setup_keyboard():
-    return InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(
-            text="Setup scrobbling",
-            callback_data=SetupScrobblingCallback(init=True, approved=False).pack(),
-            icon_custom_emoji_id=SPOTIFY_EMOJI_ID
-        ),
-        InlineKeyboardButton(
-            text="Back",
+def scrobbling_setup_keyboard(again: bool = False):
+    setup_btn = 'btn-setup-scrobbling' if not again else ''
+    return InlineKeyboardMarkup(inline_keyboard=[ # noqa
+        [InlineKeyboardButton(
+            text=LazyProxy(f'btn-setup-scrobbling{'-again' if again else ''}'),
+            callback_data=SetupScrobblingCallback(init=True, approved=False).pack()
+    # TODO lastfm icon
+        )],
+        [InlineKeyboardButton(
+            text=LazyProxy('btn-back'),
             callback_data=MainMenuCallback(path=MainMenuPath.SETTINGS).pack(),
             icon_custom_emoji_id=BACK_EMOJI_ID
-        )
-    ]])
+        )]
+    ])

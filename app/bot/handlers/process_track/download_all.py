@@ -3,6 +3,7 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message
 import re
 
+from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.utils.get_engine_emoji import get_engine_emoji
@@ -25,6 +26,7 @@ async def handle_deeplink(
         deeplink_match: re.Match,
         musicocean: FromDishka[TelegramMusicOceanClient],
         track_repo: FromDishka[TrackRepository],
+        i18n: I18nContext,
 ):
     engine_prefix = deeplink_match.group(1)
     entity_type = deeplink_match.group(2)
@@ -46,19 +48,29 @@ async def handle_deeplink(
             group_tracks = True # todo!! maybe..
             album = await musicocean.get_album(engine, entity_id)
             tracks = await musicocean.get_album_tracks(engine, entity_id)
-            text = f'<b>{engine_emoji}{album.title}</b>\n<i>{album.artist_name}</i><a href="{album.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>'
+            text = i18n.get(
+                'entity-album',
+                title=album.title,
+                artist_name=album.artist_name,
+                cover_url=album.cover_url
+            )
         case "pl":
             group_tracks = False
             playlist = await musicocean.get_playlist(engine, entity_id)
             tracks = await musicocean.get_playlist_tracks(engine, entity_id)
-            text = f'<b>{engine_emoji}{playlist.title}</b>\n<i>{playlist.track_count} tracks</i><a href="{playlist.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>'
+            text = i18n.get(
+                'entity-playlist',
+                title=playlist.title,
+                artist_name=playlist.track_count,
+                cover_url=playlist.cover_url
+            )
         # here was artist but nah i wont download all the artists tracks
         case _:
-            await message.answer("invalid link")
+            await message.answer(i18n.get('invalid-link'))
             return
 
     await message.answer(text)
-    await message.answer("Downloading..")
+    await message.answer(i18n.get('downloading'))
 
     async for track in musicocean.download_tracks(
             engine,
@@ -75,3 +87,5 @@ async def handle_deeplink(
                 telegram_file_id=track.file_id,
                 user_id=message.from_user.id,
             )
+
+    await message.answer(i18n.get('downloaded'))

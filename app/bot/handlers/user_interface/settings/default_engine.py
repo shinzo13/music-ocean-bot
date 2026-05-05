@@ -3,6 +3,7 @@ from sys import prefix
 from aiogram import Router, F
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import CallbackQuery
+from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.callbacks.default_engine_callback import DefaultEngineCallback
@@ -17,9 +18,9 @@ from app.modules.musicocean_tg.utils import prefix_to_engine
 router = Router()
 
 @router.callback_query(SettingsCallback.filter(F.path==SettingsPath.ENGINE))
-async def default_engine_handler(callback: CallbackQuery, user: User):
+async def default_engine_handler(callback: CallbackQuery, user: User, i18n: I18nContext):
     await callback.message.edit_text(
-        text="Choose a default engine to use:",
+        text=i18n.get('choose-engine'),
         reply_markup=engines_keyboard(user.settings.selected_engine)
     )
 
@@ -28,12 +29,13 @@ async def set_engine_handler(
         query: CallbackQuery,
         callback_data: DefaultEngineCallback,
         user: User,
+        i18n: I18nContext,
         user_repo: FromDishka[UserRepository],
 ):
     engine = prefix_to_engine(callback_data.engine_prefix)
 
     if user.settings.selected_engine == engine:
-        await query.answer("This engine is already selected.", show_alert=True)
+        await query.answer(i18n.get('option-already-selected'), show_alert=True)
         return
 
     user: await user_repo.update_user_settings(
@@ -44,4 +46,4 @@ async def set_engine_handler(
         reply_markup=engines_keyboard(user.settings.selected_engine)
     )
 
-    await query.answer("✅ Engined changed successfully")
+    await query.answer(i18n.get('engine-changed'))

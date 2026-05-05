@@ -4,6 +4,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery
+from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.callbacks.mailing_callback import MailingCallback
@@ -30,10 +31,11 @@ router = Router()
 async def mailing(
         callback: CallbackQuery,
         state: FSMContext,
+        i18n: I18nContext
 ):
     await state.set_state(MailingState.message)
     await callback.message.edit_text(
-        "Send a message for mailing:",
+        i18n.get('mailing-enter-message'),
         reply_markup=mailing_message_keyboard()
     )
 
@@ -55,16 +57,16 @@ async def mailing_message(message: Message, state: FSMContext):
 async def mailing_approve(
         query: CallbackQuery,
         callback_data: MailingCallback,
-        bot: Bot,
+        i18n: I18nContext,
         state: FSMContext,
         user_repo: FromDishka[UserRepository],
 ):
     if not callback_data.approved:
-        await query.message.edit_text("Canceled")
+        await query.message.edit_text(i18n.get('mailing-canceled'))
         await state.clear()
         return
 
-    await query.message.answer("sending to all users")
+    await query.message.answer(i18n.get('mailing-sending'))
     all_users = 0; succeed = 0
     msg: Message = await state.get_value('message')
     async for user_id in user_repo.get_all_users(for_mailing=True):
@@ -79,4 +81,10 @@ async def mailing_approve(
             logger.error(f"Error sending message to {user_id}: {err}")
             await user_repo.update_user(user_id, is_dm=False)
 
-    await query.message.answer(f"mailing finished ({succeed}/{all_users} succeed)")
+    await query.message.answer(
+        i18n.get(
+            'mailing-finished',
+            succeed=succeed,
+            all=all_users
+        )
+    )

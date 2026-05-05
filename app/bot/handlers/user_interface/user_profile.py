@@ -1,5 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
+from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.constants import PROFILE_EMOJI
@@ -15,12 +16,14 @@ async def user_profile(
         callback: CallbackQuery,
         user: User,
         user_repo: FromDishka[UserRepository],
+        i18n: I18nContext
 ):
     downloaded_tracks = await user_repo.get_user_downloaded_tracks(user.user_id)
-    text = (
-        f"<b>{PROFILE_EMOJI} {callback.from_user.mention_html()}</b>\n\n"
-        f"<b>• Registered</b>: <code>{user.created_at.strftime("%Y-%m-%d")}</code>\n"
-        f"<b>• Tracks downloaded</b>: <code>{len(downloaded_tracks)}</code>"
+    text = i18n.get(
+        'profile-text',
+        user=callback.from_user.mention_html(),
+        registered=user.created_at.strftime("%Y-%m-%d"),
+        tracks_downloaded=len(downloaded_tracks)
     )
     await callback.message.edit_text(
         text=text,

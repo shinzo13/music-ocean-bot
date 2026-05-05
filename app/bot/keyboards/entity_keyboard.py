@@ -1,4 +1,5 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram_i18n.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram_i18n import LazyProxy
 
 from app.bot.constants import SEARCH_EMOJI_ID, LOCKED_EMOJI_ID, DOWNLOAD_EMOJI_ID
 from app.modules.musicocean.enums import Engine
@@ -15,21 +16,21 @@ def entity_keyboard(
 
 ) -> InlineKeyboardMarkup:
     kb = [[InlineKeyboardButton(
-        text="Search for track",
+        text=LazyProxy('btn-search-for-track'),
         switch_inline_query_current_chat=f"{engine_to_prefix(engine)}::{prefix}::{entity_id}",
         icon_custom_emoji_id=SEARCH_EMOJI_ID
     )]]
     if download_all:
         if download_all_available:
             kb.append([InlineKeyboardButton(
-                text="Download all tracks",
+                text=LazyProxy('btn-download-all'),
                 url=f"https://t.me/{bot_username}?start={engine_to_prefix(engine)}_{prefix}_{entity_id}",
                 icon_custom_emoji_id=DOWNLOAD_EMOJI_ID
             )])
         else:
             kb.append([InlineKeyboardButton(
-                text="Download all tracks",
+                text=LazyProxy('btn-download-all'),
                 callback_data="feature_not_available",
                 icon_custom_emoji_id=LOCKED_EMOJI_ID
             )])
-    return InlineKeyboardMarkup(inline_keyboard=kb)
+    return InlineKeyboardMarkup(inline_keyboard=kb) # noqa

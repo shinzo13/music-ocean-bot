@@ -2,6 +2,7 @@ import re
 
 from aiogram import Router, F, Bot
 from aiogram.types import InlineQuery
+from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.utils.search_results import (
@@ -82,5 +83,5 @@ async def inline_query(
     )
 
 @router.inline_query(F.query.regexp(SOUNDCLOUD_REGEX))
-async def inline_query(query: InlineQuery):
-    await query.answer(not_supported_result("SoundCloud link search"))
+async def inline_query(query: InlineQuery, i18n: I18nContext):
+    await query.answer(not_supported_result(i18n.get('feature-soundcloud-link-search')))

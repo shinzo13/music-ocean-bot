@@ -1,11 +1,17 @@
 from aiogram import Bot, Router, F
 from aiogram.types import Message
+from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.keyboards import track_info_keyboard
+from app.bot.utils.get_engine_emoji import get_engine_emoji
 from app.database.models import User
 from app.database.repositories import TrackRepository
 from app.modules.musicocean.enums import Engine
+from app.config.log import get_logger
+
+logger = get_logger(__name__)
+
 
 router = Router()
 
@@ -14,11 +20,12 @@ async def track_info_ready(
         message: Message,
         bot: Bot,
         user: User,
-        track_repo: FromDishka[TrackRepository]
+        track_repo: FromDishka[TrackRepository],
+        i18n: I18nContext
 ):
     track = await track_repo.get_track_by_file_id(message.audio.file_id)
     if not track:
-        await message.answer("track is not from music ocean bla bla bla")
+        await message.answer(i18n.get('track-not-found'))
         # todo watermark checking here after prompting user
         return
 
@@ -29,20 +36,25 @@ async def track_info_ready(
         Engine.SPOTIFY: "Spotify"
     }
 
-    info = (
-        f"{message.audio.performer} - {message.audio.title}\n"
-        f"Downloaded from {engine_names[track.engine]}"
+    info = i18n.get(
+        'track-info',
+        artist_name=message.audio.performer,
+        title=message.audio.title,
+        engine_emoji=get_engine_emoji(track.engine),
+        engine_name=engine_names[track.engine]
     )
 
     if user.is_admin:
-        track_user = await bot.get_chat(track.user_id)
+        bot_user = await bot.get_chat(track.user_id)
         downloaded_by = (
-            '@'+track_user.username or
-            f"{track_user.first_name} {track_user.last_name}"
-        ) if track_user else f"#{track.user_id}"
-        info += (
-            f"\n\nTrack ID: {track.track_id}\n"
-            f"Downloaded by: {downloaded_by}"
+            '@'+bot_user.username if bot_user.username else
+            f"<a href='tg://user?id={bot_user.id}'>{bot_user.first_name} {bot_user.last_name}</a>"
+        ) if bot_user else f"<code>#{track.user_id}</code>"
+        
+        info += '\n' + i18n.get(
+            'track-info-admin',
+            track_id=str(track.track_id), # fluent adds stupid spaces to int
+            downloaded_by=downloaded_by
         )
 
     await message.answer(

@@ -11,14 +11,14 @@ from app.database.repositories import UserRepository
 logger = get_logger(__name__)
 
 
-class MainMiddleware(BaseMiddleware):
+class DatabaseMiddleware(BaseMiddleware):
     async def __call__(
             self,
             handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
             event: Message,
             data: Dict[str, Any]
     ) -> Any:
-        user_repo = await data["dishka_container"].get(UserRepository)
+        user_repo: UserRepository = await data["dishka_container"].get(UserRepository)
         tg_user: TelegramUser | None = data.get("event_from_user")
 
         if tg_user is None:
@@ -26,6 +26,13 @@ class MainMiddleware(BaseMiddleware):
 
         db_user: DatabaseUser =  await user_repo.get_user_by_id(tg_user.id) \
                                  or await user_repo.add_user(user_id=tg_user.id)
+
+        if not db_user.settings.locale:
+            logger.debug(f"set lang: {tg_user.language_code}")
+            await user_repo.update_user_settings(
+                db_user.user_id,
+                locale=tg_user.language_code
+            )
 
         if db_user.is_banned:
             return None

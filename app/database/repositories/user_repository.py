@@ -50,6 +50,7 @@ class UserRepository:
     async def update_user_settings(
             self,
             user_id: int,
+            locale: Optional[str] = None,
             selected_engine: Optional[Engine] = None,
             track_preview_covers: Optional[bool] = None,
             lastfm__enabled: Optional[bool] = None,
@@ -59,6 +60,8 @@ class UserRepository:
         if user is None:
             raise
 
+        if locale is not None:
+            user.settings.locale = locale
         if selected_engine is not None:
             user.settings.selected_engine = selected_engine
         if track_preview_covers is not None:
