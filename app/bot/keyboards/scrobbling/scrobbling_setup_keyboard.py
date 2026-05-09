@@ -7,7 +7,6 @@ from app.bot.constants import BACK_EMOJI_ID
 
 
 def scrobbling_setup_keyboard(again: bool = False):
-    setup_btn = 'btn-setup-scrobbling' if not again else ''
     return InlineKeyboardMarkup(inline_keyboard=[  # noqa
         [InlineKeyboardButton(
             text=LazyProxy(f'btn-setup-scrobbling{'-again' if again else ''}'),

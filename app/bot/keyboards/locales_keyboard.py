@@ -11,19 +11,23 @@ def locales_keyboard(current: str):
     return InlineKeyboardMarkup(inline_keyboard=[  # noqa
         [InlineKeyboardButton(
             text=option_selection('🇬🇧 English', current == 'en'),
-            callback_data=LocalesCallback(code='en').pack()
+            callback_data=LocalesCallback(code='en').pack(),
+            style='success' if current == 'en' else None
         )],
         [InlineKeyboardButton(
             text=option_selection('🇵🇱 Polski', current == 'pl'),
-            callback_data=LocalesCallback(code='pl').pack()
+            callback_data=LocalesCallback(code='pl').pack(),
+            style='success' if current == 'pl' else None
         )],
         [InlineKeyboardButton(
             text=option_selection('🇺🇦 Українська', current == 'uk'),
-            callback_data=LocalesCallback(code='uk').pack()
+            callback_data=LocalesCallback(code='uk').pack(),
+            style='success' if current == 'uk' else None
         )],
         [InlineKeyboardButton(
             text=option_selection('🇷🇺 Русский', current == 'ru'),
-            callback_data=LocalesCallback(code='ru').pack()
+            callback_data=LocalesCallback(code='ru').pack(),
+            style='success' if current == 'ru' else None
         )],
         [InlineKeyboardButton(
             text=LazyProxy('btn-back'),

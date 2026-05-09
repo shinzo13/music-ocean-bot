@@ -16,7 +16,8 @@ def track_preview_keyboard(i18n: I18nContext, show_covers: bool) -> InlineKeyboa
                 show_covers
             ),
             callback_data=TrackPreviewsCallback(show_covers=True).pack(),
-            icon_custom_emoji_id=COVER_EMOJI_ID
+            icon_custom_emoji_id=COVER_EMOJI_ID,
+            style='success' if show_covers else None
         )],
         [InlineKeyboardButton(
             text=option_selection(
@@ -24,7 +25,8 @@ def track_preview_keyboard(i18n: I18nContext, show_covers: bool) -> InlineKeyboa
                 not show_covers
             ),
             callback_data=TrackPreviewsCallback(show_covers=False).pack(),
-            icon_custom_emoji_id=MUSIC_EMOJI_ID
+            icon_custom_emoji_id=MUSIC_EMOJI_ID,
+            style='success' if not show_covers else None
         )],
         [InlineKeyboardButton(
             text=LazyProxy('btn-back'),
