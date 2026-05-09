@@ -35,7 +35,7 @@ async def set_engine_handler(
         await query.answer(i18n.get('option-already-selected'), show_alert=True)
         return
 
-    user: await user_repo.update_user_settings(
+    user = await user_repo.update_user_settings(
         user_id=user.user_id,
         selected_engine=engine
     )

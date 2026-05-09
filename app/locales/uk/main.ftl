@@ -16,8 +16,8 @@ usage-guide-text = ькцлдцкпл
 profile-text =
     <b>👤 {$user}</b>
 
-        <b>• Зареєстрований</b>: <code>{$registered}</code>
-        <b>• Завантажено треків</b>: <code>{$tracks_downloaded}</code>
+    <b>• Зареєстрований</b>: <code>{$registered}</code>
+    <b>• Завантажено треків</b>: <code>{$tracks_downloaded}</code>
 
 ## settings
 settings-text = Налаштування
@@ -42,14 +42,16 @@ btn-show-mp3-previews = Показувати MP3-фрагменти
 feature-not-available = 🔒 Ця функція поки недоступна.
 
 ## scrobbling
-scrobbling-description = <b>Скроблінг</b>
+scrobbling-description =
+    <b>Скроблінг</b>
 
     Увійдіть у свій акаунт Last.fm і отримайте можливість швидко завантажувати треки прослухані в інших плеєрах.
 scrobbling-already-setup = Скроблінг вже налаштовано!
 scrobbling-enter-username = Введіть ваш юзернейм на Last.fm:
 scrobbling-invalid-username = Невірний юзернейм, спробуйте ще раз.
 scrobbling-no-data = Немає даних про прослуховування.
-scrobbling-is-that-right = Останній трек: <i>{ $artist } - { $title }</i>
+scrobbling-is-that-right =
+    Останній трек: <i>{ $artist } - { $title }</i>
 
     Все вірно?
 scrobbling-success = ✅ Скроблінг Last.fm налаштовано.
@@ -70,10 +72,10 @@ mailing-finished = Розсилку завершено ({ $succeed }/{ $all } у
 track-info =
     <blockquote><b><i>{ $artist_name } - { $title }</i></b></blockquote>
 
-        • <b>Рушій</b>: {$engine_emoji}  <code>{$engine_name}</code>
+    • <b>Рушій</b>: {$engine_emoji}  <code>{$engine_name}</code>
 track-info-admin =
     • <b>ID треку</b>: <code>{ $track_id }</code>
-        • <b>Завантажив</b>: { $downloaded_by }
+    • <b>Завантажив</b>: { $downloaded_by }
 track-not-found = Цей трек не завантажувався через Music Ocean.
 btn-album = Альбом
 btn-artist = Виконавець
@@ -81,16 +83,19 @@ btn-artist = Виконавець
 ## inline search
 usage-guide-title = Як користуватись розширеним пошуком?
 usage-guide-description = Натисніть, щоб відкрити інструкцію.
-usage-guide-message = <b>Як користуватись розширеним пошуком?</b>
+usage-guide-message =
+    <b>Як користуватись розширеним пошуком?</b>
 
     i dont know
 feature-soundcloud-link-search = Пошук за посиланням SoundCloud
+feature-youtube-advanced-search = Розширений пошук по YouTube
 not-supported-title = { $feature } поки не підтримується.
 not-supported-description = :(
 not-supported-message = Ця функція поки недоступна.
 setup-scrobbling-title = Скроблінг
 setup-scrobbling-description = Налаштуйте скроблінг, щоб миттєво завантажувати те, що слухаєте!
-setup-scrobbling-message = <b>Скроблінг Spotify</b>
+setup-scrobbling-message =
+    <b>Скроблінг Spotify</b>
 
     Налаштуйте ьлициштзцкитзц ТУДУ швидко завантажувати треки з плеєра.
 
@@ -105,9 +110,13 @@ btn-downloading = Завантажую...
 ## entities
 entity-album =
     <b>{$title}</b>
-        <i>{$artist_name}</i>
-        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+    <i>{$artist_name}</i>
+    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
 entity-playlist =
     <b>{$title}</b>
-        <i>{$track_count}</i>
-        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+    <i>{$track_count} треків</i>
+    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+entity-artist =
+    <b>{$name}</b>
+    <i>{$listeners} слухачів</i>
+    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>

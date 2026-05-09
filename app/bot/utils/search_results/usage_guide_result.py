@@ -1,12 +1,13 @@
-from aiogram.types import InlineQueryResultArticle, InputTextMessageContent
+from aiogram_i18n import LazyProxy
+from aiogram_i18n.types import InlineQueryResultArticle, InputTextMessageContent
 
 
 def usage_guide_result():
     return [InlineQueryResultArticle(
         id="usage_guide",
-        title="How to use advanced search?",
-        description="Click here to see usage guide.",
+        title=LazyProxy('usage-guide-title'),
+        description=LazyProxy('usage-guide-description'),
         input_message_content=InputTextMessageContent(
-            message_text=f"<b>How to use advanced search?</b>\n\ni dont know"  # TODO
+            message_text=LazyProxy('usage-guide-message')
         )
     )]

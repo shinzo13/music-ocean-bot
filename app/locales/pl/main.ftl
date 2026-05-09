@@ -16,8 +16,8 @@ usage-guide-text = tutaj będzie tekst tutorialu
 profile-text =
     <b>👤 {$user}</b>
 
-        <b>• Zarejestrowany</b>: <code>{$registered}</code>
-        <b>• Pobrano utworów</b>: <code>{$tracks_downloaded}</code>
+    <b>• Zarejestrowany</b>: <code>{$registered}</code>
+    <b>• Pobrano utworów</b>: <code>{$tracks_downloaded}</code>
 
 ## settings
 settings-text = Ustawienia
@@ -49,7 +49,8 @@ scrobbling-already-setup = Scrobbling jest już skonfigurowany!
 scrobbling-enter-username = Podaj swój username Last.fm:
 scrobbling-invalid-username = Nieprawidłowy username, spróbuj ponownie.
 scrobbling-no-data = Brak informacji o odsłuchach.
-scrobbling-is-that-right = Ostatni utwór: <i>{ $artist } - { $title }</i>
+scrobbling-is-that-right =
+    Ostatni utwór: <i>{ $artist } - { $title }</i>
 
     Zgadza się?
 scrobbling-success = ✅ Scrobbling Last.fm został skonfigurowany.
@@ -70,10 +71,10 @@ mailing-finished = Mailing zakończony ({ $succeed }/{ $all } pomyślnie).
 track-info =
     <blockquote><b><i>{ $artist_name } - { $title }</i></b></blockquote>
 
-        • <b>Platforma</b>: {$engine_emoji}  <code>{$engine_name}</code>
+    • <b>Platforma</b>: {$engine_emoji}  <code>{$engine_name}</code>
 track-info-admin =
     • <b>ID utworu</b>: <code>{ $track_id }</code>
-        • <b>Pobrano przez</b>: { $downloaded_by }
+    • <b>Pobrano przez</b>: { $downloaded_by }
 track-not-found = Ten utwór nie był pobierany przez Music Ocean.
 btn-album = Album
 btn-artist = Wykonawca
@@ -81,16 +82,19 @@ btn-artist = Wykonawca
 ## inline search
 usage-guide-title = Jak używać zaawansowanego wyszukiwania?
 usage-guide-description = Kliknij tutaj, aby zobaczyć instrukcję.
-usage-guide-message = <b>Jak używać zaawansowanego wyszukiwania?</b>
+usage-guide-message =
+    <b>Jak używać zaawansowanego wyszukiwania?</b>
 
     i dont know
 feature-soundcloud-link-search = Wyszukiwanie po linku SoundCloud
+feature-youtube-advanced-search = Zaansowane wyszukiwanie przez YT
 not-supported-title = { $feature } nie jest aktualnie obsługiwane.
 not-supported-description = :(
 not-supported-message = Ta funkcja nie jest jeszcze dostępna.
 setup-scrobbling-title = Scrobbling Spotify
 setup-scrobbling-description = Skonfiguruj scrobbling, aby natychmiast pobierać słuchane utwory!
-setup-scrobbling-message = <b>Scrobbling Spotify</b>
+setup-scrobbling-message =
+    <b>Scrobbling Spotify</b>
 
     Zaloguj się na swoje konto Spotify i zyskaj możliwość szybkiego pobierania utworów z odtwarzacza.
 
@@ -105,9 +109,13 @@ btn-downloading = Pobieranie...
 ## entities
 entity-album =
     <b>{$title}</b>
-        <i>{$artist_name}</i>
-        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+    <i>{$artist_name}</i>
+    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
 entity-playlist =
     <b>{$title}</b>
-        <i>{$track_count}</i>
-        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+    <i>{$track_count} utworów</i>
+    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+entity-artist =
+    <b>{$name}</b>
+    <i>{$listeners} słuchaczy</i>
+    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>

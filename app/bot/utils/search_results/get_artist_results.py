@@ -1,9 +1,10 @@
 import html
 
-from aiogram.types import (
+from aiogram_i18n.types import (
     InlineQueryResultArticle,
     InputTextMessageContent
 )
+from aiogram_i18n import LazyProxy
 
 from app.bot.keyboards.entity_keyboard import entity_keyboard
 from app.modules.musicocean.engines.shared.models import BaseArtist
@@ -22,7 +23,12 @@ async def get_artist_results(
             description=f"{artist.listeners} listeners",
             thumbnail_url=artist.photo_url,
             input_message_content=InputTextMessageContent(
-                message_text=f'<b>{html.escape(artist.name)}</b>\n<i>{artist.listeners} listeners</i><a href="{artist.photo_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
+                message_text=LazyProxy(
+                    'artist',
+                    name=artist.name,
+                    listeners=artist.listeners,
+                    cover_url=artist.cover_url
+                ),
             ),
             reply_markup=entity_keyboard(
                 engine=engine,

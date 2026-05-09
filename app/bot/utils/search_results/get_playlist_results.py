@@ -1,9 +1,10 @@
 import html
 
-from aiogram.types import (
+from aiogram_i18n.types import (
     InlineQueryResultArticle,
     InputTextMessageContent
 )
+from aiogram_i18n import LazyProxy
 
 from app.bot.keyboards.entity_keyboard import entity_keyboard
 from app.modules.musicocean.engines.shared.models import BasePlaylist
@@ -20,10 +21,15 @@ async def get_playlist_results(
         InlineQueryResultArticle(
             id=f"{engine_to_prefix(engine)}_pl_{playlist.id}",
             title=playlist.title,
-            description=f"{playlist.track_count} tracks",  # TODO maybe author instead
+            description=f"{playlist.track_count} tracks",
             thumbnail_url=playlist.cover_url,
             input_message_content=InputTextMessageContent(
-                message_text=f'<b>{html.escape(playlist.title)}</b>\n<i>{playlist.track_count} tracks</i><a href="{playlist.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
+                message_text=LazyProxy(
+                    'playlist',
+                    title=playlist.title,
+                    track_count=playlist.track_count,
+                    cover_url=playlist.cover_url
+                ),
             ),
             reply_markup=entity_keyboard(
                 engine=engine,

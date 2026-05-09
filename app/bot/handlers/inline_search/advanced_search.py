@@ -2,16 +2,18 @@ import re
 
 from aiogram import Router, F, Bot
 from aiogram.types import InlineQuery
+from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.utils.search_results import (
     get_album_results,
     get_artist_results,
     get_playlist_results,
-    usage_guide_result
+    usage_guide_result, not_supported_result
 )
 from app.config.log import get_logger
 from app.database.models import User as DatabaseUser
+from app.modules.musicocean.enums import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 from app.modules.musicocean_tg.utils import prefix_to_engine
 
@@ -28,7 +30,8 @@ async def inline_query(
         match: re.Match,
         bot: Bot,
         user: DatabaseUser,
-        musicocean: FromDishka[TelegramMusicOceanClient]
+        musicocean: FromDishka[TelegramMusicOceanClient],
+        i18n: I18nContext
 ):
     logger.info(f"User #{query.from_user.id} searched for \"{query.query}\"")
     engine_prefix, entity_prefix, search_query = match.groups()
@@ -41,6 +44,11 @@ async def inline_query(
         except ValueError:
             await query.answer(usage_guide_result())
             return
+
+    if engine == Engine.YOUTUBE:
+        await query.answer(not_supported_result(
+            i18n.get('feature-youtube-advanced-search')
+        ))
 
     bot_username = (await bot.get_me()).username
 

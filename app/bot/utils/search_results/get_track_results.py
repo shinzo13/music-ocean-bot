@@ -1,9 +1,10 @@
 import html
 
-from aiogram.types import (
+from aiogram_i18n.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton, InputTextMessageContent, InlineQueryResultArticle, InlineQueryResultAudio
 )
+from aiogram_i18n import LazyProxy
 
 from app.bot.constants import LOADING_EMOJI_ID
 from app.config.log import get_logger
@@ -20,10 +21,10 @@ async def get_track_results(
         preview_covers: bool
 ):  # TODO annotation
 
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=[[
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=[[ # noqa
         InlineKeyboardButton(
-            text="Downloading...",
-            callback_data="x",
+            text=LazyProxy('btn-downloading'),
+            callback_data="meow mrrnyaahhhhh",
             icon_custom_emoji_id=LOADING_EMOJI_ID
         )
     ]])

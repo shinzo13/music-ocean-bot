@@ -16,8 +16,8 @@ usage-guide-text = мяууу мрр
 profile-text =
     <b>👤 {$user}</b>
 
-        <b>• Зарегистрирован</b>: <code>{$registered}</code>
-        <b>• Скачано треков</b>: <code>{$tracks_downloaded}</code>
+    <b>• Зарегистрирован</b>: <code>{$registered}</code>
+    <b>• Скачано треков</b>: <code>{$tracks_downloaded}</code>
 
 ## settings
 settings-text = Настройки
@@ -42,14 +42,16 @@ btn-show-mp3-previews = Показывать MP3-фрагменты
 feature-not-available = 🔒 Эта функция пока недоступна.
 
 ## scrobbling
-scrobbling-description = <b>Скробблинг</b>
+scrobbling-description =
+    <b>Скробблинг</b>
 
     Войдите в свой аккаунт Last.fm и получите возможность быстро скачивать треки прослушанные в других плеерах.
 scrobbling-already-setup = Скробблинг уже настроен!
 scrobbling-enter-username = Введите ваш юзернейм на Last.fm:
 scrobbling-invalid-username = Неверный юзернейм, попробуйте ещё раз.
 scrobbling-no-data = Нет данных о прослушиваниях.
-scrobbling-is-that-right = Последний трек: <i>{ $artist } - { $title }</i>
+scrobbling-is-that-right =
+    Последний трек: <i>{ $artist } - { $title }</i>
 
     Всё верно?
 scrobbling-success = ✅ Скробблинг Last.fm настроен.
@@ -70,10 +72,10 @@ mailing-finished = Рассылка завершена ({ $succeed }/{ $all } у
 track-info =
     <blockquote><b><i>{ $artist_name } - { $title }</i></b></blockquote>
 
-        • <b>Движок</b>: {$engine_emoji}  <code>{$engine_name}</code>
+    • <b>Движок</b>: {$engine_emoji}  <code>{$engine_name}</code>
 track-info-admin =
     • <b>ID трека</b>: <code>{ $track_id }</code>
-        • <b>Скачал</b>: { $downloaded_by }
+    • <b>Скачал</b>: { $downloaded_by }
 track-not-found = Этот трек не скачивался через Music Ocean.
 btn-album = Альбом
 btn-artist = Исполнитель
@@ -85,6 +87,7 @@ usage-guide-message = <b>Как пользоваться расширенным 
 
     i dont know
 feature-soundcloud-link-search = Поиск по ссылке SoundCloud
+feature-youtube-advanced-search = Расширенный поиск по YouTube
 not-supported-title = { $feature } пока не поддерживается.
 not-supported-description = :(
 not-supported-message = Эта функция пока недоступна.
@@ -105,9 +108,13 @@ btn-downloading = Скачиваю...
 ## entities
 entity-album =
     <b>{$title}</b>
-        <i>{$artist_name}</i>
-        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+    <i>{$artist_name}</i>
+    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
 entity-playlist =
     <b>{$title}</b>
-        <i>{$track_count}</i>
-        <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+    <i>{$track_count} треков</i>
+    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+entity-artist =
+    <b>{$name}</b>
+    <i>{$listeners} слушателей</i>
+    <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>

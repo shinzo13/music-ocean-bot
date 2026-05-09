@@ -1,9 +1,10 @@
 import html
 
-from aiogram.types import (
+from aiogram_i18n.types import (
     InlineQueryResultArticle,
     InputTextMessageContent
 )
+from aiogram_i18n import LazyProxy
 
 from app.bot.keyboards.entity_keyboard import entity_keyboard
 from app.bot.utils.get_engine_emoji import get_engine_emoji
@@ -17,7 +18,6 @@ async def get_album_results(
         matches: list[BaseAlbum],
         bot_username: str
 ):
-    emoji = get_engine_emoji(engine)
     return [
         InlineQueryResultArticle(
             id=f"{engine_to_prefix(engine)}_al_{album.id}",
@@ -25,7 +25,12 @@ async def get_album_results(
             description=album.artist_name,
             thumbnail_url=album.cover_url,
             input_message_content=InputTextMessageContent(
-                message_text=f'{emoji}<b>{html.escape(album.title)}</b>\n<i>{html.escape(album.artist_name)}</i><a href="{album.cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>',
+                message_text=LazyProxy(
+                    'album',
+                    title=album.title,
+                    artist_name=album.artist_name,
+                    cover_url=album.cover_url
+                ),
             ),
             reply_markup=entity_keyboard(
                 engine=engine,
