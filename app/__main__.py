@@ -1,4 +1,5 @@
 import asyncio
+import warnings
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -11,7 +12,7 @@ from app.bot.handlers import (
     process_track,
     user_interface,
     track_info,
-    admin_panel, shared
+    admin_panel, shared, other
 )
 from app.bot.middlewares import DatabaseMiddleware
 from app.bot.middlewares.locale_middleware import LocaleMiddleware, PatchedManager
@@ -20,6 +21,10 @@ from app.config.settings import settings
 from app.database.core import create_engine, add_env_admins, initialize_dynamic_settings
 from app.database.models.base import Base
 from app.di.container import setup_container
+
+
+# suppress pydub warning
+warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 setup_logging(level=settings.logging.level)
 logger = get_logger(__name__)
@@ -61,7 +66,8 @@ async def main():
         *process_track.routers,
         *user_interface.routers,
         *track_info.routers,
-        *admin_panel.routers
+        *admin_panel.routers,
+        *other.routers
     )
 
     try:
