@@ -24,11 +24,12 @@ async def get_artist_results(
             thumbnail_url=artist.photo_url,
             input_message_content=InputTextMessageContent(
                 message_text=LazyProxy(
-                    'artist',
+                    'entity-artist',
                     name=artist.name,
                     listeners=artist.listeners,
                     cover_url=artist.cover_url
                 ),
+                parse_mode='HTML'
             ),
             reply_markup=entity_keyboard(
                 engine=engine,

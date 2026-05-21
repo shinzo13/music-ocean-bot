@@ -25,11 +25,12 @@ async def get_playlist_results(
             thumbnail_url=playlist.cover_url,
             input_message_content=InputTextMessageContent(
                 message_text=LazyProxy(
-                    'playlist',
+                    'entity-playlist',
                     title=playlist.title,
                     track_count=playlist.track_count,
                     cover_url=playlist.cover_url
                 ),
+                parse_mode='HTML'
             ),
             reply_markup=entity_keyboard(
                 engine=engine,

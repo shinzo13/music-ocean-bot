@@ -39,7 +39,8 @@ async def get_track_results(
                 description=track.artist_name,
                 thumbnail_url=track.cover_url,
                 input_message_content=InputTextMessageContent(
-                    message_text=text
+                    message_text=text,
+                    parse_mode='HTML'
                 ),
                 reply_markup=reply_markup
             )

@@ -26,11 +26,12 @@ async def get_album_results(
             thumbnail_url=album.cover_url,
             input_message_content=InputTextMessageContent(
                 message_text=LazyProxy(
-                    'album',
+                    'entity-album',
                     title=album.title,
                     artist_name=album.artist_name,
                     cover_url=album.cover_url
                 ),
+                parse_mode='HTML'
             ),
             reply_markup=entity_keyboard(
                 engine=engine,

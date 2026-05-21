@@ -8,6 +8,7 @@ def usage_guide_result():
         title=LazyProxy('usage-guide-title'),
         description=LazyProxy('usage-guide-description'),
         input_message_content=InputTextMessageContent(
-            message_text=LazyProxy('usage-guide-message')
+            message_text=LazyProxy('usage-guide-message'),
+            parse_mode='HTML'
         )
     )]

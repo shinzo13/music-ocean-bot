@@ -11,7 +11,8 @@ def setup_scrobbling_result(bot_username: str):
         title=LazyProxy('setup-scrobbling-title'),
         description=LazyProxy('setup-scrobbling-description'),
         input_message_content=InputTextMessageContent(
-            message_text=LazyProxy('setup-scrobbling-message')
+            message_text=LazyProxy('setup-scrobbling-message'),
+            parse_mode='HTML'
         ),
         reply_markup=scrobbling_inline_setup_keyboard(bot_username),
         thumbnail_url=SPOTIFY_LOGO_URL,
