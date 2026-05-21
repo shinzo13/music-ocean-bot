@@ -14,7 +14,7 @@ from app.modules.musicocean.engines.spotify.enums import SpotifySearchType
 from app.modules.musicocean.engines.spotify.exceptions import (
     SpotifyAuthException,
     SpotifyDataException,
-    SpotifyException,
+    SpotifyException, SpotifyAPIException,
 )
 from app.modules.musicocean.engines.spotify.models import (
     SpotifyAlbum,
@@ -149,7 +149,7 @@ class SpotifyClient(BaseEngineClient):
                 return await self._get(path, **params)
             if status == 404:
                 raise SpotifyDataException(f"Not found: {message}")
-            raise SpotifyException(f"Spotify API error {status}: {message}")
+            raise SpotifyAPIException(f"Spotify API error {status}: {message}")
 
         return data
 
@@ -236,7 +236,7 @@ class SpotifyClient(BaseEngineClient):
         track = await self.get_track(track_id)
         match = await self.yt.search_exact_match(track.title, track.artist_name)
         if not match:
-            raise SpotifyException("No YouTube matches found for Spotify track")
+            raise SpotifyDataException("No YouTube matches found for Spotify track")
 
         return await self.yt.download_track(
             match.id,

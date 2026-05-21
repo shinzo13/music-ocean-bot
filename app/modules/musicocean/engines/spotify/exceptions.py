@@ -1,10 +1,15 @@
-class SpotifyException(Exception):
+from app.modules.musicocean.exceptions import ProviderException, ProviderDataException, ProviderAuthException, \
+    ProviderAPIException
+
+
+class SpotifyException(ProviderException):
     pass
 
-
-class SpotifyDataException(SpotifyException):
+class SpotifyAPIException(ProviderAPIException):
     pass
 
+class SpotifyAuthException(ProviderAuthException):
+    pass
 
-class SpotifyAuthException(SpotifyException):
+class SpotifyDataException(ProviderDataException):
     pass

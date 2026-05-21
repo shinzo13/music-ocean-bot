@@ -10,6 +10,7 @@ from app.config.log import get_logger
 from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
 from app.modules.musicocean.engines.youtube.constants import HEADERS, YTM_DOMAIN, YTM_BASE_API
 from app.modules.musicocean.engines.youtube.enums.api_method import YoutubeAPIMethod
+from app.modules.musicocean.engines.youtube.exceptions import YouTubeAuthException
 from app.modules.musicocean.engines.youtube.models.youtube_album import YoutubeAlbum
 from app.modules.musicocean.engines.youtube.models.youtube_artist import YoutubeArtist
 from app.modules.musicocean.engines.youtube.models.youtube_playlist import YoutubePlaylist
@@ -30,18 +31,15 @@ class YoutubeClient(BaseEngineClient):
         self.context = None
 
     async def _get_visitor_id(self) -> str:
-        if not self.session:
-            raise RuntimeError("youtube is uninitialized")
-
         async with self.session.get(YTM_DOMAIN) as resp:
             text = await resp.text()
 
         matches = re.findall(r"ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;", text)
         if not matches:
-            raise RuntimeError("cant fetch visitor id")
+            raise YouTubeAuthException("Cant fetch visitor id")
         visitor_id = json.loads(matches[0]).get("VISITOR_DATA")
         if not visitor_id:
-            raise RuntimeError("cant fetch visitor id")
+            raise YouTubeAuthException("Cant fetch visitor id")
         return visitor_id
 
     async def setup(self):
@@ -163,7 +161,8 @@ class YoutubeClient(BaseEngineClient):
             duration=await yt.length(),
             cover=cover
         )
-        stream = await yt.get_stream_by_itag(251)
+        logger.debug("yt: downloading")
+        stream = await yt.get_stream_by_itag(140)
         data = io.BytesIO()
         stream.stream_to_buffer(data)
         data.seek(0)

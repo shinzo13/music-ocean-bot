@@ -1,9 +1,15 @@
-from app.modules.musicocean.exceptions import MusicOceanProviderDataException, MusicOceanProviderException
+from app.modules.musicocean.exceptions import ProviderException, ProviderDataException, ProviderRestrictionException, \
+    ProviderAPIException
 
 
-class DeezerException(MusicOceanProviderException):
+class DeezerException(ProviderException):
     pass
 
+class DeezerAPIException(ProviderAPIException):
+    pass
 
-class DeezerDataException(MusicOceanProviderDataException):
+class DeezerDataException(ProviderDataException):
+    pass
+
+class DeezerCountryRestrictionException(ProviderRestrictionException):
     pass

@@ -8,6 +8,8 @@ from app.config.settings import settings
 from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
 from app.modules.musicocean.engines.soundcloud.constants import API_URL, HEADERS
 from app.modules.musicocean.engines.soundcloud.enums.api_method import SoundCloudAPIMethod
+from app.modules.musicocean.engines.soundcloud.exceptions import SoundCloudAPIException, SoundCloudDataException, \
+    SoundCloudAuthException
 from app.modules.musicocean.engines.soundcloud.models import (
     SoundCloudTrackPreview,
     SoundCloudTrack,
@@ -40,7 +42,7 @@ class SoundCloudClient(BaseEngineClient):
                 text
             )
             if not matches:
-                raise
+                raise SoundCloudAuthException('Cannot fetch client id from SoundCloud')
             url = matches[0]
         async with self.session.get(url) as resp:
             text = await resp.text()
@@ -49,7 +51,7 @@ class SoundCloudClient(BaseEngineClient):
                 text
             )
             if not client_id:
-                raise
+                raise SoundCloudAuthException('Cannot fetch client id from SoundCloud')
         return client_id.group(1)
 
     async def setup(self):
@@ -86,7 +88,7 @@ class SoundCloudClient(BaseEngineClient):
             raw_data = resp.json()
 
         if "error" in raw_data:
-            raise  # TODO separated exceptions
+            raise SoundCloudAPIException(raw_data['error'])
         return raw_data
 
     async def get_track(self, query: str) -> SoundCloudTrackPreview:
@@ -184,7 +186,7 @@ class SoundCloudClient(BaseEngineClient):
             None
         )
         if not transcoding:
-            raise  # TODO
+            raise SoundCloudDataException('No transcoding available for this track')
         async with self.session.get(f"{transcoding['url']}?client_id={self.client_id}") as resp:
             stream_url = (await resp.json())["url"]
         async with self.session.get(stream_url) as resp:
@@ -206,4 +208,4 @@ class SoundCloudClient(BaseEngineClient):
         return track
 
     async def close(self):
-        ...
+        await self.session.close()

@@ -1,3 +1,4 @@
+import asyncio
 import json
 import re
 from typing import Optional
@@ -7,7 +8,7 @@ from aiohttp import ClientSession
 from app.config.log import get_logger
 from app.modules.musicocean.engines.deezer.constants import *
 from app.modules.musicocean.engines.deezer.enums import DeezerAPIMethod
-from app.modules.musicocean.engines.deezer.exceptions import DeezerDataException, DeezerException
+from app.modules.musicocean.engines.deezer.exceptions import DeezerDataException, DeezerException, DeezerAPIException
 from app.modules.musicocean.engines.deezer.models import DeezerTrack, DeezerTrackPreview, DeezerAlbum, DeezerPlaylist, \
     DeezerArtist
 from app.modules.musicocean.engines.deezer.utils import decrypt_track, get_arl
@@ -63,7 +64,7 @@ class DeezerClient(BaseEngineClient):
         ) as resp:
             raw_data = await resp.json()
             if "error" in raw_data:
-                raise  # TODO separated DeezerAPIException
+                raise DeezerAPIException(raw_data["error"])
             return raw_data["data"]
 
     async def _get_entity(
@@ -189,7 +190,6 @@ class DeezerClient(BaseEngineClient):
                     'track_tokens': [track_token]
                 }
         ) as resp:
-            resp.raise_for_status()
             data = await resp.json()
         url = data['data'][0]['media'][0]['sources'][0]['url']
         return url
