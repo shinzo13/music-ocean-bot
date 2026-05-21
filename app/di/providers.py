@@ -16,7 +16,7 @@ class TelegramMusicOceanClientProvider(Provider):
             channel_id=settings.telegram.channel_id,
             bot_token=settings.bot.token.get_secret_value(),
             workers=list(map(lambda x: x.get_secret_value(), settings.telegram.workers)),
-            watermark=settings.tracks.watermark
+            watermark=settings.local.watermark
         )
 
         await musicocean.setup_deezer(

@@ -26,9 +26,6 @@ class DatabaseSettings(BaseSettings):
         return f"postgresql+asyncpg://{self.user}:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.db}"
 
 
-class TrackSettings(BaseSettings):
-    watermark: Optional[str]
-
 
 class BotSettings(BaseSettings):
     token: SecretStr
@@ -59,6 +56,9 @@ class SpotifySettings(BaseSettings):
 class LastfmSettings(BaseSettings):
     api_key: SecretStr
 
+class LocalSettings(BaseSettings):
+    watermark: Optional[str]
+    guide_url: Optional[str]
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -71,7 +71,6 @@ class Settings(BaseSettings):
     dev: DevSettings
 
     logging: LoggingSettings
-    tracks: TrackSettings
     bot: BotSettings
     server: ServerSettings
     telegram: TelegramSettings
@@ -79,6 +78,7 @@ class Settings(BaseSettings):
     spotify: SpotifySettings
     lastfm: LastfmSettings
     database: DatabaseSettings
+    local: LocalSettings
 
 
 settings = Settings()  # noqa
