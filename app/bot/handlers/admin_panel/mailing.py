@@ -51,7 +51,7 @@ async def mailing_message(message: Message, state: FSMContext):
 # @router.callback_query(MailingState.approving)
 
 
-@router.callback_query(MailingState.approving and MailingCallback.filter())
+@router.callback_query(MailingState.approving, MailingCallback.filter())
 async def mailing_approve(
         query: CallbackQuery,
         callback_data: MailingCallback,
@@ -65,7 +65,7 @@ async def mailing_approve(
         return
 
     await query.message.answer(i18n.get('mailing-sending'))
-    all_users = 0;
+    all_users = 0
     succeed = 0
     msg: Message = await state.get_value('message')
     async for user_id in user_repo.get_all_users(for_mailing=True):

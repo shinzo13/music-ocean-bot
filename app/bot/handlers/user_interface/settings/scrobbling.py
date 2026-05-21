@@ -80,7 +80,7 @@ async def setup_scrobbling_handler_init(
     )
 
 
-@router.message(ScrobblingSetupState.lastfm_username and F.text)
+@router.message(ScrobblingSetupState.lastfm_username, F.text)
 async def setup_scrobbling_handler_username(
         message: Message,
         state: FSMContext,
