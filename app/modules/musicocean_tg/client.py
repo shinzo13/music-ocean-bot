@@ -46,7 +46,12 @@ class TelegramMusicOceanClient(MusicOceanClient):
             if not me.can_post_messages:
                 raise "can't post messages"
 
-    async def _upload_track(self, engine: Engine, track_id: int, executor: TelegramWorker) -> Message:
+    async def _upload_track(
+            self,
+            engine: Engine,
+            track_id: int | str,
+            executor: TelegramWorker
+    ) -> Message:
         logger.debug(f"downloading track {track_id}")
         track = await super().download_track(engine, track_id)
         engine_prefix = engine_to_prefix(engine)
@@ -62,7 +67,11 @@ class TelegramMusicOceanClient(MusicOceanClient):
         )
 
     # todo another naming
-    async def download_track(self, engine: Engine, track_id: int) -> CachedTrack:
+    async def download_track(
+            self,
+            engine: Engine,
+            track_id: int | str
+    ) -> CachedTrack:
         await self.main.wait_and_acquire(timeout=60)
         msg = await self._upload_track(engine, track_id, self.main)
         return CachedTrack(
@@ -83,14 +92,14 @@ class TelegramMusicOceanClient(MusicOceanClient):
             tracks: list[BaseTrackPreview],
             track_repo: TrackRepository
     ) -> AsyncGenerator[CachedTrack, None]:
-        # tracks.reverse()
 
         cached = {
             t.id: await track_repo.get_track(t.id, engine)
             for t in tracks
         }
 
-        async def download_one(track_id: int) -> CachedTrack:
+        # todo
+        async def download_one(track_id: int | str) -> CachedTrack:
             if cached[track_id]:
                 return CachedTrack(
                     track_id=track_id,
@@ -98,15 +107,23 @@ class TelegramMusicOceanClient(MusicOceanClient):
                 )
             worker = await self._acquire_worker()
             msg = await self._upload_track(engine, track_id, worker)
-            future = asyncio.get_event_loop().create_future()
-            self.pending[msg.message_id] = future
-            logger.debug(f"pending track with message_id={msg.message_id}...")
-            file_id = await future
+
             return CachedTrack(
                 track_id=track_id,
-                file_id=file_id
+                file_id=msg.audio.file_id,
             )
 
-        futures = [asyncio.ensure_future(download_one(t.id)) for t in tracks]
-        for future in futures:
-            yield await future
+        async def download_one_indexed(index: int, track_id: int | str):
+            result = await download_one(track_id)
+            return index, result
+
+        futures = [download_one_indexed(i, t.id) for i, t in enumerate(tracks)]
+        pending_results = {}
+        next_yield = 0
+
+        for coro in asyncio.as_completed(futures):
+            idx, result = await coro
+            pending_results[idx] = result
+            while next_yield in pending_results:
+                yield pending_results.pop(next_yield)
+                next_yield += 1

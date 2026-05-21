@@ -1,1 +1,1 @@
-from .write_id3 import write_id3
+from .shazam_wrapped import shazam_wrapped
