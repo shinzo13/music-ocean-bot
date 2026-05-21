@@ -10,7 +10,7 @@ btn-how-to-use = Jak używać?
 btn-profile = Konto
 btn-settings = Ustawienia
 btn-admin-panel = Panel administratora
-usage-guide-text = tutaj będzie tekst tutorialu
+usage-guide-text = Tutorial jest dostępny poprzez <a href='{$guide_url}'>ten link</a>.
 
 ## profile
 profile-text =
@@ -119,3 +119,7 @@ entity-artist =
     <b>{$name}</b>
     <i>{$listeners} słuchaczy</i>
     <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+
+# other
+recognizing = <i>Rozpoznuję...</i>
+not-recognized = <i>Nie rozpoznano!</i>

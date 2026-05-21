@@ -10,7 +10,7 @@ btn-how-to-use = How to use?
 btn-profile = Profile
 btn-settings = Settings
 btn-admin-panel = Admin panel
-usage-guide-text = usage guide will be here
+usage-guide-text = Usage guide is available via <a href='{$guide_url}'>this link</a>.
 
 ## profile
 profile-text =
@@ -121,3 +121,7 @@ entity-artist =
     <b>{$name}</b>
     <i>{$listeners} listeners</i>
     <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+
+# other
+recognizing = <i>Recognizing...</i>
+not-recognized = <i>Not recognized!</i>

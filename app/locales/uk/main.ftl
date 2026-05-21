@@ -10,7 +10,7 @@ btn-how-to-use = Як користуватись?
 btn-profile = Профіль
 btn-settings = Налаштування
 btn-admin-panel = Адмін-панель
-usage-guide-text = ькцлдцкпл
+usage-guide-text = Гайд доступний по <a href='{$guide_url}'>цьому посиланню</a>.
 
 ## profile
 profile-text =
@@ -105,7 +105,7 @@ downloading = Завантажую...
 downloaded = Завантажено!
 btn-search-for-track = Знайти трек
 btn-download-all = Завантажити всі треки
-btn-downloading = Завантажую...
+btn-downloading = <i>Завантажую...</i>
 
 ## entities
 entity-album =
@@ -120,3 +120,7 @@ entity-artist =
     <b>{$name}</b>
     <i>{$listeners} слухачів</i>
     <a href="{$cover_url}">︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎︎</a>
+
+# other
+recognizing = <i>Розпознаю...</i>
+not-recognized = Не розпознано!</i>
