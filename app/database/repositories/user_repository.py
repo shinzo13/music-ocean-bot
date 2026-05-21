@@ -2,7 +2,7 @@ import csv
 import io
 from typing import Optional, AsyncGenerator
 
-from sqlalchemy import select
+from sqlalchemy import select, inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.attributes import flag_modified
@@ -110,29 +110,17 @@ class UserRepository:
     async def export_to_csv(self) -> bytes:
         result = await self.session.execute(select(User))
         users = result.scalars().all()
+
+        mapper = inspect(User)
+        columns = [col.key for col in mapper.attrs if hasattr(col, 'columns')] # noqa
+
         output = io.StringIO()
         writer = csv.writer(output)
-
-        writer.writerow([
-            'user_id',
-            'is_dm'
-            'is_admin',
-            'is_banned',
-            'selected_engine',
-            'track_preview_covers'
-        ])
+        writer.writerow(columns)
 
         for user in users:
-            writer.writerow([
-                user.user_id,
-                user.is_dm,
-                user.is_admin,
-                user.is_banned,
-                user.settings.selected_engine.value,
-                user.settings.track_preview_covers
-            ])
+            writer.writerow([getattr(user, col) for col in columns])
 
         csv_bytes = output.getvalue().encode('utf-8')
         output.close()
-
         return csv_bytes
