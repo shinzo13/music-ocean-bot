@@ -194,6 +194,16 @@ class DeezerClient(BaseEngineClient):
         url = data['data'][0]['media'][0]['sources'][0]['url']
         return url
 
+    async def _download_audio(self, track: DeezerTrack):
+        track_url = await self._get_track_url(track.track_token)
+        async with self.session.get(track_url) as resp:
+            return await decrypt_track(resp, track.id)
+
+    async def _download_cover(self, cover_url: str):
+        async with self.session.get(cover_url) as resp:
+            resp.raise_for_status()
+            return await resp.read()
+
     async def download_track(
             self,
             track_id: int,
@@ -203,13 +213,11 @@ class DeezerClient(BaseEngineClient):
 
         # TODO: country restriction handling
 
-        track_url = await self._get_track_url(track.track_token)
-        async with self.session.get(track_url) as resp:
-            source = await decrypt_track(resp, track.id)
-
-        async with self.session.get(track.cover_url) as resp:
-            resp.raise_for_status()
-            cover = await resp.read()
+        # maybe this will be a bit faster...
+        source, cover = await asyncio.gather(
+            self._download_audio(track),
+            self._download_cover(track.cover_url)
+        )
 
         track.cover = cover
         track.content = write_mp3_tags(
