@@ -46,9 +46,13 @@ async def inline_query(
             return
 
     if engine == Engine.YOUTUBE:
-        await query.answer(not_supported_result(
-            i18n.get('feature-youtube-advanced-search')
-        ))
+        await query.answer(
+            not_supported_result(
+                i18n.get('feature-youtube-advanced-search')
+            ),
+            cache_time=0
+        )
+        return
 
     bot_username = (await bot.get_me()).username
 
