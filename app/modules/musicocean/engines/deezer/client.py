@@ -14,7 +14,7 @@ from app.modules.musicocean.engines.deezer.utils import decrypt_track, get_arl
 from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
 from app.modules.musicocean.enums import Engine
 from app.modules.musicocean.enums.entity_type import EntityType
-from app.modules.musicocean.utils import write_id3
+from app.modules.musicocean.utils.id3 import write_mp3_tags
 
 logger = get_logger(__name__)
 
@@ -212,10 +212,9 @@ class DeezerClient(BaseEngineClient):
             cover = await resp.read()
 
         track.cover = cover
-        track.content = await write_id3(
+        track.content = write_mp3_tags(
             track=track,
             source=source,
-            engine=Engine.SOUNDCLOUD,
             watermark=watermark
         )
 

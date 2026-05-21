@@ -17,6 +17,7 @@ from app.modules.musicocean.engines.youtube.models.youtube_track import YoutubeT
 from app.modules.musicocean.engines.youtube.models.youtube_track_preview import YoutubeTrackPreview
 from app.modules.musicocean.engines.youtube.utils import initialize_context
 from app.modules.musicocean.engines.youtube.utils.parsers.parse_search_response import parse_search_response
+from app.modules.musicocean.utils.id3 import write_mp4_tags
 
 logger = get_logger(__name__)
 
@@ -166,17 +167,10 @@ class YoutubeClient(BaseEngineClient):
         data = io.BytesIO()
         stream.stream_to_buffer(data)
         data.seek(0)
-        track.content = data.read()
-        # content = convert_to_mp3(data.read())
-        # logger.debug(f"DATA LEN: {len(content)}")
-        # track.content = await write_id3(
-        #     track=track,
-        #     source=content,
-        #     engine=Engine.YOUTUBE,
-        #     watermark=watermark,
-        #     convert_to_mp3=True
-        # )
-
+        raw = data.read()
+        logger.debug("yt: writing id3")
+        track.content = write_mp4_tags(track, raw, watermark)
+        logger.debug("yt: finished")
         return track
 
     async def close(self):

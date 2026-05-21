@@ -16,7 +16,7 @@ from app.modules.musicocean.engines.soundcloud.models import (
 )
 from app.modules.musicocean.engines.soundcloud.models.soundcloud_artist import SoundCloudArtist
 from app.modules.musicocean.enums import Engine
-from app.modules.musicocean.utils import write_id3
+from app.modules.musicocean.utils.id3 import write_mp3_tags
 
 
 class SoundCloudClient(BaseEngineClient):
@@ -197,10 +197,9 @@ class SoundCloudClient(BaseEngineClient):
                 cover = await resp.read()
                 track.cover = cover
 
-        track.content = await write_id3(
+        track.content = write_mp3_tags(
             track=track,
             source=source,
-            engine=Engine.SOUNDCLOUD,
             watermark=watermark
         )
 
