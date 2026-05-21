@@ -6,7 +6,7 @@ from app.bot.utils.search_results import get_track_results, usage_guide_result
 from app.config.log import get_logger
 from app.database.models import User
 from app.modules.musicocean.enums import Engine
-from app.modules.musicocean.exceptions import MusicOceanProviderDataException
+from app.modules.musicocean.exceptions import ProviderDataException
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 from app.modules.musicocean_tg.utils import prefix_to_engine
 
@@ -44,7 +44,7 @@ async def inline_query(
                 matches = await musicocean.get_playlist_tracks(engine, entity_id)
             case _:
                 return  # TODO
-    except MusicOceanProviderDataException:
+    except ProviderDataException:
         logger.debug("No data for that query")
         return
 
