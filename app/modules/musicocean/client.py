@@ -20,6 +20,7 @@ from app.modules.musicocean.engines.youtube.client import YoutubeClient
 from app.modules.musicocean.engines.youtube.models.youtube_track_preview import YoutubeTrackPreview
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.lastfm.client import LastFMClient
+from app.modules.musicocean.utils.shazam_wrapped import shazam_wrapped
 
 
 class MusicOceanClient:
@@ -164,30 +165,9 @@ class MusicOceanClient:
     ) -> BaseTrack:
         return await self._get_engine(engine).download_track(track_id, self.watermark)
 
-    async def exchange_spotify_code(self, code: str, redirect_uri: str) -> dict:
-        if not self.spotify:
-            raise "spotify is not setup"
-        return await self.spotify.exchange_code(code, redirect_uri)
+    async def shazam_recognize(self, audio: bytes) -> Optional[YoutubeTrackPreview]:
+        res = await shazam_wrapped(audio)
+        if not res:
+            return None
 
-    async def refresh_spotify_user_token(self, refresh_token: str) -> str:
-        if not self.spotify:
-            raise "spotify is not setup"
-        return await self.spotify.refresh_token(refresh_token)
-
-    async def get_spotify_last_track(
-            self,
-            access_token: str,
-            refresh_token: str
-    ) -> SpotifyTrackPreview | None:
-        if not self.spotify:
-            raise "spotify is not setup"
-        return await self.spotify.get_last_track(access_token, refresh_token)
-
-    async def get_spotify_recently_played(
-            self,
-            access_token: str,
-            refresh_token: str
-    ) -> list[SpotifyTrackPreview]:
-        if not self.spotify:
-            raise "spotify is not setup"
-        return await self.spotify.get_recently_played(access_token, refresh_token)
+        return await self.youtube.search_exact_match(*res)
