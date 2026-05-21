@@ -8,13 +8,16 @@ from app.modules.musicocean.engines.deezer.models import (
     DeezerArtist,
     DeezerPlaylist
 )
-from app.modules.musicocean.engines.shared.models import BaseTrackPreview
+from app.modules.musicocean.engines.shared import BaseEngineClient
+from app.modules.musicocean.engines.shared.models import BaseTrackPreview, BaseAlbum, BasePlaylist, BaseArtist, \
+    BaseTrack
 from app.modules.musicocean.engines.soundcloud import SoundCloudClient
 from app.modules.musicocean.engines.soundcloud.models import SoundCloudTrack, SoundCloudTrackPreview, SoundCloudAlbum, \
     SoundCloudPlaylist, SoundCloudArtist
 from app.modules.musicocean.engines.spotify.client import SpotifyClient
 from app.modules.musicocean.engines.spotify.models import SpotifyTrackPreview
 from app.modules.musicocean.engines.youtube.client import YoutubeClient
+from app.modules.musicocean.engines.youtube.models.youtube_track_preview import YoutubeTrackPreview
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.lastfm.client import LastFMClient
 
@@ -27,10 +30,10 @@ class MusicOceanClient:
         # TODO as fields
         self.ready = False
 
-        self.deezer = None
-        self.soundcloud = None
-        self.youtube = None
-        self.spotify = None
+        self.deezer: Optional[DeezerTrack] = None
+        self.soundcloud: Optional[SoundCloudClient] = None
+        self.youtube: Optional[YoutubeClient] = None
+        self.spotify: Optional[SpotifyClient] = None
 
         self.lastfm: Optional[LastFMClient] = None
 
@@ -65,7 +68,7 @@ class MusicOceanClient:
         self.lastfm = LastFMClient(api_token)
         await self.lastfm.setup()
 
-    def _get_engine(self, engine: Engine):
+    def _get_engine(self, engine: Engine) -> BaseEngineClient:
         match engine:
             case Engine.DEEZER:
                 select_engine = self.deezer
@@ -88,64 +91,77 @@ class MusicOceanClient:
             self,
             engine: Engine,
             query: str
-    ) -> list[DeezerTrackPreview] | list[SoundCloudTrackPreview]:
+    ) -> list[BaseTrackPreview]:
         return await self._get_engine(engine).search_tracks(query)
 
     async def search_albums(
             self, engine: Engine,
             query: str
-    ) -> list[DeezerAlbum] | list[SoundCloudAlbum]:
+    ) -> list[BaseAlbum]:
         return await self._get_engine(engine).search_albums(query)
 
     async def search_playlists(
             self,
             engine: Engine,
             query: str
-    ) -> list[DeezerPlaylist] | list[SoundCloudPlaylist]:
+    ) -> list[BasePlaylist]:
         return await self._get_engine(engine).search_playlists(query)
 
     async def search_artists(
             self,
             engine: Engine,
             query: str
-    ) -> list[DeezerArtist] | list[SoundCloudArtist]:
+    ) -> list[BaseArtist]:
         return await self._get_engine(engine).search_artists(query)
 
-    async def get_album(self, engine: Engine, album_id: int) -> DeezerAlbum | SoundCloudAlbum:
+    async def get_album(
+            self,
+            engine: Engine,
+            album_id: int
+    ) -> BaseAlbum:
         return await self._get_engine(engine).get_album(album_id)
 
     async def get_album_tracks(
             self,
             engine: Engine,
             album_id: int
-    ) -> list[DeezerTrackPreview] | list[SoundCloudTrackPreview]:
+    ) -> list[BaseTrackPreview]:
         return await self._get_engine(engine).get_album_tracks(album_id)
 
-    async def get_artist(self, engine: Engine, artist_id: int) -> DeezerArtist | SoundCloudArtist:
+    async def get_artist(
+            self,
+            engine: Engine,
+            artist_id: int
+    ) -> BaseArtist:
         return await self._get_engine(engine).get_artist(artist_id)
 
     async def get_artist_tracks(
             self,
             engine: Engine,
             artist_id: int
-    ) -> list[DeezerTrackPreview] | list[SoundCloudTrackPreview]:
+    ) -> list[BaseTrackPreview]:
         return await self._get_engine(engine).get_artist_tracks(artist_id)
 
-    async def get_playlist(self, engine: Engine, playlist_id: int) -> DeezerPlaylist | SoundCloudPlaylist:
-        return await self._get_engine(engine).get_artist(playlist_id)
+    async def get_playlist(
+            self,
+            engine:
+            Engine,
+            playlist_id: int
+    ) -> BasePlaylist:
+        return await self._get_engine(engine).get_playlist(playlist_id)
 
     async def get_playlist_tracks(
             self,
             engine: Engine,
             playlist_id: int
-    ) -> list[DeezerTrackPreview] | list[SoundCloudTrackPreview]:
+    ) -> list[BaseTrackPreview]:
         return await self._get_engine(engine).get_playlist_tracks(playlist_id)
 
     async def download_track(
             self,
             engine: Engine,
             track_id: int
-    ) -> DeezerTrack | SoundCloudTrack:
+    ) -> BaseTrack:
         return await self._get_engine(engine).download_track(track_id, self.watermark)
 
     async def exchange_spotify_code(self, code: str, redirect_uri: str) -> dict:
