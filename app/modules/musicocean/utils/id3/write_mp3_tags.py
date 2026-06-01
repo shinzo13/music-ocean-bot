@@ -23,6 +23,6 @@ def write_mp3_tags(
     if watermark:
         audio.tags.add(COMM(encoding=3, lang='eng',
                            desc='', text=watermark))
-    out = io.BytesIO()
-    audio.save(out)
-    return out.getvalue()
+    audio.save(buf)
+    buf.seek(0)
+    return buf.read()
