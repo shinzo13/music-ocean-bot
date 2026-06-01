@@ -25,7 +25,8 @@ async def inline_query(
     if not user.settings.lastfm.enabled:
         await query.answer(
             setup_scrobbling_result((await bot.get_me()).username),
-            cache_time=0
+            cache_time=0,
+            is_personal=True
         )
         return
 
@@ -58,5 +59,6 @@ async def inline_query(
             [track],
             user.settings.track_preview_covers
         ),
-        cache_time=0
+        cache_time=0,
+        is_personal=True
     )
