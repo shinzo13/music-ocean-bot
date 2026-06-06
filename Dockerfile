@@ -1,8 +1,8 @@
-FROM ghcr.io/astral-sh/uv:alpine3.23
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 WORKDIR /app
 
-RUN apk add ffmpeg gcc musl-dev python3-dev alsa-lib-dev pkgconf
+RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
 ADD pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
