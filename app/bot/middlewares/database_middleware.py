@@ -1,7 +1,8 @@
 from typing import Callable, Dict, Any
 
 from aiogram import BaseMiddleware
-from aiogram.types import Message, User as TelegramUser
+from aiogram.types import Message, User as TelegramUser, Update, InputTextMessageContent
+from aiogram_i18n.types import InlineQueryResultArticle
 from typing_extensions import Awaitable
 
 from app.config.log import get_logger
@@ -14,8 +15,8 @@ logger = get_logger(__name__)
 class DatabaseMiddleware(BaseMiddleware):
     async def __call__(
             self,
-            handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
-            event: Message,
+            handler: Callable[[Update, Dict[str, Any]], Awaitable[Any]],
+            event: Update,
             data: Dict[str, Any]
     ) -> Any:
         user_repo: UserRepository = await data["dishka_container"].get(UserRepository)
@@ -35,6 +36,20 @@ class DatabaseMiddleware(BaseMiddleware):
             )
 
         if db_user.is_banned:
+            if event.message:
+                emoji = '<tg-emoji emoji-id="5346155619663491339">🎧</tg-emoji>'
+                await event.message.answer(f'you are banned{emoji}{emoji}')
+            elif event.callback_query:
+                await event.callback_query.answer(f'you are banned!!!!')
+            elif event.inline_query:
+                await event.inline_query.answer([InlineQueryResultArticle(
+                    id='banned',
+                    title='you are banned!!!',
+                    description=f'🗣🗣',
+                    input_message_content=InputTextMessageContent(
+                        message_text="im banned🗣🗣🗣🗣"
+                    )
+                )], cache_time=0, is_personal=True)
             return None
 
         if not db_user.is_dm:

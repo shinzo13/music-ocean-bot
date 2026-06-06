@@ -18,7 +18,11 @@ def admin_panel_keyboard():
             callback_data=AdminPanelCallback(path=AdminPanelPath.MAILING).pack(),
             icon_custom_emoji_id=MAILING_EMOJI_ID
         )],
-        # TODO promote/ban user button
+        [InlineKeyboardButton(
+            text='ban user',
+            callback_data=AdminPanelCallback(path=AdminPanelPath.BAN_USER).pack(),
+            icon_custom_emoji_id=DATABASE_EMOJI_ID
+        )],
         [InlineKeyboardButton(
             text=LazyProxy('btn-back'),
             callback_data=MainMenuCallback(path=MainMenuPath.SELF).pack(),
