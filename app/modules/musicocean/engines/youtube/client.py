@@ -149,7 +149,7 @@ class YoutubeClient(BaseEngineClient):
             track_id: str,
             watermark: Optional[str] = None
     ) -> YoutubeTrack:
-        yt = AsyncYouTube.from_id(track_id)
+        yt = AsyncYouTube(f'youtu.be/{track_id}','WEB')
         cover_url = await yt.thumbnail_url()
         async with self.session.get(cover_url) as resp:
             cover = await resp.read()
