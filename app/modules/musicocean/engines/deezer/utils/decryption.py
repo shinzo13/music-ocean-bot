@@ -32,7 +32,7 @@ def decrypt_chunk(data, key):
 async def decrypt_track(resp: ClientResponse, track_id: int):
     key = generate_track_key(track_id)
     i = 0
-    data = b''
+    data = bytearray()
     reading = True
     while reading:
         try:
@@ -46,4 +46,4 @@ async def decrypt_track(resp: ClientResponse, track_id: int):
             chunk = decrypt_chunk(chunk, key)
         data += chunk
         i += 1
-    return data
+    return bytes(data)
