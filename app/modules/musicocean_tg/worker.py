@@ -30,6 +30,11 @@ class TelegramWorker(Bot):
             return 0.0
         return max(0.0, self._used[0] + self.window_seconds - time.time())
 
+    def current_load(self) -> int:
+        """Сколько запросов уже использовано в текущем окне — для балансировки."""
+        self._cleanup_old()
+        return len(self._used)
+
     async def try_acquire(self) -> bool:
         async with self._lock:
             self._cleanup_old()

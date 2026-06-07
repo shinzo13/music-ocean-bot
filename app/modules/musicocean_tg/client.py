@@ -81,7 +81,9 @@ class TelegramMusicOceanClient(MusicOceanClient):
 
     async def _acquire_worker(self) -> TelegramWorker:
         while True:
-            for worker in self.workers:
+            # least-loaded: пробуем наименее загруженных воркеров первыми,
+            # чтобы нагрузка размазывалась ровно по всем, а не лилась в первого
+            for worker in sorted(self.workers, key=lambda w: w.current_load()):
                 if await worker.try_acquire():
                     return worker
             await asyncio.sleep(0.5)
