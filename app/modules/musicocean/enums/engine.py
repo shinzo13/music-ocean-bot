@@ -6,3 +6,4 @@ class Engine(str, Enum):
     SOUNDCLOUD = "SOUNDCLOUD"
     YOUTUBE = "YOUTUBE"
     SPOTIFY = "SPOTIFY"
+    YANDEX = "YANDEX"

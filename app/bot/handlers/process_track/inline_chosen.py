@@ -40,6 +40,8 @@ async def idklol(
             engine = Engine.YOUTUBE
         case "sp":
             engine = Engine.SPOTIFY
+        case "ya":
+            engine = Engine.YANDEX
         case _:
             raise "invalid engine"
 

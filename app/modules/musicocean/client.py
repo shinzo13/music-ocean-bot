@@ -18,6 +18,7 @@ from app.modules.musicocean.engines.spotify.client import SpotifyClient
 from app.modules.musicocean.engines.spotify.models import SpotifyTrackPreview
 from app.modules.musicocean.engines.youtube.client import YoutubeClient
 from app.modules.musicocean.engines.youtube.models.youtube_track_preview import YoutubeTrackPreview
+from app.modules.musicocean.engines.yandex.client import YandexClient
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.lastfm.client import LastFMClient
 from app.modules.musicocean.utils.shazam_wrapped import shazam_wrapped
@@ -35,6 +36,7 @@ class MusicOceanClient:
         self.soundcloud: Optional[SoundCloudClient] = None
         self.youtube: Optional[YoutubeClient] = None
         self.spotify: Optional[SpotifyClient] = None
+        self.yandex: Optional[YandexClient] = None
 
         self.lastfm: Optional[LastFMClient] = None
 
@@ -63,6 +65,10 @@ class MusicOceanClient:
         )
         await self.spotify.setup()
 
+    async def setup_yandex(self, token: str) -> None:
+        self.yandex = YandexClient(token=token)
+        await self.yandex.setup()
+
     async def setup_lastfm(self, api_token: str) -> None:
         if not self.youtube:
             raise "setup yt first"
@@ -79,6 +85,8 @@ class MusicOceanClient:
                 select_engine = self.youtube
             case Engine.SPOTIFY:
                 select_engine = self.spotify
+            case Engine.YANDEX:
+                select_engine = self.yandex
             case _:
                 select_engine = None
         if not select_engine:

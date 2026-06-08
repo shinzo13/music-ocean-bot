@@ -9,6 +9,7 @@ from app.database.models.base_track import BaseTrack
 from app.database.models.deezer_track import DeezerTrack
 from app.database.models.soundcloud_track import SoundCloudTrack
 from app.database.models.spotify_track import SpotifyTrack
+from app.database.models.yandex_track import YandexTrack
 from app.database.models.youtube_track import YoutubeTrack
 from app.modules.musicocean.enums.engine import Engine
 
@@ -40,6 +41,8 @@ class TrackRepository:
                 track = YoutubeTrack(**kwargs)
             case Engine.SPOTIFY:
                 track = SpotifyTrack(**kwargs)
+            case Engine.YANDEX:
+                track = YandexTrack(**kwargs)
             case _:
                 raise
 
@@ -63,6 +66,8 @@ class TrackRepository:
                 target = YoutubeTrack
             case Engine.SPOTIFY:
                 target = SpotifyTrack
+            case Engine.YANDEX:
+                target = YandexTrack
             case _:
                 raise
 

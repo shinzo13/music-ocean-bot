@@ -33,7 +33,8 @@ async def track_info_ready(
         Engine.DEEZER: "Deezer",
         Engine.SOUNDCLOUD: "SoundCloud",
         Engine.YOUTUBE: "YouTube",
-        Engine.SPOTIFY: "Spotify"
+        Engine.SPOTIFY: "Spotify",
+        Engine.YANDEX: "Yandex Music"
     }
 
     info = i18n.get(

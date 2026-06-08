@@ -22,4 +22,5 @@ dependencies = [
     "pytubefix>=10.3.8",
     "shazamio>=0.8.1",
     "sqlalchemy~=2.0.44",
+    "yandex-music[async]>=3.0.0",
 ]

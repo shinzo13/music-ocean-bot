@@ -22,6 +22,13 @@ SPOTIFY_REGEX = re.compile(r"https?://open\.spotify\.com/(track|album|playlist|a
 SOUNDCLOUD_REGEX = re.compile(r"https?://(?:www\.)?soundcloud\.com/[\w-]+/[\w-]+")
 YOUTUBE_REGEX = re.compile(r"https?://(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]+)")
 
+YANDEX_DOMAIN = r"https?://(?:www\.)?music\.yandex\.(?:ru|com|by|kz|uz)"
+YANDEX_REGEX = re.compile(YANDEX_DOMAIN + r"/")
+YANDEX_TRACK_REGEX = re.compile(YANDEX_DOMAIN + r"/album/\d+/track/(\d+)")
+YANDEX_ALBUM_REGEX = re.compile(YANDEX_DOMAIN + r"/album/(\d+)")
+YANDEX_ARTIST_REGEX = re.compile(YANDEX_DOMAIN + r"/artist/(\d+)")
+YANDEX_PLAYLIST_REGEX = re.compile(YANDEX_DOMAIN + r"/users/([\w.-]+)/playlists/(\d+)")
+
 
 @router.inline_query(
     F.query.regexp(DEEZER_REGEX).as_('match') | \
@@ -74,6 +81,37 @@ async def inline_query(
         await get_track_results(
             Engine.YOUTUBE,
             [track],
+            user.settings.track_preview_covers
+        ),
+        cache_time=0
+    )
+
+
+@router.inline_query(F.query.regexp(YANDEX_REGEX))
+async def inline_query(
+        query: InlineQuery,
+        user: DatabaseUser,
+        musicocean: FromDishka[TelegramMusicOceanClient]
+):
+    logger.info(f"User #{query.from_user.id} searched Yandex link: \"{query.query}\"")
+    text = query.query
+
+    if m := YANDEX_TRACK_REGEX.search(text):
+        tracks = [await musicocean.get_track(Engine.YANDEX, m.group(1))]
+    elif m := YANDEX_ALBUM_REGEX.search(text):
+        tracks = await musicocean.get_album_tracks(Engine.YANDEX, m.group(1))
+    elif m := YANDEX_ARTIST_REGEX.search(text):
+        tracks = await musicocean.get_artist_tracks(Engine.YANDEX, m.group(1))
+    elif m := YANDEX_PLAYLIST_REGEX.search(text):
+        playlist_id = f"{m.group(1)}:{m.group(2)}"
+        tracks = await musicocean.get_playlist_tracks(Engine.YANDEX, playlist_id)
+    else:
+        return
+
+    await query.answer(
+        await get_track_results(
+            Engine.YANDEX,
+            tracks,
             user.settings.track_preview_covers
         ),
         cache_time=0

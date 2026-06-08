@@ -53,6 +53,9 @@ class SpotifySettings(BaseSettings):
     client_secret: SecretStr
 
 
+class YandexSettings(BaseSettings):
+    token: SecretStr
+
 class LastfmSettings(BaseSettings):
     api_key: SecretStr
 
@@ -76,6 +79,7 @@ class Settings(BaseSettings):
     telegram: TelegramSettings
     deezer: DeezerSettings
     spotify: SpotifySettings
+    yandex: YandexSettings
     lastfm: LastfmSettings
     database: DatabaseSettings
     local: LocalSettings

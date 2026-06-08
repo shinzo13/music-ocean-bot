@@ -11,6 +11,8 @@ def engine_to_prefix(engine: Engine) -> str:
             return "yt"
         case Engine.SPOTIFY:
             return "sp"
+        case Engine.YANDEX:
+            return "ya"
         case _:
             raise ValueError("invalid engine")
 
@@ -25,5 +27,7 @@ def prefix_to_engine(prefix: str) -> Engine:
             return Engine.YOUTUBE
         case "sp":
             return Engine.SPOTIFY
+        case "ya":
+            return Engine.YANDEX
         case _:
             raise ValueError("invalid engine prefix")
