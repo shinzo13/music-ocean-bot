@@ -1,4 +1,5 @@
 from aiogram import Router, Bot
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import ChosenInlineResult
 from aiogram.types import InputMediaAudio
 from dishka import FromDishka
@@ -47,11 +48,14 @@ async def idklol(
 
     db_track = await track_repo.get_track(entity_id, engine)
     if db_track:
-        await bot.edit_message_media(
-            media=InputMediaAudio(media=db_track.telegram_file_id),
-            inline_message_id=chosen.inline_message_id
-        )
-        logger.info(f"Successfully sent cached track #{chosen.result_id}")
+        try:
+            await bot.edit_message_media(
+                media=InputMediaAudio(media=db_track.telegram_file_id),
+                inline_message_id=chosen.inline_message_id
+            )
+            logger.info(f"Successfully sent cached track #{chosen.result_id}")
+        except TelegramBadRequest as e:
+            logger.warning(f"edit failed for cached #{chosen.result_id}: {e.message}")
         return
 
     file_id = (await musicocean.download_track(
@@ -59,11 +63,14 @@ async def idklol(
         track_id=entity_id,
     )).file_id
     logger.debug(f"got file id: {file_id}")
-    await bot.edit_message_media(
-        media=InputMediaAudio(media=file_id),
-        inline_message_id=chosen.inline_message_id
-    )
-    logger.info(f"Successfully sent track #{chosen.result_id}")
+    try:
+        await bot.edit_message_media(
+            media=InputMediaAudio(media=file_id),
+            inline_message_id=chosen.inline_message_id
+        )
+        logger.info(f"Successfully sent track #{chosen.result_id}")
+    except TelegramBadRequest as e:
+        logger.warning(f"edit failed for #{chosen.result_id}: {e.message}")
 
     # telegram caching causing this shi
     db_track = await track_repo.get_track(entity_id, engine)
