@@ -123,4 +123,4 @@ entity-artist =
 
 # other
 recognizing = <i>Розпознаю...</i>
-not-recognized = Не розпознано!</i>
+not-recognized = <i>Не розпознано!</i>
