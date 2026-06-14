@@ -77,14 +77,14 @@ async def handle_deeplink(
             tracks,
             track_repo
     ):
-        await message.answer_audio(audio=track.file_id)
+        sent = await message.answer_audio(audio=track.file_id)
 
         # todo move db-saving logic to one place (handlers or tg_musicocean)
         if not await track_repo.get_track(track.track_id, engine):
             await track_repo.add_track(
                 engine=engine,
                 track_id=track.track_id,
-                telegram_file_id=track.file_id,
+                telegram_file_id=sent.audio.file_id,
                 user_id=message.from_user.id,
             )
 
