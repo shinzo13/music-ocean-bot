@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import with_polymorphic
 
@@ -25,11 +25,13 @@ class TrackRepository:
             engine: Engine,
             track_id: int | str,
             telegram_file_id: str,
-            user_id: int
+            user_id: int,
+            telegram_file_unique_id: str | None = None
     ) -> DeezerTrack | SoundCloudTrack | YoutubeTrack | SpotifyTrack:
         kwargs = {
             'track_id': track_id,
             'telegram_file_id': telegram_file_id,
+            'telegram_file_unique_id': telegram_file_unique_id,
             'user_id': user_id
         }
         match engine:
@@ -78,13 +80,19 @@ class TrackRepository:
         )
         return result.scalar_one_or_none()
 
-    async def get_track_by_file_id(
+    async def get_track_by_file(
             self,
+            file_unique_id: str,
             file_id: str
     ) -> Optional[DeezerTrack | SoundCloudTrack | YoutubeTrack | SpotifyTrack]:
+        # file_id is unstable across delivery contexts; match on the stable
+        # file_unique_id first, fall back to file_id for legacy rows
         wp = with_polymorphic(BaseTrack, "*")
         result = await self.session.execute(
             select(wp)
-            .where(BaseTrack.telegram_file_id == file_id)
+            .where(or_(
+                BaseTrack.telegram_file_unique_id == file_unique_id,
+                BaseTrack.telegram_file_id == file_id
+            ))
         )
-        return result.scalar_one_or_none()
+        return result.scalars().first()

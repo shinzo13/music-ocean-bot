@@ -76,7 +76,8 @@ class TelegramMusicOceanClient(MusicOceanClient):
         msg = await self._upload_track(engine, track_id, self.main)
         return CachedTrack(
             track_id=track_id,
-            file_id=msg.audio.file_id
+            file_id=msg.audio.file_id,
+            file_unique_id=msg.audio.file_unique_id
         )
 
     async def _acquire_worker(self) -> TelegramWorker:
@@ -105,7 +106,8 @@ class TelegramMusicOceanClient(MusicOceanClient):
             if cached[track_id]:
                 return CachedTrack(
                     track_id=track_id,
-                    file_id=cached[track_id].telegram_file_id  # noqa
+                    file_id=cached[track_id].telegram_file_id,  # noqa
+                    file_unique_id=cached[track_id].telegram_file_unique_id  # noqa
                 )
             worker = await self._acquire_worker()
             msg = await self._upload_track(engine, track_id, worker)
@@ -113,6 +115,7 @@ class TelegramMusicOceanClient(MusicOceanClient):
             return CachedTrack(
                 track_id=track_id,
                 file_id=msg.audio.file_id,
+                file_unique_id=msg.audio.file_unique_id,
             )
 
         async def download_one_indexed(index: int, track_id: int | str):

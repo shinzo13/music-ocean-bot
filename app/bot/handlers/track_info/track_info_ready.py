@@ -23,7 +23,10 @@ async def track_info_ready(
         track_repo: FromDishka[TrackRepository],
         i18n: I18nContext
 ):
-    track = await track_repo.get_track_by_file_id(message.audio.file_id)
+    track = await track_repo.get_track_by_file(
+        message.audio.file_unique_id,
+        message.audio.file_id
+    )
     if not track:
         await message.answer(i18n.get('track-not-found'))
         # todo watermark checking here after prompting user

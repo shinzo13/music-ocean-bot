@@ -10,6 +10,7 @@ class BaseTrack(Base, TimestampMixin, IntIDMixin):
 
     engine: Mapped[Engine] = mapped_column(Enum(Engine, name="engine_enum"))
     telegram_file_id: Mapped[str] = mapped_column(String)
+    telegram_file_unique_id: Mapped[str | None] = mapped_column(String, nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
 
     downloaded_by: Mapped["User"] = relationship(back_populates="downloaded_tracks")  # noqa

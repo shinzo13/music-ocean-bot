@@ -85,6 +85,7 @@ async def handle_deeplink(
                 engine=engine,
                 track_id=track.track_id,
                 telegram_file_id=sent.audio.file_id,
+                telegram_file_unique_id=sent.audio.file_unique_id,
                 user_id=message.from_user.id,
             )
 

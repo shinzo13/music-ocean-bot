@@ -58,10 +58,11 @@ async def idklol(
             logger.warning(f"edit failed for cached #{chosen.result_id}: {e.message}")
         return
 
-    file_id = (await musicocean.download_track(
+    cached = await musicocean.download_track(
         engine=engine,
         track_id=entity_id,
-    )).file_id
+    )
+    file_id = cached.file_id
     logger.debug(f"got file id: {file_id}")
     try:
         await bot.edit_message_media(
@@ -79,6 +80,7 @@ async def idklol(
             engine=engine,
             track_id=entity_id,
             telegram_file_id=file_id,
+            telegram_file_unique_id=cached.file_unique_id,
             user_id=chosen.from_user.id
         )
 
