@@ -55,9 +55,10 @@ class LastFMClient:
             user=username,
             limit=1
         )
-        if not data:
+        recent = (data or {}).get("recenttracks", {}).get("track")
+        if not recent:
             raise LastFMNoDataException()
-        track = data["recenttracks"]["track"][0]
+        track = recent[0] if isinstance(recent, list) else recent
         return LastFMTrackData.from_dict(track)
 
     async def get_provider_track(
