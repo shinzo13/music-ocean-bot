@@ -54,6 +54,20 @@ class TrackRepository:
         logger.debug(f"Added track: {track}")
         return track
 
+    async def update_file(
+            self,
+            track_id: int | str,
+            engine: Engine,
+            telegram_file_id: str,
+            telegram_file_unique_id: str | None = None
+    ) -> None:
+        track = await self.get_track(track_id, engine)
+        if track is None:
+            return
+        track.telegram_file_id = telegram_file_id
+        track.telegram_file_unique_id = telegram_file_unique_id
+        await self.session.commit()
+
     async def get_track(
             self,
             track_id: int | str,

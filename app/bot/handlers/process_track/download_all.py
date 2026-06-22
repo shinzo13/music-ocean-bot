@@ -1,6 +1,7 @@
 import re
 
 from aiogram import Router, F
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram_i18n import I18nContext
@@ -77,7 +78,17 @@ async def handle_deeplink(
             tracks,
             track_repo
     ):
-        sent = await message.answer_audio(audio=track.file_id)
+        try:
+            sent = await message.answer_audio(audio=track.file_id)
+        except TelegramBadRequest:
+            # cached file_id went stale (e.g. legacy worker upload) — re-fetch
+            # fresh via the main bot and refresh the cached row
+            fresh = await musicocean.download_track(engine, track.track_id)
+            sent = await message.answer_audio(audio=fresh.file_id)
+            await track_repo.update_file(
+                track.track_id, engine,
+                sent.audio.file_id, sent.audio.file_unique_id
+            )
 
         # todo move db-saving logic to one place (handlers or tg_musicocean)
         if not await track_repo.get_track(track.track_id, engine):
