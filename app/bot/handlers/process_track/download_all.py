@@ -82,8 +82,8 @@ async def handle_deeplink(
             sent = await message.answer_audio(audio=track.file_id)
         except TelegramBadRequest:
             # cached file_id went stale (e.g. legacy worker upload) — re-fetch
-            # fresh via the main bot and refresh the cached row
-            fresh = await musicocean.download_track(engine, track.track_id)
+            # fresh through a worker (not the main bot) and refresh the cached row
+            fresh = await musicocean.redownload_track(engine, track.track_id)
             sent = await message.answer_audio(audio=fresh.file_id)
             await track_repo.update_file(
                 track.track_id, engine,

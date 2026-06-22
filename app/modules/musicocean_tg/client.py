@@ -80,6 +80,20 @@ class TelegramMusicOceanClient(MusicOceanClient):
             file_unique_id=msg.audio.file_unique_id
         )
 
+    async def redownload_track(
+            self,
+            engine: Engine,
+            track_id: int | str
+    ) -> CachedTrack:
+        # like download_track but routed through a worker, not the main bot
+        worker = await self._acquire_worker()
+        msg = await self._upload_track(engine, track_id, worker)
+        return CachedTrack(
+            track_id=track_id,
+            file_id=msg.audio.file_id,
+            file_unique_id=msg.audio.file_unique_id
+        )
+
     async def _acquire_worker(self) -> TelegramWorker:
         while True:
             # least-loaded: пробуем наименее загруженных воркеров первыми,
