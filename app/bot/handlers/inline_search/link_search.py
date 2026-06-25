@@ -17,7 +17,7 @@ logger = get_logger(__name__)
 
 router = Router()
 
-DEEZER_REGEX = re.compile(r"https?://(?:www\.)?deezer\.com/\w+/(track|album|playlist|artist)/(\d+)")
+DEEZER_REGEX = re.compile(r"https?://(?:www\.)?deezer\.com/(?:\w+/)?(track|album|playlist|artist)/(\d+)")
 SPOTIFY_REGEX = re.compile(r"https?://open\.spotify\.com/(track|album|playlist|artist)/([A-Za-z0-9]+)")
 SOUNDCLOUD_REGEX = re.compile(r"https?://(?:www\.)?soundcloud\.com/[\w-]+/[\w-]+")
 YOUTUBE_REGEX = re.compile(r"https?://(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]+)")
