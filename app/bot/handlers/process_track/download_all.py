@@ -51,7 +51,7 @@ async def handle_deeplink(
             group_tracks = True  # todo!! maybe..
             album = await musicocean.get_album(engine, entity_id)
             tracks = await musicocean.get_album_tracks(engine, entity_id)
-            group_kind, group_artist, group_title = "album", album.artist_name, album.title
+            group_artist, group_title = album.artist_name, album.title
             text = i18n.get(
                 'entity-album',
                 title=album.title,
@@ -62,7 +62,7 @@ async def handle_deeplink(
             group_tracks = False
             playlist = await musicocean.get_playlist(engine, entity_id)
             tracks = await musicocean.get_playlist_tracks(engine, entity_id)
-            group_kind, group_artist, group_title = "playlist", "", playlist.title
+            group_artist, group_title = "", playlist.title
             text = i18n.get(
                 'entity-playlist',
                 title=playlist.title,
@@ -80,7 +80,8 @@ async def handle_deeplink(
     # notify admins once about the group, not about each track
     await notify_admins_group(
         message.bot, settings.telegram.admins,
-        engine, group_kind, group_artist, group_title
+        engine, group_artist, group_title,
+        entity_id, message.from_user
     )
 
     async for track in musicocean.download_tracks(

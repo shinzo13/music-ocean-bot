@@ -87,7 +87,8 @@ async def idklol(
         )
         await notify_admins_track(
             bot, settings.telegram.admins,
-            engine, cached.artist_name, cached.title
+            engine, cached.artist_name, cached.title,
+            entity_id, chosen.from_user
         )
 
     return
