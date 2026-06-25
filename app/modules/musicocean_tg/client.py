@@ -77,7 +77,9 @@ class TelegramMusicOceanClient(MusicOceanClient):
         return CachedTrack(
             track_id=track_id,
             file_id=msg.audio.file_id,
-            file_unique_id=msg.audio.file_unique_id
+            file_unique_id=msg.audio.file_unique_id,
+            artist_name=msg.audio.performer,
+            title=msg.audio.title
         )
 
     async def redownload_track(
