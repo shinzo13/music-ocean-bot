@@ -7,7 +7,9 @@ from aiogram.types import Message
 from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
+from app.bot.utils.admin_notify import notify_admins_group
 from app.bot.utils.get_engine_emoji import get_engine_emoji
+from app.config.settings import settings
 from app.database.repositories import TrackRepository
 from app.modules.musicocean.enums import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
@@ -49,6 +51,7 @@ async def handle_deeplink(
             group_tracks = True  # todo!! maybe..
             album = await musicocean.get_album(engine, entity_id)
             tracks = await musicocean.get_album_tracks(engine, entity_id)
+            group_kind, group_artist, group_title = "album", album.artist_name, album.title
             text = i18n.get(
                 'entity-album',
                 title=album.title,
@@ -59,6 +62,7 @@ async def handle_deeplink(
             group_tracks = False
             playlist = await musicocean.get_playlist(engine, entity_id)
             tracks = await musicocean.get_playlist_tracks(engine, entity_id)
+            group_kind, group_artist, group_title = "playlist", "", playlist.title
             text = i18n.get(
                 'entity-playlist',
                 title=playlist.title,
@@ -72,6 +76,12 @@ async def handle_deeplink(
 
     await message.answer(text)
     await message.answer(i18n.get('downloading'))
+
+    # notify admins once about the group, not about each track
+    await notify_admins_group(
+        message.bot, settings.telegram.admins,
+        engine, group_kind, group_artist, group_title
+    )
 
     async for track in musicocean.download_tracks(
             engine,

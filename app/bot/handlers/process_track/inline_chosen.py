@@ -4,7 +4,9 @@ from aiogram.types import ChosenInlineResult
 from aiogram.types import InputMediaAudio
 from dishka import FromDishka
 
+from app.bot.utils.admin_notify import notify_admins_track
 from app.config.log import get_logger
+from app.config.settings import settings
 from app.database.repositories import TrackRepository
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
@@ -82,6 +84,11 @@ async def idklol(
             telegram_file_id=file_id,
             telegram_file_unique_id=cached.file_unique_id,
             user_id=chosen.from_user.id
+        )
+        preview = await musicocean.get_track(engine, entity_id)
+        await notify_admins_track(
+            bot, settings.telegram.admins,
+            engine, preview.artist_name, preview.title
         )
 
     return
