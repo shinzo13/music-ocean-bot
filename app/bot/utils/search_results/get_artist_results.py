@@ -27,7 +27,7 @@ async def get_artist_results(
                     'entity-artist',
                     name=artist.name,
                     listeners=artist.listeners,
-                    cover_url=artist.cover_url
+                    cover_url=artist.photo_url
                 ),
                 parse_mode='HTML'
             ),
