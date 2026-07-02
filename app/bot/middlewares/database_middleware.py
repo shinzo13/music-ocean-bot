@@ -1,6 +1,7 @@
 from typing import Callable, Dict, Any
 
 from aiogram import BaseMiddleware
+from aiogram.enums import ChatType
 from aiogram.types import Message, User as TelegramUser, Update, InputTextMessageContent
 from aiogram_i18n.types import InlineQueryResultArticle
 from typing_extensions import Awaitable
@@ -52,7 +53,9 @@ class DatabaseMiddleware(BaseMiddleware):
                 )], cache_time=0, is_personal=True)
             return None
 
-        if not db_user.is_dm:
+        # is_dm should flip to True only when the user actually DMs the bot,
+        # not on any interaction (inline queries, group messages, callbacks)
+        if not db_user.is_dm and event.message and event.message.chat.type == ChatType.PRIVATE:
             await user_repo.update_user(db_user.user_id, is_dm=True)
 
         data["user"] = db_user
