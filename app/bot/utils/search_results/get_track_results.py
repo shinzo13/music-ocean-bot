@@ -52,7 +52,8 @@ async def get_track_results(
                 audio_url=track.preview_url,
                 performer=track.artist_name,
                 input_message_content=InputTextMessageContent(
-                    message_text=text
+                    message_text=text,
+                    parse_mode='HTML'
                 ),
                 reply_markup=reply_markup
             )
