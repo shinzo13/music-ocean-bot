@@ -35,6 +35,7 @@ btn-scrobbling = Scrobbling
 btn-track-previews = Podgląd utworu
 choose-previews = Wybierz wygląd podglądu utworu:
 previews-changed = ✅ Zmieniono podgląd utworu
+previews-already-selected = ☑️ Ta opcja jest już wybrana
 
 btn-show-covers = Pokazuj okładki
 btn-show-mp3-previews = Pokazuj fragmenty MP3

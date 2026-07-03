@@ -35,6 +35,7 @@ btn-scrobbling = Скробблинг
 btn-track-previews = Превью треков
 choose-previews = Выберите вид превью треков:
 previews-changed = ✅ Превью треков изменено
+previews-already-selected = ☑️ Эта опция уже выбрана
 
 btn-show-covers = Показывать обложки
 btn-show-mp3-previews = Показывать MP3-фрагменты

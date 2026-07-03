@@ -36,6 +36,7 @@ btn-scrobbling = Scrobbling
 btn-track-previews = Track previews
 choose-previews = Choose track preview appearance:
 previews-changed = ✅ Track preview options changed successfully
+previews-already-selected = ☑️ This option is already selected
 
 btn-show-covers = Show covers
 btn-show-mp3-previews = Show MP3 previews
