@@ -23,17 +23,27 @@ class DatabaseMiddleware(BaseMiddleware):
         user_repo: UserRepository = await data["dishka_container"].get(UserRepository)
         tg_user: TelegramUser | None = data.get("event_from_user")
 
-        if tg_user is None:
+        # anonymous senders (posting as a channel in discussion comments) arrive
+        # with no from_user; fall back to the sender channel id so the flow keeps
+        # working instead of crashing handlers that require a user object
+        sender_chat = event.message.sender_chat if event.message else None
+        if tg_user is not None:
+            user_id = tg_user.id
+            language_code = tg_user.language_code
+        elif sender_chat is not None:
+            user_id = sender_chat.id
+            language_code = None
+        else:
             return await handler(event, data)
 
-        db_user: DatabaseUser = await user_repo.get_user_by_id(tg_user.id) \
-                                or await user_repo.add_user(user_id=tg_user.id)
+        db_user: DatabaseUser = await user_repo.get_user_by_id(user_id) \
+                                or await user_repo.add_user(user_id=user_id)
 
-        if not db_user.settings.locale:
-            logger.debug(f"set lang: {tg_user.language_code}")
+        if not db_user.settings.locale and language_code:
+            logger.debug(f"set lang: {language_code}")
             await user_repo.update_user_settings(
                 db_user.user_id,
-                locale=tg_user.language_code
+                locale=language_code
             )
 
         if db_user.is_banned:

@@ -1,5 +1,5 @@
 from aiogram import Bot
-from aiogram.types import User
+from aiogram.types import Chat, User
 
 from app.bot.utils.get_engine_emoji import get_engine_emoji
 from app.config.log import get_logger
@@ -16,14 +16,17 @@ ENGINE_NAMES = {
 }
 
 
-def _format_user(user: User) -> str:
+def _format_user(user: User | Chat) -> str:
     if user.username:
         return "@" + user.username
+    # anonymous sender is a Chat (channel) — it has a title, not first/last name
+    if isinstance(user, Chat):
+        return f"{user.title or user.id} (channel)"
     last = f" {user.last_name}" if user.last_name else ""
     return f"<a href='tg://user?id={user.id}'>{user.first_name}{last}</a>"
 
 
-def _format(engine: Engine, artist_name: str, title: str, entity_id: int | str, user: User) -> str:
+def _format(engine: Engine, artist_name: str, title: str, entity_id: int | str, user: User | Chat) -> str:
     name = f"{artist_name} - {title}" if artist_name else title
     return (
         f"<blockquote><b><i>{name}</i></b></blockquote>\n\n"
@@ -48,7 +51,7 @@ async def notify_admins_track(
         artist_name: str,
         title: str,
         track_id: int | str,
-        user: User
+        user: User | Chat
 ) -> None:
     await _broadcast(bot, admins, _format(engine, artist_name, title, track_id, user))
 
@@ -60,7 +63,7 @@ async def notify_admins_group(
         artist_name: str,
         title: str,
         entity_id: int | str,
-        user: User
+        user: User | Chat
 ) -> None:
     # one notification for the whole album/playlist, same track-info format
     await _broadcast(bot, admins, _format(engine, artist_name, title, entity_id, user))

@@ -31,6 +31,10 @@ async def handle_deeplink(
         track_repo: FromDishka[TrackRepository],
         i18n: I18nContext,
 ):
+    # anonymous senders (posting as a channel) have no from_user; use the
+    # sender channel as a fallback so downloads still attribute to someone
+    sender = message.from_user or message.sender_chat
+
     engine_prefix = deeplink_match.group(1)
     entity_type = deeplink_match.group(2)
     entity_id = deeplink_match.group(3)
@@ -81,7 +85,7 @@ async def handle_deeplink(
     await notify_admins_group(
         message.bot, settings.telegram.admins,
         engine, group_artist, group_title,
-        entity_id, message.from_user
+        entity_id, sender
     )
 
     async for track in musicocean.download_tracks(
@@ -108,7 +112,7 @@ async def handle_deeplink(
                 track_id=track.track_id,
                 telegram_file_id=sent.audio.file_id,
                 telegram_file_unique_id=sent.audio.file_unique_id,
-                user_id=message.from_user.id,
+                user_id=sender.id,
             )
 
     await message.answer(i18n.get('downloaded'))
