@@ -191,10 +191,10 @@ class SpotifyClient(BaseEngineClient):
 
     async def get_album_tracks(self, album_id: str) -> list[SpotifyTrackPreview]:
         tracks: list[SpotifyTrackPreview] = []
-        path = f"/albums/{album_id}/tracks"
+        path = f"albums/{album_id}/tracks"
         album = await self.get_album(album_id)
         while path:
-            path.removeprefix(f"{SPOTIFY_API_BASE}/")
+            path = path.removeprefix(f"{SPOTIFY_API_BASE}/")
             data = await self._get(path, limit=10)
             for item in data["items"]:
                 item["cover_url"] = album.cover_url
@@ -209,9 +209,9 @@ class SpotifyClient(BaseEngineClient):
 
     async def get_playlist_tracks(self, playlist_id: str) -> list[SpotifyTrackPreview]:
         tracks: list[SpotifyTrackPreview] = []
-        path = f"/playlists/{playlist_id}/tracks"
+        path = f"playlists/{playlist_id}/tracks"
         while path:
-            path.removeprefix(f"{SPOTIFY_API_BASE}/")
+            path = path.removeprefix(f"{SPOTIFY_API_BASE}/")
             data = await self._get(path, limit=10)
             for item in data["items"]:
                 if item.get("track"):
