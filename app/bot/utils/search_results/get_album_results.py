@@ -27,8 +27,8 @@ async def get_album_results(
             input_message_content=InputTextMessageContent(
                 message_text=LazyProxy(
                     'entity-album',
-                    title=album.title,
-                    artist_name=album.artist_name,
+                    title=html.escape(album.title),
+                    artist_name=html.escape(album.artist_name),
                     cover_url=album.cover_url
                 ),
                 parse_mode='HTML'

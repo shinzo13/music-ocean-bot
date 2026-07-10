@@ -25,7 +25,7 @@ async def get_artist_results(
             input_message_content=InputTextMessageContent(
                 message_text=LazyProxy(
                     'entity-artist',
-                    name=artist.name,
+                    name=html.escape(artist.name),
                     listeners=artist.listeners,
                     cover_url=artist.photo_url
                 ),

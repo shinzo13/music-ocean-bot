@@ -26,7 +26,7 @@ async def get_playlist_results(
             input_message_content=InputTextMessageContent(
                 message_text=LazyProxy(
                     'entity-playlist',
-                    title=playlist.title,
+                    title=html.escape(playlist.title),
                     track_count=playlist.track_count,
                     cover_url=playlist.cover_url
                 ),
