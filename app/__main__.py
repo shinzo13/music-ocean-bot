@@ -12,7 +12,7 @@ from app.bot.handlers import (
     process_track,
     user_interface,
     track_info,
-    admin_panel, shared, other
+    admin_panel, shared, other, errors
 )
 from app.bot.middlewares import DatabaseMiddleware
 from app.bot.middlewares.locale_middleware import LocaleMiddleware, PatchedManager
@@ -67,7 +67,8 @@ async def main():
         *user_interface.routers,
         *track_info.routers,
         *admin_panel.routers,
-        *other.routers
+        *other.routers,
+        *errors.routers
     )
 
     try:
