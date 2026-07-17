@@ -38,6 +38,7 @@ async def inline_query(
         query: InlineQuery,
         match: re.Match,
         user: DatabaseUser,
+        i18n: I18nContext,
         musicocean: FromDishka[TelegramMusicOceanClient]
 ):
     engine = Engine.DEEZER if 'deezer' in query.query else Engine.SPOTIFY
@@ -45,6 +46,15 @@ async def inline_query(
     entity_type, entity_id = match.groups()
     if engine == Engine.DEEZER:
         entity_id = int(entity_id)
+
+    # Spotify returns 403 on playlist tracks and artist top-tracks for
+    # client-credentials apps since its 2024 API restrictions.
+    if engine == Engine.SPOTIFY and entity_type in ("playlist", "artist"):
+        await query.answer(
+            not_supported_result(i18n.get('feature-spotify-link-search')),
+            cache_time=0
+        )
+        return
 
     match entity_type:
         case "track":

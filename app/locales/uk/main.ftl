@@ -89,6 +89,7 @@ usage-guide-message =
 
     i dont know
 feature-soundcloud-link-search = Пошук за посиланням SoundCloud
+feature-spotify-link-search = Пошук за посиланням Spotify (плейлист/виконавець)
 feature-youtube-advanced-search = Розширений пошук по YouTube
 not-supported-title = { $feature } поки не підтримується.
 not-supported-description = :(

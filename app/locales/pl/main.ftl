@@ -88,6 +88,7 @@ usage-guide-message =
 
     i dont know
 feature-soundcloud-link-search = Wyszukiwanie po linku SoundCloud
+feature-spotify-link-search = Wyszukiwanie po linku Spotify (playlista/artysta)
 feature-youtube-advanced-search = Zaansowane wyszukiwanie przez YT
 not-supported-title = { $feature } nie jest aktualnie obsługiwane.
 not-supported-description = :(

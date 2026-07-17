@@ -88,6 +88,7 @@ usage-guide-message = <b>Как пользоваться расширенным 
 
     i dont know
 feature-soundcloud-link-search = Поиск по ссылке SoundCloud
+feature-spotify-link-search = Поиск по ссылке Spotify (плейлист/исполнитель)
 feature-youtube-advanced-search = Расширенный поиск по YouTube
 not-supported-title = { $feature } пока не поддерживается.
 not-supported-description = :(

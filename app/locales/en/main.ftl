@@ -90,6 +90,7 @@ usage-guide-message =
 
     i dont know
 feature-soundcloud-link-search = SoundCloud link search
+feature-spotify-link-search = Spotify playlist/artist link search
 feature-youtube-advanced-search = YouTube-based advanced search
 not-supported-title = { $feature } is not supported at the moment.
 not-supported-description = :(
