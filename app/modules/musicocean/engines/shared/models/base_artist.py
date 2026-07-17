@@ -6,5 +6,5 @@ from pydantic import BaseModel
 class BaseArtist(BaseModel):
     id: int | str
     name: str
-    photo_url: str  # not sure
+    photo_url: Optional[str] = None
     listeners: Optional[int] = None

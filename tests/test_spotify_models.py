@@ -77,6 +77,35 @@ def test_track_preview_prefers_explicit_cover_url():
     assert track.cover_url == "https://img/override"
 
 
+def test_album_without_images_has_no_cover():
+    album = SpotifyAlbum.from_dict({
+        "id": "abc",
+        "name": "No Art",
+        "artists": [{"name": "A"}],
+        "images": [],
+    })
+    assert album.cover_url is None
+
+
+def test_playlist_without_images_has_no_cover():
+    pl = SpotifyPlaylist.from_dict({
+        "id": "pl1",
+        "name": "No Art",
+        "images": [],
+        "tracks": {"total": 3},
+    })
+    assert pl.cover_url is None
+
+
+def test_artist_without_images_has_no_photo():
+    artist = SpotifyArtist.from_dict({
+        "id": "id1",
+        "name": "Artist",
+        "images": [],
+    })
+    assert artist.photo_url is None
+
+
 def test_track_preview_without_cover_is_none():
     track = SpotifyTrackPreview.from_dict({
         "id": "t1",
