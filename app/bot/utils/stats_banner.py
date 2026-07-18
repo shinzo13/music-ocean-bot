@@ -49,19 +49,13 @@ def _render_banner(
         ax.set_facecolor(BG)
         ax.axis("off")
 
-    _, _, autotexts = ax_pie.pie(
+    ax_pie.pie(
         values,
         colors=wedge_colors,
         startangle=90,
         counterclock=False,
-        autopct=lambda pct: f"{pct:.0f}%" if pct >= 4 else "",
-        pctdistance=0.76,
         wedgeprops={"width": 0.42, "edgecolor": BG, "linewidth": 2},
     )
-    for t in autotexts:
-        t.set_color(FG)
-        t.set_fontsize(13)
-        t.set_fontweight("bold")
     ax_pie.text(0, 0, f"{total}", ha="center", va="center",
                 color=FG, fontsize=30, fontweight="bold")
 
@@ -71,24 +65,23 @@ def _render_banner(
     y0 = 0.5 + row_h * (len(items) - 1) / 2
     for i, (label, value) in enumerate(items):
         y = y0 - i * row_h
-        ax_leg.add_patch(FancyBboxPatch(
-            (0.02, y - 0.028), 0.056, 0.056,
-            boxstyle="round,pad=0.004,rounding_size=0.012",
-            linewidth=0, facecolor=wedge_colors[i],
-            transform=ax_leg.transAxes
-        ))
-        text_x = 0.13
-        if icons:
-            icon_path = ICONS_DIR / f"{label}.png"
-            if icon_path.exists():
-                img = plt.imread(icon_path)
-                ab = AnnotationBbox(
-                    OffsetImage(img, zoom=0.32),
-                    (0.16, y), xycoords=ax_leg.transAxes,
-                    frameon=False
-                )
-                ax_leg.add_artist(ab)
-            text_x = 0.24
+        icon_path = ICONS_DIR / f"{label}.png" if icons else None
+        if icon_path and icon_path.exists():
+            img = plt.imread(icon_path)
+            ab = AnnotationBbox(
+                OffsetImage(img, zoom=0.32),
+                (0.06, y), xycoords=ax_leg.transAxes,
+                frameon=False
+            )
+            ax_leg.add_artist(ab)
+        else:
+            ax_leg.add_patch(FancyBboxPatch(
+                (0.03, y - 0.028), 0.056, 0.056,
+                boxstyle="round,pad=0.004,rounding_size=0.012",
+                linewidth=0, facecolor=wedge_colors[i],
+                transform=ax_leg.transAxes
+            ))
+        text_x = 0.16
         pct = f"{value / total * 100:.0f}%" if total else "0%"
         ax_leg.text(text_x, y, label, ha="left", va="center",
                     color=FG, fontsize=18, fontweight="bold")
