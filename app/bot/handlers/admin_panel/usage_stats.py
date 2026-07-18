@@ -1,15 +1,23 @@
 import asyncio
+from typing import Awaitable, Callable
 
 from aiogram import Router, F
-from aiogram.types import CallbackQuery, BufferedInputFile
+from aiogram.filters.callback_data import CallbackData
+from aiogram.types import CallbackQuery, BufferedInputFile, InputMediaPhoto
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dishka import FromDishka
 
 from app.bot.callbacks.admin_panel_callback import AdminPanelCallback, AdminPanelPath
-from app.bot.utils.stats_banner import render_stats_banner
+from app.bot.utils.stats_banner import render_engine_banner, render_context_banner
 from app.database.models.download_context import EntityType, DownloadMode
 from app.database.repositories import TrackRepository
 
 router = Router()
+
+
+class StatsPageCallback(CallbackData, prefix="astats"):
+    page: str
+
 
 ENTITY_LABELS = {
     EntityType.ALBUM: "album",
@@ -21,6 +29,32 @@ MODE_LABELS = {
     DownloadMode.SINGLE: "single",
     DownloadMode.MULTI: "multi",
 }
+
+
+def _engine_banner(stats: dict) -> bytes:
+    return render_engine_banner({e.value.lower(): c for e, c in stats['by_engine'].items()})
+
+
+def _context_banner(stats: dict) -> bytes:
+    return render_context_banner({c.value.lower(): n for c, n in stats['by_context'].items()})
+
+
+# page key -> (switch-button label, banner renderer); add new pages here
+PAGES: dict[str, tuple[str, Callable[[dict], bytes]]] = {
+    "engine": ("📀 by engine", _engine_banner),
+    "context": ("🔀 by context", _context_banner),
+}
+
+DEFAULT_PAGE = "engine"
+
+
+def page_keyboard(current: str):
+    kb = InlineKeyboardBuilder()
+    for key, (label, _) in PAGES.items():
+        if key != current:
+            kb.button(text=label, callback_data=StatsPageCallback(page=key).pack())
+    kb.adjust(1)
+    return kb.as_markup()
 
 
 def build_caption(stats: dict) -> str:
@@ -37,16 +71,38 @@ def build_caption(stats: dict) -> str:
     return "\n".join(lines)
 
 
+async def render_page(page: str, track_repo: TrackRepository) -> tuple[BufferedInputFile, str]:
+    stats = await track_repo.usage_stats()
+    _, renderer = PAGES[page]
+    banner = await asyncio.to_thread(renderer, stats)
+    photo = BufferedInputFile(banner, filename=f"stats-{page}.png")
+    return photo, build_caption(stats)
+
+
 @router.callback_query(AdminPanelCallback.filter(F.path == AdminPanelPath.USAGE_STATS))
 async def usage_stats(callback: CallbackQuery, track_repo: FromDishka[TrackRepository]):
-    stats = await track_repo.usage_stats()
-    banner = await asyncio.to_thread(
-        render_stats_banner,
-        {e.value.lower(): c for e, c in stats['by_engine'].items()},
-        {ctx.value.lower(): c for ctx, c in stats['by_context'].items()},
-    )
+    photo, caption = await render_page(DEFAULT_PAGE, track_repo)
     await callback.message.answer_photo(
-        photo=BufferedInputFile(banner, filename="usage-stats.png"),
-        caption=build_caption(stats)
+        photo=photo,
+        caption=caption,
+        reply_markup=page_keyboard(DEFAULT_PAGE)
+    )
+    await callback.answer()
+
+
+@router.callback_query(StatsPageCallback.filter())
+async def switch_stats_page(
+        callback: CallbackQuery,
+        callback_data: StatsPageCallback,
+        track_repo: FromDishka[TrackRepository]
+):
+    page = callback_data.page
+    if page not in PAGES:
+        await callback.answer()
+        return
+    photo, caption = await render_page(page, track_repo)
+    await callback.message.edit_media(
+        media=InputMediaPhoto(media=photo, caption=caption),
+        reply_markup=page_keyboard(page)
     )
     await callback.answer()
