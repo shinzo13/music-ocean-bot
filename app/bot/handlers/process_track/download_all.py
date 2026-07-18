@@ -1,7 +1,8 @@
+import asyncio
 import re
 
 from aiogram import Router, F
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramBadRequest, TelegramNetworkError
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram_i18n import I18nContext
@@ -16,7 +17,21 @@ from app.modules.musicocean.enums import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 from app.modules.musicocean_tg.utils import prefix_to_engine
 
+from app.config.log import get_logger
+
+logger = get_logger(__name__)
+
 router = Router()
+
+
+async def answer_audio_retrying(message: Message, file_id: str, attempts: int = 3):
+    for attempt in range(attempts):
+        try:
+            return await message.answer_audio(audio=file_id)
+        except TelegramNetworkError:
+            if attempt == attempts - 1:
+                raise
+            await asyncio.sleep(3 * (attempt + 1))
 
 
 @router.message(
@@ -91,34 +106,43 @@ async def handle_deeplink(
         entity_id, sender
     )
 
+    failed = 0
     async for track in musicocean.download_tracks(
             engine,
             tracks,
             track_repo
     ):
+        # one bad track (stale file_id, network hiccup) must not kill the batch
         try:
-            sent = await message.answer_audio(audio=track.file_id)
-        except TelegramBadRequest:
-            # cached file_id went stale (e.g. legacy worker upload) — re-fetch
-            # fresh through a worker (not the main bot) and refresh the cached row
-            fresh = await musicocean.redownload_track(engine, track.track_id)
-            sent = await message.answer_audio(audio=fresh.file_id)
-            await track_repo.update_file(
-                track.track_id, engine,
-                sent.audio.file_id, sent.audio.file_unique_id
-            )
+            try:
+                sent = await answer_audio_retrying(message, track.file_id)
+            except TelegramBadRequest:
+                # cached file_id went stale (e.g. legacy worker upload) — re-fetch
+                # fresh through a worker (not the main bot) and refresh the cached row
+                fresh = await musicocean.redownload_track(engine, track.track_id)
+                sent = await answer_audio_retrying(message, fresh.file_id)
+                await track_repo.update_file(
+                    track.track_id, engine,
+                    sent.audio.file_id, sent.audio.file_unique_id
+                )
 
-        # todo move db-saving logic to one place (handlers or tg_musicocean)
-        if not await track_repo.get_track(track.track_id, engine):
-            await track_repo.add_track(
-                engine=engine,
-                track_id=track.track_id,
-                telegram_file_id=sent.audio.file_id,
-                telegram_file_unique_id=sent.audio.file_unique_id,
-                user_id=sender.id,
-                download_context=DownloadContext.ENTITY,
-                entity_type=entity_kind,
-                download_mode=DownloadMode.MULTI
-            )
+            # todo move db-saving logic to one place (handlers or tg_musicocean)
+            if not await track_repo.get_track(track.track_id, engine):
+                await track_repo.add_track(
+                    engine=engine,
+                    track_id=track.track_id,
+                    telegram_file_id=sent.audio.file_id,
+                    telegram_file_unique_id=sent.audio.file_unique_id,
+                    user_id=sender.id,
+                    download_context=DownloadContext.ENTITY,
+                    entity_type=entity_kind,
+                    download_mode=DownloadMode.MULTI
+                )
+        except Exception as e:
+            failed += 1
+            logger.warning(f"skipping track {track.track_id} in batch: {e}")
 
-    await message.answer(i18n.get('downloaded'))
+    done_text = i18n.get('downloaded')
+    if failed:
+        done_text += f" ({failed} failed)"
+    await message.answer(done_text)
