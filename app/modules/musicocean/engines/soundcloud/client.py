@@ -1,3 +1,4 @@
+import asyncio
 import re
 from typing import Optional
 
@@ -199,7 +200,8 @@ class SoundCloudClient(BaseEngineClient):
                 cover = await resp.read()
                 track.cover = cover
 
-        track.content = write_mp3_tags(
+        track.content = await asyncio.to_thread(
+            write_mp3_tags,
             track=track,
             source=source,
             watermark=watermark

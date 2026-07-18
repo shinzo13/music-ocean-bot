@@ -1,3 +1,4 @@
+import asyncio
 import io
 import json
 import re
@@ -164,11 +165,12 @@ class YoutubeClient(BaseEngineClient):
         logger.debug("yt: downloading")
         stream = await yt.get_stream_by_itag(140)
         data = io.BytesIO()
-        stream.stream_to_buffer(data)
+        # blocking download + cpu-heavy transcode must not starve the event loop
+        await asyncio.to_thread(stream.stream_to_buffer, data)
         data.seek(0)
         raw = data.read()
         logger.debug("yt: writing id3")
-        track.content = write_mp4_tags(track, raw, watermark)
+        track.content = await asyncio.to_thread(write_mp4_tags, track, raw, watermark)
         logger.debug("yt: finished")
         return track
 

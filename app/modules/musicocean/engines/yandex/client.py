@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional
 
 from yandex_music import ClientAsync
@@ -146,7 +147,8 @@ class YandexClient(BaseEngineClient):
         if track.cover_url:
             track.cover = await raw_track.download_cover_bytes_async(size=COVER_SIZE)
 
-        track.content = write_mp3_tags(
+        track.content = await asyncio.to_thread(
+            write_mp3_tags,
             track=track,
             source=source,
             watermark=watermark,
