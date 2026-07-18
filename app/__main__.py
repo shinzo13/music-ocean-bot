@@ -19,6 +19,7 @@ from app.bot.middlewares.locale_middleware import LocaleMiddleware, PatchedManag
 from app.config.log import setup_logging, get_logger
 from app.config.settings import settings
 from app.database.core import create_engine, add_env_admins, initialize_dynamic_settings
+from app.database.migrations import run_migrations
 from app.database.models.base import Base
 from app.di.container import setup_container
 
@@ -40,6 +41,7 @@ async def main():
     engine = create_engine(settings.database.url)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    await run_migrations(engine)
 
     bot_username = (await bot.get_me()).username
     await initialize_dynamic_settings(  # todo not sure is this still needed

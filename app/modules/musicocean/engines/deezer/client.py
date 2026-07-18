@@ -185,7 +185,7 @@ class DeezerClient(BaseEngineClient):
                     'license_token': self.license_token,
                     'media': [{'type': "FULL", "formats": [{
                         "cipher": "BF_CBC_STRIPE",
-                        "format": "MP3_320"  # TODO
+                        "format": "MP3_128"
                     }]}],
                     'track_tokens': [track_token]
                 }

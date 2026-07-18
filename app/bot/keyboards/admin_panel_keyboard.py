@@ -24,6 +24,11 @@ def admin_panel_keyboard():
             icon_custom_emoji_id=DATABASE_EMOJI_ID
         )],
         [InlineKeyboardButton(
+            text='usage stats',
+            callback_data=AdminPanelCallback(path=AdminPanelPath.USAGE_STATS).pack(),
+            icon_custom_emoji_id=DATABASE_EMOJI_ID
+        )],
+        [InlineKeyboardButton(
             text=LazyProxy('btn-back'),
             callback_data=MainMenuCallback(path=MainMenuPath.SELF).pack(),
             icon_custom_emoji_id=BACK_EMOJI_ID

@@ -18,7 +18,8 @@ logger = get_logger(__name__)
 async def get_track_results(
         engine: Engine,
         matches: list[BaseTrackPreview],
-        preview_covers: bool
+        preview_covers: bool,
+        ctx: str = "s"
 ):  # TODO annotation
 
     reply_markup = InlineKeyboardMarkup(inline_keyboard=[[ # noqa
@@ -34,7 +35,7 @@ async def get_track_results(
         text = f"<i><b>♫ {html.escape(track.artist_name)}</b> - {html.escape(track.title)}</i>"
         if preview_covers or not track.preview_url:
             res = InlineQueryResultArticle(
-                id=f"{engine_to_prefix(engine)}_tr_{track.id}",
+                id=f"{engine_to_prefix(engine)}_tr_{ctx}_{track.id}",
                 title=track.title,
                 description=track.artist_name,
                 thumbnail_url=track.cover_url,
@@ -46,7 +47,7 @@ async def get_track_results(
             )
         else:
             res = InlineQueryResultAudio(
-                id=f"{engine_to_prefix(engine)}_tr_{track.id}",
+                id=f"{engine_to_prefix(engine)}_tr_{ctx}_{track.id}",
                 title=track.title,
                 thumbnail_url=track.cover_url,
                 audio_url=track.preview_url,

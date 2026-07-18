@@ -5,8 +5,10 @@ from aiogram.types import InputMediaAudio
 from dishka import FromDishka
 
 from app.bot.utils.admin_notify import notify_admins_track
+from app.bot.utils.context_codes import CTX_CODES
 from app.config.log import get_logger
 from app.config.settings import settings
+from app.database.models.download_context import DownloadContext
 from app.database.repositories import TrackRepository
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
@@ -27,10 +29,18 @@ async def idklol(
     if chosen.result_id in ['usage_guide', "setup_scrobbling"]:
         return
     # todo i hate stupid split i wanna regex in handler
-    engine_prefix, entity_type, entity_id = chosen.result_id.split("_", maxsplit=2)
-
-    if entity_type != "tr":
+    parts = chosen.result_id.split("_", maxsplit=3)
+    if len(parts) < 3 or parts[1] != "tr":
         return
+    engine_prefix = parts[0]
+    # new ids carry a context code ({engine}_tr_{ctx}_{id}); ids cached by
+    # telegram before the rollout lack it — treat those as plain search
+    if len(parts) == 4 and parts[2] in CTX_CODES:
+        download_context, entity_kind, download_mode = CTX_CODES[parts[2]]
+        entity_id = parts[3]
+    else:
+        download_context, entity_kind, download_mode = DownloadContext.SEARCH, None, None
+        entity_id = chosen.result_id.split("_", maxsplit=2)[2]
 
     match engine_prefix:
         case "dz":
@@ -83,7 +93,10 @@ async def idklol(
             track_id=entity_id,
             telegram_file_id=file_id,
             telegram_file_unique_id=cached.file_unique_id,
-            user_id=chosen.from_user.id
+            user_id=chosen.from_user.id,
+            download_context=download_context,
+            entity_type=entity_kind,
+            download_mode=download_mode
         )
         await notify_admins_track(
             bot, settings.telegram.admins,

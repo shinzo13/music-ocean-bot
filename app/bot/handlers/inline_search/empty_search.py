@@ -57,7 +57,8 @@ async def inline_query(
         await get_track_results(
             engine,
             [track],
-            user.settings.track_preview_covers
+            user.settings.track_preview_covers,
+            ctx="f"
         ),
         cache_time=0,
         is_personal=True

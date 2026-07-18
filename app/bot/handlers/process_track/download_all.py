@@ -10,6 +10,7 @@ from dishka import FromDishka
 from app.bot.utils.admin_notify import notify_admins_group
 from app.bot.utils.get_engine_emoji import get_engine_emoji
 from app.config.settings import settings
+from app.database.models.download_context import DownloadContext, EntityType, DownloadMode
 from app.database.repositories import TrackRepository
 from app.modules.musicocean.enums import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
@@ -49,6 +50,8 @@ async def handle_deeplink(
         entity_id = int(entity_id)
 
     engine_emoji = get_engine_emoji(engine)
+
+    entity_kind = EntityType.ALBUM if entity_type == "al" else EntityType.PLAYLIST
 
     match entity_type:
         case "al":
@@ -113,6 +116,9 @@ async def handle_deeplink(
                 telegram_file_id=sent.audio.file_id,
                 telegram_file_unique_id=sent.audio.file_unique_id,
                 user_id=sender.id,
+                download_context=DownloadContext.ENTITY,
+                entity_type=entity_kind,
+                download_mode=DownloadMode.MULTI
             )
 
     await message.answer(i18n.get('downloaded'))

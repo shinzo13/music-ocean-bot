@@ -59,12 +59,16 @@ async def inline_query(
     match entity_type:
         case "track":
             tracks = [await musicocean.get_track(engine, entity_id)]
+            ctx = "l"
         case "album":
             tracks = await musicocean.get_album_tracks(engine, entity_id)
+            ctx = "ea"
         case "artist":
             tracks = await musicocean.get_artist_tracks(engine, entity_id)
+            ctx = "er"
         case "playlist":
             tracks = await musicocean.get_playlist_tracks(engine, entity_id)
+            ctx = "ep"
         case "" | _:
             return
 
@@ -72,7 +76,8 @@ async def inline_query(
         await get_track_results(
             engine,
             tracks,
-            user.settings.track_preview_covers
+            user.settings.track_preview_covers,
+            ctx=ctx
         ),
         cache_time=0
     )
@@ -91,7 +96,8 @@ async def inline_query(
         await get_track_results(
             Engine.YOUTUBE,
             [track],
-            user.settings.track_preview_covers
+            user.settings.track_preview_covers,
+            ctx="l"
         ),
         cache_time=0
     )
@@ -108,13 +114,17 @@ async def inline_query(
 
     if m := YANDEX_TRACK_REGEX.search(text):
         tracks = [await musicocean.get_track(Engine.YANDEX, m.group(1))]
+        ctx = "l"
     elif m := YANDEX_ALBUM_REGEX.search(text):
         tracks = await musicocean.get_album_tracks(Engine.YANDEX, m.group(1))
+        ctx = "ea"
     elif m := YANDEX_ARTIST_REGEX.search(text):
         tracks = await musicocean.get_artist_tracks(Engine.YANDEX, m.group(1))
+        ctx = "er"
     elif m := YANDEX_PLAYLIST_REGEX.search(text):
         playlist_id = f"{m.group(1)}:{m.group(2)}"
         tracks = await musicocean.get_playlist_tracks(Engine.YANDEX, playlist_id)
+        ctx = "ep"
     else:
         return
 
@@ -122,7 +132,8 @@ async def inline_query(
         await get_track_results(
             Engine.YANDEX,
             tracks,
-            user.settings.track_preview_covers
+            user.settings.track_preview_covers,
+            ctx=ctx
         ),
         cache_time=0
     )

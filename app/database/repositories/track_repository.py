@@ -1,11 +1,12 @@
 from typing import Optional
 
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, func, distinct
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import with_polymorphic
 
 from app.config.log import get_logger
 from app.database.models.base_track import BaseTrack
+from app.database.models.download_context import DownloadContext, EntityType, DownloadMode
 from app.database.models.deezer_track import DeezerTrack
 from app.database.models.soundcloud_track import SoundCloudTrack
 from app.database.models.spotify_track import SpotifyTrack
@@ -26,13 +27,19 @@ class TrackRepository:
             track_id: int | str,
             telegram_file_id: str,
             user_id: int,
-            telegram_file_unique_id: str | None = None
+            telegram_file_unique_id: str | None = None,
+            download_context: DownloadContext = DownloadContext.SEARCH,
+            entity_type: EntityType | None = None,
+            download_mode: DownloadMode | None = None
     ) -> DeezerTrack | SoundCloudTrack | YoutubeTrack | SpotifyTrack:
         kwargs = {
             'track_id': track_id,
             'telegram_file_id': telegram_file_id,
             'telegram_file_unique_id': telegram_file_unique_id,
-            'user_id': user_id
+            'user_id': user_id,
+            'download_context': download_context,
+            'entity_type': entity_type,
+            'download_mode': download_mode
         }
         match engine:
             case Engine.DEEZER:
@@ -93,6 +100,34 @@ class TrackRepository:
             )
         )
         return result.scalar_one_or_none()
+
+    async def usage_stats(self) -> dict:
+        total = (await self.session.execute(
+            select(func.count()).select_from(BaseTrack)
+        )).scalar_one()
+        users = (await self.session.execute(
+            select(func.count(distinct(BaseTrack.user_id)))
+        )).scalar_one()
+        by_context = (await self.session.execute(
+            select(BaseTrack.download_context, func.count())
+            .group_by(BaseTrack.download_context)
+        )).all()
+        by_entity = (await self.session.execute(
+            select(BaseTrack.entity_type, BaseTrack.download_mode, func.count())
+            .where(BaseTrack.download_context == DownloadContext.ENTITY)
+            .group_by(BaseTrack.entity_type, BaseTrack.download_mode)
+        )).all()
+        by_engine = (await self.session.execute(
+            select(BaseTrack.engine, func.count())
+            .group_by(BaseTrack.engine)
+        )).all()
+        return {
+            'total': total,
+            'users': users,
+            'by_context': dict(by_context),
+            'by_entity': {(e, m): c for e, m, c in by_entity},
+            'by_engine': dict(by_engine),
+        }
 
     async def get_track_by_file(
             self,
