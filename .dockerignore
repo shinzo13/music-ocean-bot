@@ -5,3 +5,4 @@
 !app
 !pyproject.toml
 !uv.lock
+!assets
