@@ -31,7 +31,8 @@ async def get_track_results(
     ]])
 
     results = []
-    for track in matches:
+    # telegram allows at most 50 inline results per answer
+    for track in matches[:50]:
         text = f"<i><b>♫ {html.escape(track.artist_name)}</b> - {html.escape(track.title)}</i>"
         if preview_covers or not track.preview_url:
             res = InlineQueryResultArticle(
