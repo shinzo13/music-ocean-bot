@@ -6,6 +6,7 @@ from dishka import FromDishka
 
 from app.bot.utils.admin_notify import notify_admins_track
 from app.bot.utils.context_codes import CTX_CODES
+from app.bot.utils.save_track import save_track_with_source
 from app.config.log import get_logger
 from app.config.settings import settings
 from app.database.models.download_context import DownloadContext
@@ -88,11 +89,13 @@ async def idklol(
     # telegram caching causing this shi
     db_track = await track_repo.get_track(entity_id, engine)
     if db_track is None:
-        await track_repo.add_track(
+        await save_track_with_source(
+            track_repo,
             engine=engine,
             track_id=entity_id,
-            telegram_file_id=file_id,
-            telegram_file_unique_id=cached.file_unique_id,
+            cached=cached,
+            file_id=file_id,
+            file_unique_id=cached.file_unique_id,
             user_id=chosen.from_user.id,
             download_context=download_context,
             entity_type=entity_kind,

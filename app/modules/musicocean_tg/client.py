@@ -51,20 +51,34 @@ class TelegramMusicOceanClient(MusicOceanClient):
             engine: Engine,
             track_id: int | str,
             executor: TelegramWorker
-    ) -> Message:
+    ) -> tuple[Message, Engine | None, int | str | None]:
+        # spotify audio actually comes from deezer (isrc match) or youtube;
+        # keep the real source so both ids land in the caption and the db
+        source_engine, source_id = None, None
+        if engine == Engine.SPOTIFY:
+            source_engine, source_id = await self.resolve_spotify_source(track_id)
+
         logger.debug(f"downloading track {track_id}")
-        track = await super().download_track(engine, track_id)
-        engine_prefix = engine_to_prefix(engine)
+        if source_engine is not None:
+            track = await super().download_track(source_engine, source_id)
+        else:
+            track = await super().download_track(engine, track_id)
+
+        caption = f"<code>{engine_to_prefix(engine)}-{track_id}</code>"
+        if source_engine is not None:
+            caption = f"<code>{engine_to_prefix(source_engine)}-{source_id}</code>\n{caption}"
+
         logger.debug(f"uploading track {track_id}")
-        return await executor.send_audio(
+        msg = await executor.send_audio(
             self.channel_id,
             audio=BufferedInputFile(file=track.content, filename=f"{track.artist_name} – {track.title}.mp3"),
             title=track.title,
             thumbnail=URLInputFile(track.cover_url),
             performer=track.artist_name,
             duration=track.duration,
-            caption=f"<code>{engine_prefix}-{track_id}</code>"
+            caption=caption
         )
+        return msg, source_engine, source_id
 
     # todo another naming
     async def download_track(
@@ -73,13 +87,15 @@ class TelegramMusicOceanClient(MusicOceanClient):
             track_id: int | str
     ) -> CachedTrack:
         await self.main.wait_and_acquire(timeout=60)
-        msg = await self._upload_track(engine, track_id, self.main)
+        msg, source_engine, source_id = await self._upload_track(engine, track_id, self.main)
         return CachedTrack(
             track_id=track_id,
             file_id=msg.audio.file_id,
             file_unique_id=msg.audio.file_unique_id,
             artist_name=msg.audio.performer,
-            title=msg.audio.title
+            title=msg.audio.title,
+            source_engine=source_engine,
+            source_id=source_id
         )
 
     async def redownload_track(
@@ -89,11 +105,13 @@ class TelegramMusicOceanClient(MusicOceanClient):
     ) -> CachedTrack:
         # like download_track but routed through a worker, not the main bot
         worker = await self._acquire_worker()
-        msg = await self._upload_track(engine, track_id, worker)
+        msg, source_engine, source_id = await self._upload_track(engine, track_id, worker)
         return CachedTrack(
             track_id=track_id,
             file_id=msg.audio.file_id,
-            file_unique_id=msg.audio.file_unique_id
+            file_unique_id=msg.audio.file_unique_id,
+            source_engine=source_engine,
+            source_id=source_id
         )
 
     async def _acquire_worker(self) -> TelegramWorker:
@@ -126,12 +144,14 @@ class TelegramMusicOceanClient(MusicOceanClient):
                     file_unique_id=cached[track_id].telegram_file_unique_id  # noqa
                 )
             worker = await self._acquire_worker()
-            msg = await self._upload_track(engine, track_id, worker)
+            msg, source_engine, source_id = await self._upload_track(engine, track_id, worker)
 
             return CachedTrack(
                 track_id=track_id,
                 file_id=msg.audio.file_id,
                 file_unique_id=msg.audio.file_unique_id,
+                source_engine=source_engine,
+                source_id=source_id
             )
 
         async def download_one_indexed(index: int, track_id: int | str):

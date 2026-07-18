@@ -10,6 +10,7 @@ from dishka import FromDishka
 
 from app.bot.utils.admin_notify import notify_admins_group
 from app.bot.utils.get_engine_emoji import get_engine_emoji
+from app.bot.utils.save_track import save_track_with_source
 from app.config.settings import settings
 from app.database.models.download_context import DownloadContext, EntityType, DownloadMode
 from app.database.repositories import TrackRepository
@@ -127,17 +128,18 @@ async def handle_deeplink(
                 )
 
             # todo move db-saving logic to one place (handlers or tg_musicocean)
-            if not await track_repo.get_track(track.track_id, engine):
-                await track_repo.add_track(
-                    engine=engine,
-                    track_id=track.track_id,
-                    telegram_file_id=sent.audio.file_id,
-                    telegram_file_unique_id=sent.audio.file_unique_id,
-                    user_id=sender.id,
-                    download_context=DownloadContext.ENTITY,
-                    entity_type=entity_kind,
-                    download_mode=DownloadMode.MULTI
-                )
+            await save_track_with_source(
+                track_repo,
+                engine=engine,
+                track_id=track.track_id,
+                cached=track,
+                file_id=sent.audio.file_id,
+                file_unique_id=sent.audio.file_unique_id,
+                user_id=sender.id,
+                download_context=DownloadContext.ENTITY,
+                entity_type=entity_kind,
+                download_mode=DownloadMode.MULTI
+            )
         except Exception as e:
             failed += 1
             logger.warning(f"skipping track {track.track_id} in batch: {e}")

@@ -15,6 +15,7 @@ from app.modules.musicocean.engines.soundcloud import SoundCloudClient
 from app.modules.musicocean.engines.soundcloud.models import SoundCloudTrack, SoundCloudTrackPreview, SoundCloudAlbum, \
     SoundCloudPlaylist, SoundCloudArtist
 from app.modules.musicocean.engines.spotify.client import SpotifyClient
+from app.modules.musicocean.engines.spotify.exceptions import SpotifyDataException
 from app.modules.musicocean.engines.spotify.models import SpotifyTrackPreview
 from app.modules.musicocean.engines.youtube.client import YoutubeClient
 from app.modules.musicocean.engines.youtube.models.youtube_track_preview import YoutubeTrackPreview
@@ -172,6 +173,19 @@ class MusicOceanClient:
             track_id: int
     ) -> BaseTrack:
         return await self._get_engine(engine).download_track(track_id, self.watermark)
+
+    async def resolve_spotify_source(self, track_id: str) -> tuple[Engine, int | str]:
+        # spotify has no audio api: prefer an exact deezer match via isrc,
+        # fall back to youtube title/artist matching
+        track = await self.spotify.get_track(track_id)
+        if track.isrc:
+            dz = await self.deezer.get_track_by_isrc(track.isrc)
+            if dz:
+                return Engine.DEEZER, dz.id
+        match = await self.youtube.search_exact_match(track.title, track.artist_name)
+        if not match:
+            raise SpotifyDataException("No Deezer or YouTube source found for Spotify track")
+        return Engine.YOUTUBE, match.id
 
     async def shazam_recognize(self, audio: bytes) -> Optional[YoutubeTrackPreview]:
         res = await shazam_wrapped(audio)

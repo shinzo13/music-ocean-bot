@@ -112,6 +112,13 @@ class DeezerClient(BaseEngineClient):
         )
         return DeezerTrackPreview.from_dict(raw_track)
 
+    async def get_track_by_isrc(self, isrc: str) -> Optional[DeezerTrackPreview]:
+        async with self.session.get(f"{API_URL}/track/isrc:{isrc}") as resp:
+            raw_track = await resp.json()
+        if "error" in raw_track:
+            return None
+        return DeezerTrackPreview.from_dict(raw_track)
+
     async def search_tracks(self, query: str) -> list[DeezerTrackPreview]:
         raw_data = await self._api_request(
             method=DeezerAPIMethod.SEARCH_TRACKS,

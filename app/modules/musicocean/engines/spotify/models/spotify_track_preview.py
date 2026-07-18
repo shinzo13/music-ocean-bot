@@ -3,6 +3,7 @@ from app.modules.musicocean.engines.shared.models import BaseTrackPreview
 
 class SpotifyTrackPreview(BaseTrackPreview):
     id: str
+    isrc: str | None = None
 
     @classmethod
     def from_dict(cls, data: dict):
@@ -16,5 +17,6 @@ class SpotifyTrackPreview(BaseTrackPreview):
             title=data["name"],
             artist_name=", ".join(a["name"] for a in data["artists"]),
             cover_url=cover_url,
-            preview_url=data.get("preview_url")
+            preview_url=data.get("preview_url"),
+            isrc=(data.get("external_ids") or {}).get("isrc")
         )
