@@ -2,6 +2,7 @@ import asyncio
 from typing import Optional
 
 from yandex_music import ClientAsync
+from yandex_music.exceptions import NetworkError
 from yandex_music.utils.request_async import Request
 
 from app.config.log import get_logger
@@ -148,10 +149,19 @@ class YandexClient(BaseEngineClient):
         if not preferred:
             raise YandexDataException("No download options for track")
         best = max(preferred, key=lambda i: i.bitrate_in_kbps)
-        source = await raw_track.download_bytes_async(
-            codec=best.codec,
-            bitrate_in_kbps=min(best.bitrate_in_kbps, self.bitrate_in_kbps),
-        )
+        # shared proxy ip periodically catches yandex 429 — retry with backoff
+        for attempt in range(3):
+            try:
+                source = await raw_track.download_bytes_async(
+                    codec=best.codec,
+                    bitrate_in_kbps=min(best.bitrate_in_kbps, self.bitrate_in_kbps),
+                )
+                break
+            except NetworkError as e:
+                if "429" not in str(e) or attempt == 2:
+                    raise
+                logger.warning(f"yandex 429, retrying track {track_id}")
+                await asyncio.sleep(8 * (attempt + 1))
 
         track = YandexTrack.from_obj(raw_track)
         if track.cover_url:
