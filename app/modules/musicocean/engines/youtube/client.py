@@ -153,9 +153,15 @@ class YoutubeClient(BaseEngineClient):
     ) -> YoutubeTrack:
         yt = AsyncYouTube.from_id(track_id)
         cover_url = await yt.thumbnail_url()
-        async with self.session.get(cover_url) as resp:
-            cover = await resp.read()
-        # video thumbnails are 16:9 — crop to square so audio covers look sane
+        async with self.session.get(
+                f"https://i.ytimg.com/vi/{track_id}/maxresdefault.jpg"
+        ) as resp:
+            if resp.status == 200:
+                cover = await resp.read()
+            else:
+                async with self.session.get(cover_url) as fallback:
+                    cover = await fallback.read()
+        # yt thumbs are 16:9 with baked-in bars — trim them and crop to square
         cover = await asyncio.to_thread(square_cover, cover)
         track = YoutubeTrack(
             id=track_id,
