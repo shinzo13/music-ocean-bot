@@ -66,8 +66,8 @@ class MusicOceanClient:
         )
         await self.spotify.setup()
 
-    async def setup_yandex(self, token: str) -> None:
-        self.yandex = YandexClient(token=token)
+    async def setup_yandex(self, token: str, proxy: str | None = None) -> None:
+        self.yandex = YandexClient(token=token, proxy=proxy)
         await self.yandex.setup()
 
     async def setup_lastfm(self, api_token: str) -> None:

@@ -55,6 +55,7 @@ class SpotifySettings(BaseSettings):
 
 class YandexSettings(BaseSettings):
     token: SecretStr
+    proxy: Optional[SecretStr] = None
 
 class LastfmSettings(BaseSettings):
     api_key: SecretStr

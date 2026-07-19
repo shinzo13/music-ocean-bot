@@ -2,6 +2,7 @@ import asyncio
 from typing import Optional
 
 from yandex_music import ClientAsync
+from yandex_music.utils.request_async import Request
 
 from app.config.log import get_logger
 from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
@@ -31,14 +32,17 @@ class YandexClient(BaseEngineClient):
             token: str,
             codec: str = DEFAULT_CODEC,
             bitrate_in_kbps: int = DEFAULT_BITRATE,
+            proxy: Optional[str] = None,
     ):
         self.token = token
         self.codec = codec
         self.bitrate_in_kbps = bitrate_in_kbps
+        self.proxy = proxy
         self.client: Optional[ClientAsync] = None
 
     async def setup(self):
-        self.client = await ClientAsync(self.token).init()
+        request = Request(proxy_url=self.proxy) if self.proxy else None
+        self.client = await ClientAsync(self.token, request=request).init()
 
     @staticmethod
     def _parse_playlist_id(playlist_id: int | str) -> tuple[str, str]:
@@ -138,9 +142,15 @@ class YandexClient(BaseEngineClient):
         raw_track = tracks[0]
 
         # lossless: branch on codec == "flac" via get_download_info_async()
+        # accounts without plus don't get the top bitrate — pick best available
+        infos = await raw_track.get_download_info_async()
+        preferred = [i for i in infos if i.codec == self.codec] or list(infos)
+        if not preferred:
+            raise YandexDataException("No download options for track")
+        best = max(preferred, key=lambda i: i.bitrate_in_kbps)
         source = await raw_track.download_bytes_async(
-            codec=self.codec,
-            bitrate_in_kbps=self.bitrate_in_kbps,
+            codec=best.codec,
+            bitrate_in_kbps=min(best.bitrate_in_kbps, self.bitrate_in_kbps),
         )
 
         track = YandexTrack.from_obj(raw_track)

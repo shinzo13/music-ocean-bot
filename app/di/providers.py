@@ -35,6 +35,7 @@ class TelegramMusicOceanClientProvider(Provider):
 
         await musicocean.setup_yandex(
             token=settings.yandex.token.get_secret_value(),
+            proxy=settings.yandex.proxy.get_secret_value() if settings.yandex.proxy else None,
         )
 
         await musicocean.setup_lastfm(
