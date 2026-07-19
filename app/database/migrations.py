@@ -28,6 +28,8 @@ STATEMENTS = [
     "ALTER TABLE base_tracks ALTER COLUMN download_context SET NOT NULL",
     "ALTER TABLE base_tracks ALTER COLUMN download_context SET DEFAULT 'SEARCH'",
     "ALTER TABLE base_tracks ADD COLUMN IF NOT EXISTS download_speed double precision",
+    # create_all never extends existing enums — yandex was added after the type
+    "ALTER TYPE engine_enum ADD VALUE IF NOT EXISTS 'YANDEX'",
 ]
 
 
