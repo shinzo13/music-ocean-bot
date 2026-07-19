@@ -20,6 +20,7 @@ from app.modules.musicocean.engines.youtube.models.youtube_track_preview import 
 from app.modules.musicocean.engines.youtube.utils import initialize_context
 from app.modules.musicocean.engines.youtube.utils.parsers.parse_search_response import parse_search_response
 from app.modules.musicocean.utils.id3 import write_mp4_tags
+from app.modules.musicocean.utils.square_cover import square_cover
 
 logger = get_logger(__name__)
 
@@ -154,6 +155,8 @@ class YoutubeClient(BaseEngineClient):
         cover_url = await yt.thumbnail_url()
         async with self.session.get(cover_url) as resp:
             cover = await resp.read()
+        # video thumbnails are 16:9 — crop to square so audio covers look sane
+        cover = await asyncio.to_thread(square_cover, cover)
         track = YoutubeTrack(
             id=track_id,
             title=await yt.title(),

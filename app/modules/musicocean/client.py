@@ -174,18 +174,19 @@ class MusicOceanClient:
     ) -> BaseTrack:
         return await self._get_engine(engine).download_track(track_id, self.watermark)
 
-    async def resolve_spotify_source(self, track_id: str) -> tuple[Engine, int | str]:
+    async def resolve_spotify_source(self, track_id: str) -> tuple[Engine, int | str, str | None]:
         # spotify has no audio api: prefer an exact deezer match via isrc,
-        # fall back to youtube title/artist matching
+        # fall back to youtube title/artist matching.
+        # also returns spotify's own square cover url to override ugly yt thumbs
         track = await self.spotify.get_track(track_id)
         if track.isrc:
             dz = await self.deezer.get_track_by_isrc(track.isrc)
             if dz:
-                return Engine.DEEZER, dz.id
+                return Engine.DEEZER, dz.id, track.cover_url
         match = await self.youtube.search_exact_match(track.title, track.artist_name)
         if not match:
             raise SpotifyDataException("No Deezer or YouTube source found for Spotify track")
-        return Engine.YOUTUBE, match.id
+        return Engine.YOUTUBE, match.id, track.cover_url
 
     async def shazam_recognize(self, audio: bytes) -> Optional[YoutubeTrackPreview]:
         res = await shazam_wrapped(audio)

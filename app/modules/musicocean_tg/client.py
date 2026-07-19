@@ -54,9 +54,9 @@ class TelegramMusicOceanClient(MusicOceanClient):
     ) -> tuple[Message, Engine | None, int | str | None]:
         # spotify audio actually comes from deezer (isrc match) or youtube;
         # keep the real source so both ids land in the caption and the db
-        source_engine, source_id = None, None
+        source_engine, source_id, cover_override = None, None, None
         if engine == Engine.SPOTIFY:
-            source_engine, source_id = await self.resolve_spotify_source(track_id)
+            source_engine, source_id, cover_override = await self.resolve_spotify_source(track_id)
 
         logger.debug(f"downloading track {track_id}")
         if source_engine is not None:
@@ -68,12 +68,21 @@ class TelegramMusicOceanClient(MusicOceanClient):
         if source_engine is not None:
             caption = f"<code>{engine_to_prefix(source_engine)}-{source_id}</code>\n{caption}"
 
+        dl_engine = source_engine or engine
+        if cover_override:
+            thumbnail = URLInputFile(cover_override)
+        elif dl_engine == Engine.YOUTUBE and track.cover:
+            # yt client pre-crops its 16:9 thumb into square 320px bytes
+            thumbnail = BufferedInputFile(file=track.cover, filename="cover.jpg")
+        else:
+            thumbnail = URLInputFile(track.cover_url)
+
         logger.debug(f"uploading track {track_id}")
         msg = await executor.send_audio(
             self.channel_id,
             audio=BufferedInputFile(file=track.content, filename=f"{track.artist_name} – {track.title}.mp3"),
             title=track.title,
-            thumbnail=URLInputFile(track.cover_url),
+            thumbnail=thumbnail,
             performer=track.artist_name,
             duration=track.duration,
             caption=caption
