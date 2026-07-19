@@ -27,6 +27,7 @@ STATEMENTS = [
     "UPDATE base_tracks SET download_context = 'SEARCH' WHERE download_context IS NULL",
     "ALTER TABLE base_tracks ALTER COLUMN download_context SET NOT NULL",
     "ALTER TABLE base_tracks ALTER COLUMN download_context SET DEFAULT 'SEARCH'",
+    "ALTER TABLE base_tracks ADD COLUMN IF NOT EXISTS download_speed double precision",
 ]
 
 

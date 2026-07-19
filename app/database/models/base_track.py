@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey, Enum
+from sqlalchemy import String, ForeignKey, Enum, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.models.base import Base, TimestampMixin, IntIDMixin
@@ -24,6 +24,8 @@ class BaseTrack(Base, TimestampMixin, IntIDMixin):
     download_mode: Mapped[DownloadMode | None] = mapped_column(
         Enum(DownloadMode, name="download_mode_enum"), nullable=True
     )
+    # MB/s of the actual audio fetch; null for rows cached before this metric
+    download_speed: Mapped[float | None] = mapped_column(Float, nullable=True)
 
     downloaded_by: Mapped["User"] = relationship(back_populates="downloaded_tracks")  # noqa
 

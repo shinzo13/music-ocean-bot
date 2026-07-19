@@ -12,3 +12,4 @@ class CachedTrack(BaseModel):
     # for spotify: the engine the audio was actually pulled from
     source_engine: Engine | None = None
     source_id: int | str | None = None
+    download_speed: float | None = None

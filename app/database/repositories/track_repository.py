@@ -30,7 +30,8 @@ class TrackRepository:
             telegram_file_unique_id: str | None = None,
             download_context: DownloadContext = DownloadContext.SEARCH,
             entity_type: EntityType | None = None,
-            download_mode: DownloadMode | None = None
+            download_mode: DownloadMode | None = None,
+            download_speed: float | None = None
     ) -> DeezerTrack | SoundCloudTrack | YoutubeTrack | SpotifyTrack:
         kwargs = {
             'track_id': track_id,
@@ -39,7 +40,8 @@ class TrackRepository:
             'user_id': user_id,
             'download_context': download_context,
             'entity_type': entity_type,
-            'download_mode': download_mode
+            'download_mode': download_mode,
+            'download_speed': download_speed
         }
         match engine:
             case Engine.DEEZER:
@@ -121,12 +123,18 @@ class TrackRepository:
             select(BaseTrack.engine, func.count())
             .group_by(BaseTrack.engine)
         )).all()
+        speed_by_engine = (await self.session.execute(
+            select(BaseTrack.engine, func.avg(BaseTrack.download_speed))
+            .where(BaseTrack.download_speed.is_not(None))
+            .group_by(BaseTrack.engine)
+        )).all()
         return {
             'total': total,
             'users': users,
             'by_context': dict(by_context),
             'by_entity': {(e, m): c for e, m, c in by_entity},
             'by_engine': dict(by_engine),
+            'speed_by_engine': dict(speed_by_engine),
         }
 
     async def get_track_by_file(

@@ -97,6 +97,53 @@ def _render_banner(
     return buf.getvalue()
 
 
+def render_speed_banner(speed_by_engine: dict[str, float]) -> bytes:
+    sns.set_theme(style="dark")
+    items = sorted(speed_by_engine.items(), key=lambda kv: -kv[1])
+    labels = [k for k, _ in items]
+    values = [v for _, v in items]
+    colors = [ENGINE_COLORS.get(l, "#5b6270") for l in labels]
+
+    fig, ax = plt.subplots(figsize=(10.8, 8.1), facecolor=BG)
+    ax.set_facecolor(BG)
+
+    bars = ax.bar(labels, values, color=colors, width=0.55, zorder=2)
+    for bar, v in zip(bars, values):
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height(),
+                f"{v:.2f}", ha="center", va="bottom",
+                color=FG, fontsize=15, fontweight="bold")
+
+    for i, label in enumerate(labels):
+        icon_path = ICONS_DIR / f"{label}.png"
+        if icon_path.exists():
+            ab = AnnotationBbox(
+                OffsetImage(plt.imread(icon_path), zoom=0.22),
+                (i, 0), xycoords=("data", "axes fraction"),
+                xybox=(0, -52), boxcoords="offset points",
+                frameon=False, annotation_clip=False
+            )
+            ax.add_artist(ab)
+
+    ax.set_xticks(range(len(labels)))
+    ax.set_xticklabels(labels, color=FG, fontsize=15, fontweight="bold")
+    ax.tick_params(axis="x", pad=8, length=0)
+    ax.tick_params(axis="y", colors=MUTED, labelsize=12)
+    ax.set_ylabel("MB/s", color=MUTED, fontsize=13)
+    ax.grid(axis="y", color="#2a2a36", linewidth=0.8, zorder=1)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    fig.text(0.04, 0.94, "average download speed", color=FG, fontsize=21, fontweight="bold")
+    fig.text(0.04, 0.03, "koshke usage stats · tracks cached before speed tracking excluded",
+             color=MUTED, fontsize=11)
+    fig.tight_layout(rect=(0.02, 0.08, 0.98, 0.9))
+
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=150, facecolor=BG)
+    plt.close(fig)
+    return buf.getvalue()
+
+
 def render_engine_banner(by_engine: dict[str, int]) -> bytes:
     return _render_banner(by_engine, "downloads by engine", colors=ENGINE_COLORS, icons=True)
 

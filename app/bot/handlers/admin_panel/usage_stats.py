@@ -8,7 +8,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dishka import FromDishka
 
 from app.bot.callbacks.admin_panel_callback import AdminPanelCallback, AdminPanelPath
-from app.bot.utils.stats_banner import render_engine_banner, render_context_banner
+from app.bot.utils.stats_banner import render_engine_banner, render_context_banner, render_speed_banner
 from app.database.models.download_context import EntityType, DownloadMode
 from app.database.repositories import TrackRepository
 
@@ -39,10 +39,17 @@ def _context_banner(stats: dict) -> bytes:
     return render_context_banner({c.value.lower(): n for c, n in stats['by_context'].items()})
 
 
+def _speed_banner(stats: dict) -> bytes:
+    return render_speed_banner(
+        {e.value.lower(): v for e, v in stats['speed_by_engine'].items()}
+    )
+
+
 # page key -> (switch-button label, banner renderer); add new pages here
 PAGES: dict[str, tuple[str, Callable[[dict], bytes]]] = {
     "engine": ("📀 by engine", _engine_banner),
     "context": ("🔀 by context", _context_banner),
+    "speed": ("⚡ avg speed", _speed_banner),
 }
 
 DEFAULT_PAGE = "engine"

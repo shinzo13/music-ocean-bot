@@ -17,6 +17,7 @@ async def save_track_with_source(
         download_mode: DownloadMode | None = None
 ) -> None:
     kwargs = dict(
+        download_speed=cached.download_speed,
         telegram_file_id=file_id,
         telegram_file_unique_id=file_unique_id,
         user_id=user_id,

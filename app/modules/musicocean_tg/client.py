@@ -1,4 +1,5 @@
 import asyncio
+import time
 from typing import Optional, AsyncGenerator
 
 from aiogram.client.default import DefaultBotProperties
@@ -51,7 +52,7 @@ class TelegramMusicOceanClient(MusicOceanClient):
             engine: Engine,
             track_id: int | str,
             executor: TelegramWorker
-    ) -> tuple[Message, Engine | None, int | str | None]:
+    ) -> tuple[Message, Engine | None, int | str | None, float | None]:
         # spotify audio actually comes from deezer (isrc match) or youtube;
         # keep the real source so both ids land in the caption and the db
         source_engine, source_id, cover_override = None, None, None
@@ -59,10 +60,16 @@ class TelegramMusicOceanClient(MusicOceanClient):
             source_engine, source_id, cover_override = await self.resolve_spotify_source(track_id)
 
         logger.debug(f"downloading track {track_id}")
+        started = time.monotonic()
         if source_engine is not None:
             track = await super().download_track(source_engine, source_id)
         else:
             track = await super().download_track(engine, track_id)
+        elapsed = time.monotonic() - started
+        speed = (
+            len(track.content) / 1048576 / elapsed
+            if track.content and elapsed > 0 else None
+        )
 
         caption = f"<code>{engine_to_prefix(engine)}-{track_id}</code>"
         if source_engine is not None:
@@ -87,7 +94,7 @@ class TelegramMusicOceanClient(MusicOceanClient):
             duration=track.duration,
             caption=caption
         )
-        return msg, source_engine, source_id
+        return msg, source_engine, source_id, speed
 
     # todo another naming
     async def download_track(
@@ -96,7 +103,7 @@ class TelegramMusicOceanClient(MusicOceanClient):
             track_id: int | str
     ) -> CachedTrack:
         await self.main.wait_and_acquire(timeout=60)
-        msg, source_engine, source_id = await self._upload_track(engine, track_id, self.main)
+        msg, source_engine, source_id, speed = await self._upload_track(engine, track_id, self.main)
         return CachedTrack(
             track_id=track_id,
             file_id=msg.audio.file_id,
@@ -104,7 +111,8 @@ class TelegramMusicOceanClient(MusicOceanClient):
             artist_name=msg.audio.performer,
             title=msg.audio.title,
             source_engine=source_engine,
-            source_id=source_id
+            source_id=source_id,
+            download_speed=speed
         )
 
     async def redownload_track(
@@ -114,13 +122,14 @@ class TelegramMusicOceanClient(MusicOceanClient):
     ) -> CachedTrack:
         # like download_track but routed through a worker, not the main bot
         worker = await self._acquire_worker()
-        msg, source_engine, source_id = await self._upload_track(engine, track_id, worker)
+        msg, source_engine, source_id, speed = await self._upload_track(engine, track_id, worker)
         return CachedTrack(
             track_id=track_id,
             file_id=msg.audio.file_id,
             file_unique_id=msg.audio.file_unique_id,
             source_engine=source_engine,
-            source_id=source_id
+            source_id=source_id,
+            download_speed=speed
         )
 
     async def _acquire_worker(self) -> TelegramWorker:
@@ -153,14 +162,15 @@ class TelegramMusicOceanClient(MusicOceanClient):
                     file_unique_id=cached[track_id].telegram_file_unique_id  # noqa
                 )
             worker = await self._acquire_worker()
-            msg, source_engine, source_id = await self._upload_track(engine, track_id, worker)
+            msg, source_engine, source_id, speed = await self._upload_track(engine, track_id, worker)
 
             return CachedTrack(
                 track_id=track_id,
                 file_id=msg.audio.file_id,
                 file_unique_id=msg.audio.file_unique_id,
                 source_engine=source_engine,
-                source_id=source_id
+                source_id=source_id,
+                download_speed=speed
             )
 
         async def download_one_indexed(index: int, track_id: int | str):
