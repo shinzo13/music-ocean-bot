@@ -63,6 +63,9 @@ class LastfmSettings(BaseSettings):
 class LocalSettings(BaseSettings):
     watermark: Optional[str]
     guide_url: Optional[str]
+    # public project name is "Music Ocean"; a deployment can rebrand the
+    # user-facing name via LOCAL__BRAND without touching the repo
+    brand: str = "Music Ocean"
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(

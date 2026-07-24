@@ -8,6 +8,7 @@ class MainMenuPath(StrEnum):
     GUIDE = auto()
     PROFILE = auto()
     SETTINGS = auto()
+    SUPPORT = auto()
     ADMIN_PANEL = auto()
 
 

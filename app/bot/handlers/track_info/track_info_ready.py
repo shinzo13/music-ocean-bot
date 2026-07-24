@@ -5,6 +5,7 @@ from dishka import FromDishka
 
 from app.bot.keyboards import track_info_keyboard
 from app.bot.utils.get_engine_emoji import get_engine_emoji
+from app.config import settings
 from app.config.log import get_logger
 from app.database.models import User
 from app.database.repositories import TrackRepository
@@ -28,7 +29,7 @@ async def track_info_ready(
         message.audio.file_id
     )
     if not track:
-        await message.answer(i18n.get('track-not-found'))
+        await message.answer(i18n.get('track-not-found', brand=settings.local.brand))
         # todo watermark checking here after prompting user
         return
 

@@ -5,7 +5,7 @@ btn-no = No
 btn-cancel = Cancel
 
 ## main menu
-welcome = Welcome to <b>Music Ocean!</b> 🌊
+welcome = Welcome to <b>{ $brand }!</b> 🌊
 btn-how-to-use = How to use?
 btn-profile = Profile
 btn-settings = Settings
@@ -78,7 +78,7 @@ track-info =
 track-info-admin =
     • <b>Track ID</b>: <code>{ $track_id }</code>
     • <b>Downloaded by</b>: { $downloaded_by }
-track-not-found = This track was not downloaded via Music Ocean.
+track-not-found = This track was not downloaded via { $brand }.
 btn-album = Album
 btn-artist = Artist
 
@@ -127,3 +127,15 @@ entity-artist =
 # other
 recognizing = <i>Recognizing...</i>
 not-recognized = <i>Not recognized!</i>
+
+## support / errors
+error-track-unavailable = 😔 This track is unavailable for download.
+support-hint = Still not working? Contact support @koshkesupportbot
+
+## support menu
+btn-support = Support
+btn-write-support = Contact support
+support-text =
+    <b>Support</b>
+
+    Got a question, a bug, or a track won't download? Message us — we'll reply right here in Telegram.

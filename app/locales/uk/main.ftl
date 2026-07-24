@@ -5,7 +5,7 @@ btn-no = Ні
 btn-cancel = Скасувати
 
 ## main menu
-welcome = Ласкаво просимо до <b>Music Ocean!</b> 🌊
+welcome = Ласкаво просимо до <b>{ $brand }!</b> 🌊
 btn-how-to-use = Як користуватись?
 btn-profile = Профіль
 btn-settings = Налаштування
@@ -77,7 +77,7 @@ track-info =
 track-info-admin =
     • <b>ID треку</b>: <code>{ $track_id }</code>
     • <b>Завантажив</b>: { $downloaded_by }
-track-not-found = Цей трек не завантажувався через Music Ocean.
+track-not-found = Цей трек не завантажувався через { $brand }.
 btn-album = Альбом
 btn-artist = Виконавець
 
@@ -126,3 +126,15 @@ entity-artist =
 # other
 recognizing = <i>Розпознаю...</i>
 not-recognized = <i>Не розпознано!</i>
+
+## support / errors
+error-track-unavailable = 😔 Трек недоступний для завантаження.
+support-hint = Якщо проблема лишилась — напиши в підтримку @koshkesupportbot
+
+## support menu
+btn-support = Підтримка
+btn-write-support = Contact support
+support-text =
+    <b>Підтримка</b>
+
+    Є питання, баг або трек не завантажується? Напиши нам — відповімо тут же, у телеграмі.
