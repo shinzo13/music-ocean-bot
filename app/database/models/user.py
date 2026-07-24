@@ -21,6 +21,8 @@ class UserSettings(BaseModel):
     locale: Optional[str] = None
     selected_engine: Engine = Engine.DEEZER
     track_preview_covers: bool = True
+    # admins opt in to download notifications; off by default for new admins
+    admin_download_notifications: bool = False
 
     lastfm: LastfmSettings = LastfmSettings()
 

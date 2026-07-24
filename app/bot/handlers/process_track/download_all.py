@@ -13,7 +13,7 @@ from app.bot.utils.get_engine_emoji import get_engine_emoji
 from app.bot.utils.save_track import save_track_with_source
 from app.config.settings import settings
 from app.database.models.download_context import DownloadContext, EntityType, DownloadMode
-from app.database.repositories import TrackRepository
+from app.database.repositories import TrackRepository, UserRepository
 from app.modules.musicocean.enums import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 from app.modules.musicocean_tg.utils import prefix_to_engine
@@ -46,6 +46,7 @@ async def handle_deeplink(
         deeplink_match: re.Match,
         musicocean: FromDishka[TelegramMusicOceanClient],
         track_repo: FromDishka[TrackRepository],
+        user_repo: FromDishka[UserRepository],
         i18n: I18nContext,
 ):
     # anonymous senders (posting as a channel) have no from_user; use the
@@ -59,7 +60,7 @@ async def handle_deeplink(
     try:
         engine = prefix_to_engine(engine_prefix)
     except ValueError:
-        await message.answer("invalid link")
+        await message.answer(i18n.get('invalid-link') + "\n\n" + i18n.get('support-hint'))
         return
 
     if engine in (Engine.DEEZER, Engine.SOUNDCLOUD):
@@ -94,17 +95,19 @@ async def handle_deeplink(
             )
         # here was artist but nah i wont download all the artists tracks
         case _:
-            await message.answer(i18n.get('invalid-link'))
+            await message.answer(i18n.get('invalid-link') + "\n\n" + i18n.get('support-hint'))
             return
 
     await message.answer(text)
     await message.answer(i18n.get('downloading'))
 
     # notify admins once about the group, not about each track
+    notify_admins = await user_repo.get_notify_admin_ids(settings.telegram.admins)
+    id_label = "Album ID" if entity_kind == EntityType.ALBUM else "Playlist ID"
     await notify_admins_group(
-        message.bot, settings.telegram.admins,
+        message.bot, notify_admins,
         engine, group_artist, group_title,
-        entity_id, sender
+        entity_id, sender, id_label
     )
 
     failed = 0

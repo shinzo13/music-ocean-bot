@@ -3,7 +3,8 @@ from aiogram_i18n.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from app.bot.callbacks.admin_panel_callback import AdminPanelCallback, AdminPanelPath
 from app.bot.callbacks.main_menu_callback import MainMenuCallback, MainMenuPath
-from app.bot.constants import DATABASE_EMOJI_ID, BACK_EMOJI_ID, MAILING_EMOJI_ID, STATS_EMOJI_ID, BAN_EMOJI_ID
+from app.bot.constants import DATABASE_EMOJI_ID, BACK_EMOJI_ID, MAILING_EMOJI_ID, STATS_EMOJI_ID, BAN_EMOJI_ID, \
+    DOWNLOAD_EMOJI_ID
 
 
 def admin_panel_keyboard():
@@ -30,6 +31,13 @@ def admin_panel_keyboard():
                 text='usage stats',
                 callback_data=AdminPanelCallback(path=AdminPanelPath.USAGE_STATS).pack(),
                 icon_custom_emoji_id=STATS_EMOJI_ID
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text='уведомления',
+                callback_data=AdminPanelCallback(path=AdminPanelPath.NOTIFICATIONS).pack(),
+                icon_custom_emoji_id=DOWNLOAD_EMOJI_ID
             )
         ],
         [

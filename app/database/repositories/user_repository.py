@@ -53,6 +53,7 @@ class UserRepository:
             locale: Optional[str] = None,
             selected_engine: Optional[Engine] = None,
             track_preview_covers: Optional[bool] = None,
+            admin_download_notifications: Optional[bool] = None,
             lastfm__enabled: Optional[bool] = None,
             lastfm__username: Optional[str] = None
     ) -> User:
@@ -66,6 +67,8 @@ class UserRepository:
             user.settings.selected_engine = selected_engine
         if track_preview_covers is not None:
             user.settings.track_preview_covers = track_preview_covers
+        if admin_download_notifications is not None:
+            user.settings.admin_download_notifications = admin_download_notifications
         if lastfm__enabled is not None:
             user.settings.lastfm.enabled = lastfm__enabled
         if lastfm__username is not None:
@@ -76,6 +79,19 @@ class UserRepository:
         await self.session.refresh(user)
         logger.info(f"Updated settings for user {user_id}")
         return user
+
+    async def get_notify_admin_ids(self, admin_ids: list[int]) -> list[int]:
+        """From the given admin ids, return those who opted in to download
+        notifications (settings.admin_download_notifications == true)."""
+        if not admin_ids:
+            return []
+        result = await self.session.execute(
+            select(User.user_id).where(
+                User.user_id.in_(admin_ids),
+                User.settings["admin_download_notifications"].as_boolean() == True,  # noqa: E712
+            )
+        )
+        return list(result.scalars().all())
 
     async def get_user_by_id(self, user_id: int) -> Optional[User]:
         result = await self.session.execute(

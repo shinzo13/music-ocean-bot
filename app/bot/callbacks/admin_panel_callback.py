@@ -8,6 +8,7 @@ class AdminPanelPath(StrEnum):
     MAILING = auto()
     BAN_USER = auto()
     USAGE_STATS = auto()
+    NOTIFICATIONS = auto()
 
 
 class AdminPanelCallback(CallbackData, prefix="admin"):

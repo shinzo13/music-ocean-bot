@@ -30,6 +30,12 @@ STATEMENTS = [
     "ALTER TABLE base_tracks ADD COLUMN IF NOT EXISTS download_speed double precision",
     # create_all never extends existing enums — yandex was added after the type
     "ALTER TYPE engine_enum ADD VALUE IF NOT EXISTS 'YANDEX'",
+    # download notifications default off, but admins who already existed when
+    # the toggle shipped keep them on (only set the key where it's still absent)
+    """UPDATE users
+       SET settings = jsonb_set(settings::jsonb, '{admin_download_notifications}', 'true'::jsonb)::json
+       WHERE is_admin = true
+         AND NOT (settings::jsonb ? 'admin_download_notifications')""",
 ]
 
 

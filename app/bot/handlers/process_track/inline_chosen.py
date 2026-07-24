@@ -2,6 +2,7 @@ from aiogram import Router, Bot
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import ChosenInlineResult
 from aiogram.types import InputMediaAudio
+from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.utils.admin_notify import notify_admins_track
@@ -10,7 +11,7 @@ from app.bot.utils.save_track import save_track_with_source
 from app.config.log import get_logger
 from app.config.settings import settings
 from app.database.models.download_context import DownloadContext
-from app.database.repositories import TrackRepository
+from app.database.repositories import TrackRepository, UserRepository
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 
@@ -24,7 +25,9 @@ async def idklol(
         chosen: ChosenInlineResult,
         bot: Bot,
         musicocean: FromDishka[TelegramMusicOceanClient],
-        track_repo: FromDishka[TrackRepository]
+        track_repo: FromDishka[TrackRepository],
+        user_repo: FromDishka[UserRepository],
+        i18n: I18nContext,
 ):
     # todo
     if chosen.result_id in ['usage_guide', "setup_scrobbling"]:
@@ -71,10 +74,21 @@ async def idklol(
             logger.warning(f"edit failed for cached #{chosen.result_id}: {e.message}")
         return
 
-    cached = await musicocean.download_track(
-        engine=engine,
-        track_id=entity_id,
-    )
+    try:
+        cached = await musicocean.download_track(
+            engine=engine,
+            track_id=entity_id,
+        )
+    except Exception as e:  # noqa: BLE001 — source may 404/geoblock/remove a track
+        logger.warning(f"download failed for #{chosen.result_id}: {e!r}")
+        try:
+            await bot.edit_message_text(
+                inline_message_id=chosen.inline_message_id,
+                text=i18n.get('error-track-unavailable') + "\n\n" + i18n.get('support-hint'),
+            )
+        except TelegramBadRequest as edit_err:
+            logger.warning(f"error edit failed for #{chosen.result_id}: {edit_err.message}")
+        return
     file_id = cached.file_id
     logger.debug(f"got file id: {file_id}")
     try:
@@ -101,8 +115,9 @@ async def idklol(
             entity_type=entity_kind,
             download_mode=download_mode
         )
+        notify_admins = await user_repo.get_notify_admin_ids(settings.telegram.admins)
         await notify_admins_track(
-            bot, settings.telegram.admins,
+            bot, notify_admins,
             engine, cached.artist_name, cached.title,
             entity_id, chosen.from_user
         )

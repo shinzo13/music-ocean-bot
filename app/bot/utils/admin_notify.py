@@ -26,12 +26,13 @@ def _format_user(user: User | Chat) -> str:
     return f"<a href='tg://user?id={user.id}'>{user.first_name}{last}</a>"
 
 
-def _format(engine: Engine, artist_name: str, title: str, entity_id: int | str, user: User | Chat) -> str:
+def _format(engine: Engine, artist_name: str, title: str, entity_id: int | str,
+            user: User | Chat, id_label: str = "Track ID") -> str:
     name = f"{artist_name} - {title}" if artist_name else title
     return (
         f"<blockquote><b><i>{name}</i></b></blockquote>\n\n"
         f"• <b>Engine</b>: {get_engine_emoji(engine)}  <code>{ENGINE_NAMES[engine]}</code>\n"
-        f"• <b>Track ID</b>: <code>{entity_id}</code>\n"
+        f"• <b>{id_label}</b>: <code>{entity_id}</code>\n"
         f"• <b>Downloaded by</b>: {_format_user(user)}"
     )
 
@@ -63,7 +64,9 @@ async def notify_admins_group(
         artist_name: str,
         title: str,
         entity_id: int | str,
-        user: User | Chat
+        user: User | Chat,
+        id_label: str = "Entity ID"
 ) -> None:
-    # one notification for the whole album/playlist, same track-info format
-    await _broadcast(bot, admins, _format(engine, artist_name, title, entity_id, user))
+    # one notification for the whole album/playlist — id is the album/playlist
+    # id, so it must not be labelled "Track ID"
+    await _broadcast(bot, admins, _format(engine, artist_name, title, entity_id, user, id_label))
