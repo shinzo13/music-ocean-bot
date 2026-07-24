@@ -21,7 +21,7 @@ ENGINE_COLORS = {
     "soundcloud": "#ff5500",
     "youtube": "#ff0000",
     "spotify": "#1ed760",
-    "yandex": "#fc3f1d",
+    "yandex": "#fed42b",
 }
 
 
