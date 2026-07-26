@@ -5,7 +5,7 @@ btn-no = Ні
 btn-cancel = Скасувати
 
 ## main menu
-welcome = Ласкаво просимо до <b>{ $brand }!</b> 🌊
+welcome = Ласкаво просимо до <b>{ $brand }!</b>
 btn-how-to-use = Як користуватись?
 btn-profile = Профіль
 btn-settings = Налаштування

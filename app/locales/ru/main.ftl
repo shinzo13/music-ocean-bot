@@ -5,7 +5,7 @@ btn-no = Нет
 btn-cancel = Отмена
 
 ## main menu
-welcome = Добро пожаловать в <b>{ $brand }!</b> 🌊
+welcome = Добро пожаловать в <b>{ $brand }!</b>
 btn-how-to-use = Как пользоваться?
 btn-profile = Профиль
 btn-settings = Настройки
