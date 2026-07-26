@@ -65,10 +65,19 @@ admin-panel-text = Admin panel
 btn-export-users = Export users
 btn-mailing = Mailing
 btn-mailing-send = Send
-mailing-enter-message = Send a message for mailing:
-mailing-canceled = Canceled.
-mailing-sending = Sending to all users...
-mailing-finished = Mailing finished ({ $succeed }/{ $all } succeeded).
+mailing-enter-message = <i>Send a message for mailing:</i>
+mailing-enter-buttons =
+    <i>Enter buttons formatted in this way:</i>
+
+    <code>
+    button1 - link1
+    button2 - link2
+    [...]
+    </code>
+
+mailing-canceled = <i>Canceled.</i>
+mailing-sending = <i>Sending to all users...</i>
+mailing-finished = <i>Mailing finished ({ $succeed }/{ $all } succeeded).</i>
 
 ## track info
 track-info =
@@ -129,7 +138,7 @@ recognizing = <i>Recognizing...</i>
 not-recognized = <i>Not recognized!</i>
 
 ## support / errors
-error-track-unavailable = 😔 This track is unavailable for download.
+error-track-unavailable = This track is unavailable for download.
 support-hint = Still not working? Contact support @koshkesupportbot
 
 ## support menu

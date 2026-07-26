@@ -1,7 +1,7 @@
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.types import Message
 from aiogram_i18n import I18nContext
 from dishka import FromDishka
@@ -37,22 +37,52 @@ async def mailing(
     )
 
 
+@router.callback_query(
+    MailingState.message and \
+    (F.text or F.photo or F.video or F.animation or F.sticker or F.document),
+)
+async def mailing_message(
+        message: Message,
+        state: FSMContext,
+        i18n: I18nContext
+):
+    await state.update_data(message=message)
+    await message.answer(i18n.get('mailing-enter-buttons'))
+    await state.set_state(MailingState.buttons)
+
+
 @router.message(MailingState.message)
-async def mailing_message(message: Message, state: FSMContext):
-    await state.set_state(MailingState.approving)
-    msg = await message.send_copy(
+async def mailing_buttons(
+        message: Message,
+        state: FSMContext,
+        i18n: I18nContext
+):
+    try:
+        kb = []
+        for btn in message.text.split():
+            btn_name, btn_link = btn.split(' - ', maxsplit=1)
+            kb.append([InlineKeyboardButton(text=btn_name, url=btn_link)])
+    except ValueError:
+        await message.answer(
+            i18n.get('mailing-invalid-format'),
+            reply_markup=mailing_message_keyboard()
+        )
+        return
+    buttons = InlineKeyboardMarkup(inline_keyboard=kb)
+    await state.update_data(buttons=buttons)
+    msg: Message = await state.get_value('message')
+    await msg.send_copy(
         message.from_user.id,
+        reply_markup=buttons
+    )
+    await message.answer(
+        i18n.get('mailing-approve-message'),
         reply_markup=mailing_approve_keyboard()
     )
-    await state.update_data(message=msg)
-
-
-# todo buttons state
-# @router.callback_query(MailingState.approving)
-
+    await state.set_state(MailingState.approving)
 
 @router.callback_query(MailingState.approving, MailingCallback.filter())
-async def mailing_approve(
+async def mailing_approved(
         query: CallbackQuery,
         callback_data: MailingCallback,
         i18n: I18nContext,
