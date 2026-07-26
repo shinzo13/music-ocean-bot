@@ -1,7 +1,7 @@
 from typing import List, TYPE_CHECKING, Optional
 
 from pydantic import BaseModel
-from sqlalchemy import Boolean, BigInteger
+from sqlalchemy import Boolean, BigInteger, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.models.base import Base, TimestampMixin, IntIDMixin
@@ -31,6 +31,9 @@ class User(Base, TimestampMixin, IntIDMixin):
     __tablename__ = "users"
 
     user_id: Mapped[int] = mapped_column(BigInteger, unique=True)
+    first_name: Mapped[str | None] = mapped_column(String, nullable=True)
+    last_name: Mapped[str | None] = mapped_column(String, nullable=True)
+    username: Mapped[str | None] = mapped_column(String, nullable=True)
     is_dm: Mapped[bool] = mapped_column(Boolean, default=False)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
     is_banned: Mapped[bool] = mapped_column(Boolean, default=False)

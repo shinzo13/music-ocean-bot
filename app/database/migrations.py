@@ -30,6 +30,10 @@ STATEMENTS = [
     "ALTER TABLE base_tracks ADD COLUMN IF NOT EXISTS download_speed double precision",
     # create_all never extends existing enums — yandex was added after the type
     "ALTER TYPE engine_enum ADD VALUE IF NOT EXISTS 'YANDEX'",
+    # user identity for /top and support context
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS first_name varchar",
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_name varchar",
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS username varchar",
     # download notifications default off, but admins who already existed when
     # the toggle shipped keep them on (only set the key where it's still absent)
     """UPDATE users

@@ -137,3 +137,7 @@ support-text =
     <b>Wsparcie</b>
 
     Masz pytanie, błąd lub utwór się nie pobiera? Napisz do nas — odpowiemy tutaj, na Telegramie.
+
+## top
+top-title = 🏆 <b>Top wg pobrań</b>
+top-empty = Nikt jeszcze niczego nie pobrał.

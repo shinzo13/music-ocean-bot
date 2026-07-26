@@ -6,6 +6,7 @@ from .settings.settings import router as user_settings_router
 from .settings.track_preview import router as user_settings_track_preview_router
 from .usage_guide import router as usage_guide_router
 from .user_profile import router as user_profile_router
+from .top import router as top_router
 
 routers = [
     home_router,
@@ -15,5 +16,6 @@ routers = [
     user_settings_scrobbling_router,
     user_settings_track_preview_router,
     user_settings_default_engine_router,
-    usage_guide_router
+    usage_guide_router,
+    top_router
 ]

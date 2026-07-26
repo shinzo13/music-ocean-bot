@@ -2,13 +2,13 @@ import csv
 import io
 from typing import Optional, AsyncGenerator
 
-from sqlalchemy import select, inspect
+from sqlalchemy import select, inspect, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.attributes import flag_modified
 
 from app.config.log import get_logger
-from app.database.models import User
+from app.database.models import User, BaseTrack
 from app.database.models.user import UserSettings
 from app.modules.musicocean.enums.engine import Engine
 
@@ -19,9 +19,18 @@ class UserRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def add_user(self, user_id: int) -> User:
+    async def add_user(
+            self,
+            user_id: int,
+            first_name: Optional[str] = None,
+            last_name: Optional[str] = None,
+            username: Optional[str] = None,
+    ) -> User:
         user = User(
             user_id=user_id,
+            first_name=first_name,
+            last_name=last_name,
+            username=username,
             is_admin=False,
             is_banned=False,
             settings=UserSettings()
@@ -31,6 +40,23 @@ class UserRepository:
         await self.session.refresh(user)
         logger.info(f"Added user: {user}")
         return user
+
+    async def sync_identity(self, user: User, first_name, last_name, username) -> None:
+        """Keep first/last name and username fresh — they change over time."""
+        if (user.first_name, user.last_name, user.username) == (first_name, last_name, username):
+            return
+        user.first_name, user.last_name, user.username = first_name, last_name, username
+        await self.session.commit()
+
+    async def top_users(self, limit: int = 10) -> list[tuple[User, int]]:
+        result = await self.session.execute(
+            select(User, func.count(BaseTrack.id).label("cnt"))
+            .join(BaseTrack, BaseTrack.user_id == User.user_id)
+            .group_by(User.id)
+            .order_by(func.count(BaseTrack.id).desc())
+            .limit(limit)
+        )
+        return [(row[0], row[1]) for row in result.all()]
 
     async def update_user(self, user_id: int, **kwargs) -> User:
         user = await self.get_user_by_id(user_id)

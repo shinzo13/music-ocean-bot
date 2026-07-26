@@ -36,8 +36,19 @@ class DatabaseMiddleware(BaseMiddleware):
         else:
             return await handler(event, data)
 
-        db_user: DatabaseUser = await user_repo.get_user_by_id(user_id) \
-                                or await user_repo.add_user(user_id=user_id)
+        db_user: DatabaseUser = await user_repo.get_user_by_id(user_id)
+        if db_user is None:
+            db_user = await user_repo.add_user(
+                user_id=user_id,
+                first_name=tg_user.first_name if tg_user else None,
+                last_name=tg_user.last_name if tg_user else None,
+                username=tg_user.username if tg_user else None,
+            )
+        elif tg_user is not None:
+            # names/username change over time — keep them fresh
+            await user_repo.sync_identity(
+                db_user, tg_user.first_name, tg_user.last_name, tg_user.username
+            )
 
         if not db_user.settings.locale and language_code:
             logger.debug(f"set lang: {language_code}")

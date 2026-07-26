@@ -139,3 +139,7 @@ support-text =
     <b>Support</b>
 
     Got a question, a bug, or a track won't download? Message us — we'll reply right here in Telegram.
+
+## top
+top-title = 🏆 <b>Top by downloads</b>
+top-empty = Nobody has downloaded anything yet.
