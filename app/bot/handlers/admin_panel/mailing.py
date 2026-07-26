@@ -51,7 +51,7 @@ async def mailing_message(
     await state.set_state(MailingState.buttons)
 
 
-@router.message(MailingState.message)
+@router.message(MailingState.buttons)
 async def mailing_buttons(
         message: Message,
         state: FSMContext,
