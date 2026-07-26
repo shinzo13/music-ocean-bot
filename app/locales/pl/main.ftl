@@ -63,10 +63,20 @@ admin-panel-text = Panel administratora
 btn-export-users = Eksportuj użytkowników
 btn-mailing = Mailing
 btn-mailing-send = Wyślij
-mailing-enter-message = Wpisz wiadomość do wysłania:
-mailing-canceled = Odrzucono.
-mailing-sending = Wysyłam do wszystkich użytkowników...
-mailing-finished = Mailing zakończony ({ $succeed }/{ $all } pomyślnie).
+mailing-enter-message = <i>Wpisz wiadomość do wysłania:</i>
+mailing-enter-buttons =
+    <i>Wpisz przyciski w takim formacie:</i>
+
+    <code>
+    przycisk1 - link1
+    przycisk2 - link2
+    { "[...]" }
+    </code>
+
+mailing-invalid-format = <i>Nieprawidłowy format, spróbuj ponownie.</i>
+mailing-canceled = <i>Odrzucono.</i>
+mailing-sending = <i>Wysyłam do wszystkich użytkowników...</i>
+mailing-finished = <i>Mailing zakończony ({ $succeed }/{ $all } pomyślnie).</i>
 
 ## track info
 track-info =
@@ -127,7 +137,7 @@ recognizing = <i>Rozpoznuję...</i>
 not-recognized = <i>Nie rozpoznano!</i>
 
 ## support / errors
-error-track-unavailable = 😔 Ten utwór jest niedostępny do pobrania.
+error-track-unavailable = Ten utwór jest niedostępny do pobrania.
 support-hint = Jeśli problem nadal występuje — napisz do wsparcia @koshkesupportbot
 
 ## support menu
