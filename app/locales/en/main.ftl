@@ -72,9 +72,10 @@ mailing-enter-buttons =
     <code>
     button1 - link1
     button2 - link2
-    [...]
+    { "[...]" }
     </code>
 
+mailing-invalid-format = <i>Invalid format, try again.</i>
 mailing-canceled = <i>Canceled.</i>
 mailing-sending = <i>Sending to all users...</i>
 mailing-finished = <i>Mailing finished ({ $succeed }/{ $all } succeeded).</i>

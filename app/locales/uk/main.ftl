@@ -71,9 +71,10 @@ mailing-enter-buttons =
     <code>
     кнопка1 - посилання1
     кнопка2 - посилання2
-    [...]
+    { "[...]" }
     </code>
 
+mailing-invalid-format = <i>Невірний формат, спробуйте ще раз.</i>
 mailing-canceled = <i>Скасовано.</i>
 mailing-sending = <i>Надсилаю всім користувачам...</i>
 mailing-finished = <i>Розсилку завершено ({ $succeed }/{ $all } успішно).</i>
