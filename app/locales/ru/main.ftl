@@ -64,10 +64,19 @@ admin-panel-text = Админ-панель
 btn-export-users = Экспорт пользователей
 btn-mailing = Рассылка
 btn-mailing-send = Отправить
-mailing-enter-message = Введите сообщение для рассылки:
-mailing-canceled = Отменено.
-mailing-sending = Отправляю всем пользователям...
-mailing-finished = Рассылка завершена ({ $succeed }/{ $all } успешно).
+mailing-enter-message = <i>Введите сообщение для рассылки:</i>
+mailing-enter-buttons =
+    <i>Введите кнопки в таком формате:</i>
+
+    <code>
+    кнопка1 - ссылка1
+    кнопка2 - ссылка2
+    [...]
+    </code>
+
+mailing-canceled = <i>Отменено.</i>
+mailing-sending = <i>Отправляю всем пользователям...</i>
+mailing-finished = <i>Рассылка завершена ({ $succeed }/{ $all } успешно).</i>
 
 ## track info
 track-info =
@@ -126,7 +135,7 @@ recognizing = <i>Распознаю...</i>
 not-recognized = <i>Не распознано!</i>
 
 ## support / errors
-error-track-unavailable = 😔 Трек недоступен для загрузки.
+error-track-unavailable = Трек недоступен для загрузки.
 support-hint = Если проблема осталась — напиши в поддержку @koshkesupportbot
 
 ## support menu
