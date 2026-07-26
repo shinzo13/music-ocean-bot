@@ -107,7 +107,7 @@ downloading = Завантажую...
 downloaded = Завантажено!
 btn-search-for-track = Знайти трек
 btn-download-all = Завантажити всі треки
-btn-downloading = <i>Завантажую...</i>
+btn-downloading = Завантажую...
 
 ## entities
 entity-album =
