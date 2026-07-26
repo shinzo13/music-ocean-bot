@@ -6,7 +6,7 @@ from app.bot.callbacks.main_menu_callback import MainMenuCallback, MainMenuPath
 from app.bot.constants import BACK_EMOJI_ID
 
 
-def mailing_message_keyboard():
+def mailing_back_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[[  # noqa
         InlineKeyboardButton(
             text=LazyProxy('btn-back'),

@@ -1,4 +1,5 @@
 from aiogram import Router, F
+from aiogram.enums import ContentType
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
@@ -8,12 +9,22 @@ from dishka import FromDishka
 
 from app.bot.callbacks.admin_panel_callback import AdminPanelCallback, AdminPanelPath
 from app.bot.callbacks.mailing_callback import MailingCallback
-from app.bot.keyboards.mailing import mailing_approve_keyboard, mailing_message_keyboard
+from app.bot.keyboards.mailing import mailing_approve_keyboard, mailing_back_keyboard
 from app.config.log import get_logger
 from app.database.repositories import UserRepository
 
 logger = get_logger(__name__)
 
+
+MAILING_CONTENT_TYPES = [
+    ContentType.RICH_MESSAGE,
+    ContentType.TEXT,
+    ContentType.ANIMATION,
+    ContentType.DOCUMENT,
+    ContentType.PHOTO,
+    ContentType.STICKER,
+    ContentType.VIDEO,
+]
 
 class MailingState(StatesGroup):
     message = State()
@@ -33,19 +44,23 @@ async def mailing(
     await state.set_state(MailingState.message)
     await callback.message.edit_text(
         i18n.get('mailing-enter-message'),
-        reply_markup=mailing_message_keyboard()
+        reply_markup=mailing_back_keyboard()
     )
 
 
-@router.callback_query(
-    MailingState.message and \
-    (F.text or F.photo or F.video or F.animation or F.sticker or F.document),
-)
+@router.callback_query(MailingState.message)
 async def mailing_message(
         message: Message,
         state: FSMContext,
         i18n: I18nContext
 ):
+    if message.content_type not in MAILING_CONTENT_TYPES:
+        await message.answer(
+            i18n.get('mailing-restricted-content-type'),
+            reply_markup=mailing_back_keyboard()
+        )
+        return
+
     await state.update_data(message=message)
     await message.answer(i18n.get('mailing-enter-buttons'))
     await state.set_state(MailingState.buttons)
@@ -65,7 +80,7 @@ async def mailing_buttons(
     except ValueError:
         await message.answer(
             i18n.get('mailing-invalid-format'),
-            reply_markup=mailing_message_keyboard()
+            reply_markup=mailing_back_keyboard()
         )
         return
     buttons = InlineKeyboardMarkup(inline_keyboard=kb)
