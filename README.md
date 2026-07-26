@@ -6,7 +6,7 @@
 
 Telegram inline-moded bot for fast searching & downloading music from different sources.
 
-Project demo: [@koshke2bot](koshke2bot.t.me)
+Project demo: [@koshkebot](koshkebot.t.me)
 
 <img src="assets/usage_example.gif"  width="400" alt="demo"/>
 
@@ -75,11 +75,11 @@ In order to search music, just write `@botname <YOUR QUERY>` in the message inpu
 
 There are several available search options:
 
-- **Default search**: `@botname <TRACK QUERY>`, ex. `@koshke2bot Back in black`
-- **Engine-specified search**: `@botname <dz/sc/yt/sp> <QUERY>`, ex. `@koshke2bot dz:goth tv`
-- **Entity search**: `@botname <album/artist/playlist> <QUERY>`, ex. `@koshke2bot album:Who really cares` or just
-  `@koshke2bot al:Who really cares`
-- **Combined search**: you can combine engine and entity specification, ex. `@koshke2bot sc:pl:Jazz`
+- **Default search**: `@botname <TRACK QUERY>`, ex. `@koshkebot Back in black`
+- **Engine-specified search**: `@botname <dz/sc/yt/sp> <QUERY>`, ex. `@koshkebot dz:goth tv`
+- **Entity search**: `@botname <album/artist/playlist> <QUERY>`, ex. `@koshkebot album:Who really cares` or just
+  `@koshkebot al:Who really cares`
+- **Combined search**: you can combine engine and entity specification, ex. `@koshkebot sc:pl:Jazz`
 - **In-entity search**: automatically pasted via `Search tracks` button, looks like `@botname al_id:1ch95c`. Do not
   modify it!
 
