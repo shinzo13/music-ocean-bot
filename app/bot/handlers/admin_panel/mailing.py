@@ -1,5 +1,8 @@
+from urllib.parse import urlparse
+
 from aiogram import Router, F
 from aiogram.enums import ContentType
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
@@ -25,6 +28,13 @@ MAILING_CONTENT_TYPES = [
     ContentType.STICKER,
     ContentType.VIDEO,
 ]
+
+def _is_valid_url(url: str) -> bool:
+    parsed = urlparse(url)
+    if parsed.scheme in ('http', 'https'):
+        return bool(parsed.netloc)
+    return parsed.scheme == 'tg' and bool(parsed.path or parsed.netloc)
+
 
 class MailingState(StatesGroup):
     message = State()
@@ -79,7 +89,10 @@ async def mailing_buttons(
             if not btn.strip():
                 continue
             btn_name, btn_link = btn.split(' - ', maxsplit=1)
-            kb.append([InlineKeyboardButton(text=btn_name.strip(), url=btn_link.strip())])
+            btn_link = btn_link.strip()
+            if not _is_valid_url(btn_link):
+                raise ValueError(f'bad url: {btn_link}')
+            kb.append([InlineKeyboardButton(text=btn_name.strip(), url=btn_link)])
         if not kb:
             raise ValueError('no buttons')
     except ValueError:
@@ -89,12 +102,21 @@ async def mailing_buttons(
         )
         return
     buttons = InlineKeyboardMarkup(inline_keyboard=kb)
-    await state.update_data(buttons=buttons)
     msg: Message = await state.get_value('message')
-    await msg.send_copy(
-        message.from_user.id,
-        reply_markup=buttons
-    )
+    try:
+        await msg.send_copy(
+            message.from_user.id,
+            reply_markup=buttons
+        )
+    except TelegramBadRequest as err:
+        # telegram validates the keyboard on its side too — never lose the state over it
+        logger.info(f"mailing preview rejected: {err}")
+        await message.answer(
+            i18n.get('mailing-invalid-format'),
+            reply_markup=mailing_back_keyboard()
+        )
+        return
+    await state.update_data(buttons=buttons)
     await message.answer(
         i18n.get('mailing-approve-message'),
         reply_markup=mailing_approve_keyboard()
