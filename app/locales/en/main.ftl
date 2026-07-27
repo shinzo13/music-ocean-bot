@@ -75,6 +75,8 @@ mailing-enter-buttons =
     { "[...]" }
     </code>
 
+mailing-restricted-content-type = <i>This content type can't be mailed, send another message.</i>
+mailing-approve-message = <i>Send this to all users?</i>
 mailing-invalid-format = <i>Invalid format, try again.</i>
 mailing-canceled = <i>Canceled.</i>
 mailing-sending = <i>Sending to all users...</i>

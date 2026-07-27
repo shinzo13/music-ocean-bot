@@ -27,7 +27,12 @@ async def ban_user_id_entered(
         state: FSMContext,
         user_repo: FromDishka[UserRepository],
 ):
-    user_id = int(message.text)
+    try:
+        user_id = int((message.text or '').strip())
+    except ValueError:
+        await message.answer('id must be a number, try again')
+        return
+
     user = await user_repo.get_user_by_id(user_id) \
         or await user_repo.add_user(user_id=user_id)
     user = await user_repo.update_user(user_id, is_banned=(not user.is_banned))

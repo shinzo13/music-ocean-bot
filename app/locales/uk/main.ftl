@@ -74,6 +74,8 @@ mailing-enter-buttons =
     { "[...]" }
     </code>
 
+mailing-restricted-content-type = <i>Такий тип контенту не можна розіслати, надішліть інше повідомлення.</i>
+mailing-approve-message = <i>Розіслати це всім користувачам?</i>
 mailing-invalid-format = <i>Невірний формат, спробуйте ще раз.</i>
 mailing-canceled = <i>Скасовано.</i>
 mailing-sending = <i>Надсилаю всім користувачам...</i>

@@ -48,7 +48,7 @@ async def mailing(
     )
 
 
-@router.callback_query(MailingState.message)
+@router.message(MailingState.message)
 async def mailing_message(
         message: Message,
         state: FSMContext,
@@ -74,9 +74,14 @@ async def mailing_buttons(
 ):
     try:
         kb = []
-        for btn in message.text.split():
+        # one button per line: "name - link"
+        for btn in (message.text or '').splitlines():
+            if not btn.strip():
+                continue
             btn_name, btn_link = btn.split(' - ', maxsplit=1)
-            kb.append([InlineKeyboardButton(text=btn_name, url=btn_link)])
+            kb.append([InlineKeyboardButton(text=btn_name.strip(), url=btn_link.strip())])
+        if not kb:
+            raise ValueError('no buttons')
     except ValueError:
         await message.answer(
             i18n.get('mailing-invalid-format'),
