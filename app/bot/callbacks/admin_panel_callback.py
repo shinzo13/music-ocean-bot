@@ -7,6 +7,7 @@ class AdminPanelPath(StrEnum):
     EXPORT_USERS = auto()
     MAILING = auto()
     BAN_USER = auto()
+    BANNED_USERS = auto()
     USAGE_STATS = auto()
     NOTIFICATIONS = auto()
 

@@ -125,6 +125,32 @@ class UserRepository:
         )
         return result.scalar_one_or_none()
 
+    async def get_user_by_username(self, username: str) -> Optional[User]:
+        """Look a user up by @username, case-insensitively and without the @."""
+        handle = username.lstrip('@').strip()
+        if not handle:
+            return None
+        result = await self.session.execute(
+            select(User).where(func.lower(User.username) == handle.lower())
+        )
+        return result.scalars().first()
+
+    async def count_banned(self) -> int:
+        result = await self.session.execute(
+            select(func.count()).select_from(User).where(User.is_banned == True)  # noqa: E712
+        )
+        return result.scalar_one()
+
+    async def get_banned_users(self, limit: int, offset: int = 0) -> list[User]:
+        result = await self.session.execute(
+            select(User)
+            .where(User.is_banned == True)  # noqa: E712
+            .order_by(User.updated_at.desc(), User.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return list(result.scalars().all())
+
     async def get_user_downloaded_tracks(self, user_id: int):
         result = await self.session.execute(
             select(User)

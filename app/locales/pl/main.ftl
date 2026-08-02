@@ -153,3 +153,6 @@ support-text =
 ## top
 top-title = 🏆 <b>Top wg pobrań</b>
 top-empty = Nikt jeszcze niczego nie pobrał.
+
+## moderation
+unban-notice = 🔓 <b>Blokada zdjęta.</b> Możesz znowu korzystać z bota — witamy z powrotem!

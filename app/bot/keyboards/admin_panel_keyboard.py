@@ -23,8 +23,8 @@ def admin_panel_keyboard():
         ],
         [
             InlineKeyboardButton(
-                text='ban user',
-                callback_data=AdminPanelCallback(path=AdminPanelPath.BAN_USER).pack(),
+                text='banned users',
+                callback_data=AdminPanelCallback(path=AdminPanelPath.BANNED_USERS).pack(),
                 icon_custom_emoji_id=BAN_EMOJI_ID
             ),
             InlineKeyboardButton(

@@ -155,3 +155,6 @@ support-text =
 ## top
 top-title = 🏆 <b>Top by downloads</b>
 top-empty = Nobody has downloaded anything yet.
+
+## moderation
+unban-notice = 🔓 <b>You're unbanned.</b> You can use the bot again — welcome back!
