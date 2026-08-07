@@ -30,9 +30,21 @@ async def get_track_results(
         )
     ]])
 
+    # engines happily return the same track twice (re-releases, mixed sources);
+    # telegram rejects the whole answer with RESULT_ID_DUPLICATE if ids repeat
+    unique: list[BaseTrackPreview] = []
+    seen: set[int | str] = set()
+    for track in matches:
+        if track.id in seen:
+            continue
+        seen.add(track.id)
+        unique.append(track)
+    if len(unique) != len(matches):
+        logger.debug(f"dropped {len(matches) - len(unique)} duplicate track ids")
+
     results = []
     # telegram allows at most 50 inline results per answer
-    for track in matches[:50]:
+    for track in unique[:50]:
         text = f"<i><b>♫ {html.escape(track.artist_name)}</b> - {html.escape(track.title)}</i>"
         if preview_covers or not track.preview_url:
             res = InlineQueryResultArticle(
