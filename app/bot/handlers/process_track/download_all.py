@@ -90,7 +90,7 @@ async def handle_deeplink(
             text = i18n.get(
                 'entity-playlist',
                 title=playlist.title,
-                artist_name=playlist.track_count,
+                track_count=playlist.track_count,
                 cover_url=playlist.cover_url
             )
         # here was artist but nah i wont download all the artists tracks
