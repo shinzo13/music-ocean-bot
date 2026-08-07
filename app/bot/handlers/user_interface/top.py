@@ -6,6 +6,7 @@ from aiogram.types import Message
 from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
+from app.bot.filters import IsAdmin
 from app.database.repositories import UserRepository
 
 router = Router()
@@ -18,7 +19,7 @@ def _name(user) -> str:
     return full or (f"@{user.username}" if user.username else str(user.user_id))
 
 
-@router.message(Command("top"))
+@router.message(Command("top"), IsAdmin())
 async def top_downloaders(message: Message, user_repo: FromDishka[UserRepository], i18n: I18nContext):
     rows = await user_repo.top_users(limit=10)
     if not rows:
