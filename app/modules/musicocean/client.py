@@ -21,8 +21,10 @@ from app.modules.musicocean.engines.youtube.client import YoutubeClient
 from app.modules.musicocean.engines.youtube.models.youtube_track_preview import YoutubeTrackPreview
 from app.modules.musicocean.engines.yandex.client import YandexClient
 from app.modules.musicocean.enums.engine import Engine
+from app.modules.musicocean.exceptions import ProviderException
 from app.modules.musicocean.lastfm.client import LastFMClient
 from app.modules.musicocean.utils.shazam_wrapped import shazam_wrapped
+from app.modules.musicocean.utils.title_match import titles_match
 
 
 class MusicOceanClient:
@@ -187,6 +189,24 @@ class MusicOceanClient:
         if not match:
             raise SpotifyDataException("No Deezer or YouTube source found for Spotify track")
         return Engine.YOUTUBE, match.id, track.cover_url
+
+    async def resolve_snippet_source(self, title: str, artist_name: str) -> Optional[tuple[Engine, int | str]]:
+        # some soundcloud tracks only stream a 30s preview; look for the whole
+        # thing elsewhere, but never hand back a track with a different title
+        query = f"{artist_name} {title}"
+        try:
+            for dz in await self.deezer.search_tracks(query):
+                if titles_match(title, dz.title):
+                    return Engine.DEEZER, dz.id
+        except ProviderException:
+            pass
+        try:
+            match = await self.youtube.search_exact_match(title, artist_name)
+        except ProviderException:
+            return None
+        if match and titles_match(title, match.title):
+            return Engine.YOUTUBE, match.id
+        return None
 
     async def shazam_recognize(self, audio: bytes) -> Optional[YoutubeTrackPreview]:
         res = await shazam_wrapped(audio)

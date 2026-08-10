@@ -13,3 +13,10 @@ class SoundCloudAPIException(ProviderAPIException):
 
 class SoundCloudDataException(ProviderDataException):
     pass
+
+
+class SoundCloudSnippetException(SoundCloudDataException):
+    def __init__(self, title: str, artist_name: str):
+        super().__init__(f"soundcloud only serves a 30s snippet of {artist_name} - {title}")
+        self.title = title
+        self.artist_name = artist_name

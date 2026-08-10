@@ -11,6 +11,7 @@ from app.config import log
 from app.database.repositories import TrackRepository
 from app.modules.musicocean.client import MusicOceanClient
 from app.modules.musicocean.engines.shared.models import BaseTrackPreview
+from app.modules.musicocean.engines.soundcloud.exceptions import SoundCloudSnippetException
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg.models.cached_track import CachedTrack
 from app.modules.musicocean_tg.utils import engine_to_prefix
@@ -61,10 +62,21 @@ class TelegramMusicOceanClient(MusicOceanClient):
 
         logger.debug(f"downloading track {track_id}")
         started = time.monotonic()
-        if source_engine is not None:
+        try:
+            if source_engine is not None:
+                track = await super().download_track(source_engine, source_id)
+            else:
+                track = await super().download_track(engine, track_id)
+        except SoundCloudSnippetException as snippet:
+            resolved = await self.resolve_snippet_source(snippet.title, snippet.artist_name)
+            if resolved is None:
+                raise
+            source_engine, source_id = resolved
+            logger.info(
+                f"soundcloud {track_id} is a 30s snippet, "
+                f"downloading from {source_engine.value} {source_id} instead"
+            )
             track = await super().download_track(source_engine, source_id)
-        else:
-            track = await super().download_track(engine, track_id)
         elapsed = time.monotonic() - started
         speed = (
             len(track.content) / 1048576 / elapsed

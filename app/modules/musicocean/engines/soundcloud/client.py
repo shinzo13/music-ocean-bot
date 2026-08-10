@@ -10,7 +10,7 @@ from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
 from app.modules.musicocean.engines.soundcloud.constants import API_URL, HEADERS
 from app.modules.musicocean.engines.soundcloud.enums.api_method import SoundCloudAPIMethod
 from app.modules.musicocean.engines.soundcloud.exceptions import SoundCloudAPIException, SoundCloudDataException, \
-    SoundCloudAuthException
+    SoundCloudAuthException, SoundCloudSnippetException
 from app.modules.musicocean.engines.soundcloud.models import (
     SoundCloudTrackPreview,
     SoundCloudTrack,
@@ -182,11 +182,18 @@ class SoundCloudClient(BaseEngineClient):
 
         track = SoundCloudTrack.from_dict(raw_data)
 
+        transcodings = raw_data["media"]["transcodings"]
         transcoding = next(
-            (x for x in raw_data["media"]["transcodings"] if x["format"]["protocol"] == "progressive"),
+            (
+                x for x in transcodings
+                if x["format"]["protocol"] == "progressive" and not x.get("snipped")
+            ),
             None
         )
         if not transcoding:
+            # go+ / snip-policy tracks expose nothing but a 30s preview to us
+            if raw_data.get("policy") == "SNIP" or any(x.get("snipped") for x in transcodings):
+                raise SoundCloudSnippetException(track.title, track.artist_name)
             raise SoundCloudDataException('No transcoding available for this track')
         async with self.session.get(f"{transcoding['url']}?client_id={self.client_id}") as resp:
             stream_url = (await resp.json())["url"]
