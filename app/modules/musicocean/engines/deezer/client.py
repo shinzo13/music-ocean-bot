@@ -58,6 +58,10 @@ class DeezerClient(BaseEngineClient):
             method: DeezerAPIMethod,
             **kwargs
     ) -> dict:
+        # deezer treats a bare "0" as an empty parameter and 500s; quoting it
+        # turns it back into a normal term
+        if kwargs.get("q") == "0":
+            kwargs["q"] = '"0"'
         async with self.session.get(
                 f"{API_URL}/{method}",
                 params=kwargs

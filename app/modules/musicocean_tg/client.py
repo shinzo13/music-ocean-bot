@@ -158,7 +158,7 @@ class TelegramMusicOceanClient(MusicOceanClient):
             engine: Engine,
             tracks: list[BaseTrackPreview],
             track_repo: TrackRepository
-    ) -> AsyncGenerator[CachedTrack, None]:
+    ) -> AsyncGenerator[CachedTrack | None, None]:
 
         cached = {
             t.id: await track_repo.get_track(t.id, engine)
@@ -186,8 +186,13 @@ class TelegramMusicOceanClient(MusicOceanClient):
             )
 
         async def download_one_indexed(index: int, track_id: int | str):
-            result = await download_one(track_id)
-            return index, result
+            # a single dead track (404, geoblock, snippet-only) must not abort
+            # the whole batch — report it as None and let the caller count it
+            try:
+                return index, await download_one(track_id)
+            except Exception as e:  # noqa: BLE001
+                logger.warning(f"failed to download track {track_id} in batch: {e!r}")
+                return index, None
 
         futures = [download_one_indexed(i, t.id) for i, t in enumerate(tracks)]
         pending_results = {}

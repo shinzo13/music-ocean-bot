@@ -116,6 +116,9 @@ async def handle_deeplink(
             tracks,
             track_repo
     ):
+        if track is None:
+            failed += 1
+            continue
         # one bad track (stale file_id, network hiccup) must not kill the batch
         try:
             try:

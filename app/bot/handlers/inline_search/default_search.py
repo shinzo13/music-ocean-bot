@@ -7,6 +7,7 @@ from dishka import FromDishka
 from app.bot.utils.search_results import get_track_results, usage_guide_result
 from app.config.log import get_logger
 from app.database.models import User as DatabaseUser  # TODO costyl
+from app.modules.musicocean.exceptions import ProviderException
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 from app.modules.musicocean_tg.utils import prefix_to_engine
 
@@ -36,7 +37,13 @@ async def inline_query(
             return
 
     logger.debug(f"Engine: {engine}, search query: \"{search_query}\"")
-    matches = await musicocean.search_tracks(engine, search_query)
+    try:
+        matches = await musicocean.search_tracks(engine, search_query)
+    except ProviderException as e:
+        # a rejected query or a flaky engine shouldn't blow up the inline session
+        logger.warning(f"search failed on {engine} for {search_query!r}: {e!r}")
+        await query.answer([], cache_time=0, is_personal=True)
+        return
     res = await get_track_results(engine, matches, user.settings.track_preview_covers)
     logger.debug(f"Got {len(res)} results")
     await query.answer(res, cache_time=0, is_personal=True)
