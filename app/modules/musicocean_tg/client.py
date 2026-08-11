@@ -8,6 +8,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import BufferedInputFile, URLInputFile, Message
 
 from app.config import log
+from app.config.settings import settings
 from app.database.repositories import TrackRepository
 from app.modules.musicocean.client import MusicOceanClient
 from app.modules.musicocean.engines.shared.models import BaseTrackPreview
@@ -185,14 +186,19 @@ class TelegramMusicOceanClient(MusicOceanClient):
                 download_speed=speed
             )
 
+        # every track is held in memory while it uploads, so only a few may be
+        # in flight at once no matter how big the album is
+        slots = asyncio.Semaphore(settings.limits.batch_concurrency)
+
         async def download_one_indexed(index: int, track_id: int | str):
             # a single dead track (404, geoblock, snippet-only) must not abort
             # the whole batch — report it as None and let the caller count it
-            try:
-                return index, await download_one(track_id)
-            except Exception as e:  # noqa: BLE001
-                logger.warning(f"failed to download track {track_id} in batch: {e!r}")
-                return index, None
+            async with slots:
+                try:
+                    return index, await download_one(track_id)
+                except Exception as e:  # noqa: BLE001
+                    logger.warning(f"failed to download track {track_id} in batch: {e!r}")
+                    return index, None
 
         futures = [download_one_indexed(i, t.id) for i, t in enumerate(tracks)]
         pending_results = {}

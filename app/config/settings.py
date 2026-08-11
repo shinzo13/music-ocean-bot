@@ -67,6 +67,14 @@ class LocalSettings(BaseSettings):
     # user-facing name via LOCAL__BRAND without touching the repo
     brand: str = "Music Ocean"
 
+class LimitsSettings(BaseSettings):
+    # a batch downloads every track into memory, so an unbounded album or a
+    # handful of parallel playlists is all it takes to knock the bot over
+    max_entity_tracks: int = 100
+    batch_concurrency: int = 4
+    max_concurrent_batches: int = 3
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_nested_delimiter='__',
@@ -87,6 +95,7 @@ class Settings(BaseSettings):
     lastfm: LastfmSettings
     database: DatabaseSettings
     local: LocalSettings
+    limits: LimitsSettings = LimitsSettings()
 
 
 settings = Settings()  # noqa

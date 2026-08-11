@@ -4,11 +4,12 @@ import re
 from aiogram import Router, F
 from aiogram.exceptions import TelegramBadRequest, TelegramNetworkError
 from aiogram.filters import CommandStart
-from aiogram.types import Message
+from aiogram.types import Chat, Message, User
 from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
 from app.bot.utils.admin_notify import notify_admins_group
+from app.bot.utils.batch_guard import BatchBusy, UserBatchBusy, batch_guard
 from app.bot.utils.get_engine_emoji import get_engine_emoji
 from app.bot.utils.save_track import save_track_with_source
 from app.config.settings import settings
@@ -63,6 +64,36 @@ async def handle_deeplink(
         await message.answer(i18n.get('invalid-link') + "\n\n" + i18n.get('support-hint'))
         return
 
+    try:
+        async with batch_guard.reserve(sender.id):
+            await download_entity(
+                message=message,
+                engine=engine,
+                entity_type=entity_type,
+                entity_id=entity_id,
+                sender=sender,
+                musicocean=musicocean,
+                track_repo=track_repo,
+                user_repo=user_repo,
+                i18n=i18n,
+            )
+    except UserBatchBusy:
+        await message.answer(i18n.get('batch-already-running'))
+    except BatchBusy:
+        await message.answer(i18n.get('bot-busy'))
+
+
+async def download_entity(
+        message: Message,
+        engine: Engine,
+        entity_type: str,
+        entity_id: str,
+        sender: User | Chat,
+        musicocean: TelegramMusicOceanClient,
+        track_repo: TrackRepository,
+        user_repo: UserRepository,
+        i18n: I18nContext,
+):
     if engine in (Engine.DEEZER, Engine.SOUNDCLOUD):
         entity_id = int(entity_id)
 
@@ -99,6 +130,12 @@ async def handle_deeplink(
             return
 
     await message.answer(text)
+
+    limit = settings.limits.max_entity_tracks
+    if len(tracks) > limit:
+        tracks = tracks[:limit]
+        await message.answer(i18n.get('entity-truncated', limit=limit))
+
     await message.answer(i18n.get('downloading'))
 
     # notify admins once about the group, not about each track
