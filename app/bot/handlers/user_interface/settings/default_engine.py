@@ -6,6 +6,7 @@ from dishka import FromDishka
 from app.bot.callbacks.default_engine_callback import DefaultEngineCallback
 from app.bot.callbacks.settings_callback import SettingsCallback, SettingsPath
 from app.bot.keyboards import engines_keyboard
+from app.config.settings import settings
 from app.database.models import User
 from app.database.repositories import UserRepository
 from app.modules.musicocean_tg.utils import prefix_to_engine
@@ -30,6 +31,14 @@ async def set_engine_handler(
         user_repo: FromDishka[UserRepository],
 ):
     engine = prefix_to_engine(callback_data.engine_prefix)
+
+    # an old keyboard may still offer an engine that has since been switched off
+    if not settings.engines.is_enabled(engine):
+        await query.answer(i18n.get('engine-disabled'), show_alert=True)
+        await query.message.edit_reply_markup(
+            reply_markup=engines_keyboard(user.settings.selected_engine)
+        )
+        return
 
     if user.settings.selected_engine == engine:
         await query.answer(i18n.get('option-already-selected'), show_alert=True)

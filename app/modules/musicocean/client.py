@@ -21,7 +21,7 @@ from app.modules.musicocean.engines.youtube.client import YoutubeClient
 from app.modules.musicocean.engines.youtube.models.youtube_track_preview import YoutubeTrackPreview
 from app.modules.musicocean.engines.yandex.client import YandexClient
 from app.modules.musicocean.enums.engine import Engine
-from app.modules.musicocean.exceptions import ProviderException
+from app.modules.musicocean.exceptions import EngineUnavailableException, ProviderException
 from app.modules.musicocean.lastfm.client import LastFMClient
 from app.modules.musicocean.utils.shazam_wrapped import shazam_wrapped
 from app.modules.musicocean.utils.title_match import titles_match
@@ -93,7 +93,7 @@ class MusicOceanClient:
             case _:
                 select_engine = None
         if not select_engine:
-            raise "engine is not setup blablabla"  # TODO
+            raise EngineUnavailableException(f"{engine} is not set up")
         return select_engine
 
     async def get_track(self, engine: Engine, track_id: int | str) -> BaseTrackPreview:

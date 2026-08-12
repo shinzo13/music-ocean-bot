@@ -6,7 +6,9 @@ from aiogram.types import Message, User as TelegramUser, Update, InputTextMessag
 from aiogram_i18n.types import InlineQueryResultArticle
 from typing_extensions import Awaitable
 
+from app.bot.utils.engines import fallback_engine
 from app.config.log import get_logger
+from app.config.settings import settings
 from app.database.models import User as DatabaseUser
 from app.database.repositories import UserRepository
 
@@ -55,6 +57,18 @@ class DatabaseMiddleware(BaseMiddleware):
             await user_repo.update_user_settings(
                 db_user.user_id,
                 locale=language_code
+            )
+
+        if not settings.engines.is_enabled(db_user.settings.selected_engine):
+            # engine was switched off after the user picked it
+            replacement = fallback_engine()
+            logger.info(
+                f"user {db_user.user_id} had disabled engine "
+                f"{db_user.settings.selected_engine}, moving to {replacement}"
+            )
+            db_user = await user_repo.update_user_settings(
+                db_user.user_id,
+                selected_engine=replacement
             )
 
         if db_user.is_banned:

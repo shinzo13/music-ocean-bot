@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from app.config.settings import settings
 from app.database.core import create_engine, create_session_factory
 from app.database.repositories import UserRepository, TrackRepository, DynamicSettingsRepository
+from app.modules.musicocean.enums import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 
 
@@ -33,10 +34,11 @@ class TelegramMusicOceanClientProvider(Provider):
             client_secret=settings.spotify.client_secret.get_secret_value(),
         )
 
-        await musicocean.setup_yandex(
-            token=settings.yandex.token.get_secret_value(),
-            proxy=settings.yandex.proxy.get_secret_value() if settings.yandex.proxy else None,
-        )
+        if settings.engines.is_enabled(Engine.YANDEX):
+            await musicocean.setup_yandex(
+                token=settings.yandex.token.get_secret_value(),
+                proxy=settings.yandex.proxy.get_secret_value() if settings.yandex.proxy else None,
+            )
 
         await musicocean.setup_lastfm(
             api_token=settings.lastfm.api_key.get_secret_value(),

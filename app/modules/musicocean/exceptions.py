@@ -6,6 +6,9 @@ class MusicOceanException(Exception):
 class ProviderException(MusicOceanException):
     pass
 
+class EngineUnavailableException(ProviderException):
+    pass
+
 class ProviderAuthException(ProviderException):
     pass
 

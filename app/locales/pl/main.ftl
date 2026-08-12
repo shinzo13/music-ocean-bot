@@ -100,6 +100,8 @@ usage-guide-message =
 
     i dont know
 feature-soundcloud-link-search = Wyszukiwanie po linku SoundCloud
+feature-yandex-link-search = Wyszukiwanie po linku Yandex Music
+engine-disabled = Ten silnik jest teraz wyłączony.
 feature-spotify-link-search = Wyszukiwanie po linku Spotify (playlista/artysta)
 feature-youtube-advanced-search = Zaansowane wyszukiwanie przez YT
 not-supported-title = { $feature } nie jest aktualnie obsługiwane.

@@ -9,6 +9,7 @@ from app.bot.utils.search_results import (
     get_track_results, not_supported_result
 )
 from app.config.log import get_logger
+from app.config.settings import settings
 from app.database.models import User as DatabaseUser
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
@@ -107,9 +108,14 @@ async def inline_query(
 async def inline_query(
         query: InlineQuery,
         user: DatabaseUser,
+        i18n: I18nContext,
         musicocean: FromDishka[TelegramMusicOceanClient]
 ):
     logger.info(f"User #{query.from_user.id} searched Yandex link: \"{query.query}\"")
+    if not settings.engines.is_enabled(Engine.YANDEX):
+        await query.answer(not_supported_result(i18n.get('feature-yandex-link-search')))
+        return
+
     text = query.query
 
     if m := YANDEX_TRACK_REGEX.search(text):

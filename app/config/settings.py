@@ -67,6 +67,15 @@ class LocalSettings(BaseSettings):
     # user-facing name via LOCAL__BRAND without touching the repo
     brand: str = "Music Ocean"
 
+class EnginesSettings(BaseSettings):
+    # engines listed here stay in the codebase but are hidden from users and
+    # never set up on boot, e.g. ENGINES__DISABLED=["YANDEX"]
+    disabled: List[str] = []
+
+    def is_enabled(self, engine) -> bool:
+        return str(getattr(engine, "value", engine)).upper() not in {e.upper() for e in self.disabled}
+
+
 class LimitsSettings(BaseSettings):
     # a batch downloads every track into memory, so an unbounded album or a
     # handful of parallel playlists is all it takes to knock the bot over
@@ -96,6 +105,7 @@ class Settings(BaseSettings):
     database: DatabaseSettings
     local: LocalSettings
     limits: LimitsSettings = LimitsSettings()
+    engines: EnginesSettings = EnginesSettings()
 
 
 settings = Settings()  # noqa

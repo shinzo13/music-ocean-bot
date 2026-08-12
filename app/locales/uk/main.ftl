@@ -101,6 +101,8 @@ usage-guide-message =
 
     i dont know
 feature-soundcloud-link-search = Пошук за посиланням SoundCloud
+feature-yandex-link-search = Пошук за посиланням Яндекс Музики
+engine-disabled = Цей рушій зараз вимкнено.
 feature-spotify-link-search = Пошук за посиланням Spotify (плейлист/виконавець)
 feature-youtube-advanced-search = Розширений пошук по YouTube
 not-supported-title = { $feature } поки не підтримується.
