@@ -124,6 +124,7 @@ bot-busy = Pobieram teraz kilka albumów naraz, spróbuj za parę minut.
 btn-search-for-track = Szukaj utworu
 btn-download-all = Pobierz wszystkie utwory
 btn-downloading = Pobieranie...
+btn-click-to-download = Kliknij, aby pobrać
 
 ## entities
 entity-album =

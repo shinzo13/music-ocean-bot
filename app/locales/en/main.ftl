@@ -126,6 +126,7 @@ bot-busy = I'm downloading several albums right now, try again in a couple of mi
 btn-search-for-track = Search for track
 btn-download-all = Download all tracks
 btn-downloading = Downloading...
+btn-click-to-download = Click to download
 
 ## entities
 entity-album =

@@ -1,18 +1,12 @@
-from aiogram import Router, Bot
-from aiogram.exceptions import TelegramBadRequest
-from aiogram.types import ChosenInlineResult
-from aiogram.types import InputMediaAudio
+from aiogram import Bot, F, Router
+from aiogram.types import CallbackQuery, ChosenInlineResult
 from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
-from app.bot.utils.admin_notify import notify_admins_track
-from app.bot.utils.context_codes import CTX_CODES
-from app.bot.utils.save_track import save_track_with_source
+from app.bot.handlers.process_track.deliver import deliver_track, is_in_flight
+from app.bot.utils.track_ref import parse_track_ref
 from app.config.log import get_logger
-from app.config.settings import settings
-from app.database.models.download_context import DownloadContext
 from app.database.repositories import TrackRepository, UserRepository
-from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 
 logger = get_logger(__name__)
@@ -29,97 +23,55 @@ async def idklol(
         user_repo: FromDishka[UserRepository],
         i18n: I18nContext,
 ):
-    # todo
-    if chosen.result_id in ['usage_guide', "setup_scrobbling"]:
-        return
-    # todo i hate stupid split i wanna regex in handler
-    parts = chosen.result_id.split("_", maxsplit=3)
-    if len(parts) < 3 or parts[1] != "tr":
-        return
-    engine_prefix = parts[0]
-    # new ids carry a context code ({engine}_tr_{ctx}_{id}); ids cached by
-    # telegram before the rollout lack it — treat those as plain search
-    if len(parts) == 4 and parts[2] in CTX_CODES:
-        download_context, entity_kind, download_mode = CTX_CODES[parts[2]]
-        entity_id = parts[3]
-    else:
-        download_context, entity_kind, download_mode = DownloadContext.SEARCH, None, None
-        entity_id = chosen.result_id.split("_", maxsplit=2)[2]
+    # logged before anything is parsed: telegram delivering no update at all and
+    # an id we failed to read used to look identical in the log — like nothing
+    logger.info(f"chosen inline result #{chosen.result_id} by {chosen.from_user.id}")
 
-    match engine_prefix:
-        case "dz":
-            engine = Engine.DEEZER
-            entity_id = int(entity_id)
-        case "sc":
-            engine = Engine.SOUNDCLOUD
-            entity_id = int(entity_id)
-        case "yt":
-            engine = Engine.YOUTUBE
-        case "sp":
-            engine = Engine.SPOTIFY
-        case "ya":
-            engine = Engine.YANDEX
-        case _:
-            raise "invalid engine"
-
-    db_track = await track_repo.get_track(entity_id, engine)
-    if db_track:
-        try:
-            await bot.edit_message_media(
-                media=InputMediaAudio(media=db_track.telegram_file_id),
-                inline_message_id=chosen.inline_message_id
-            )
-            logger.info(f"Successfully sent cached track #{chosen.result_id}")
-        except TelegramBadRequest as e:
-            logger.warning(f"edit failed for cached #{chosen.result_id}: {e.message}")
+    ref = parse_track_ref(chosen.result_id)
+    if ref is None:
+        return
+    if not chosen.inline_message_id:
+        # no reply markup means no message to edit: nothing to deliver into
+        logger.warning(f"no inline_message_id for #{chosen.result_id}")
         return
 
-    try:
-        cached = await musicocean.download_track(
-            engine=engine,
-            track_id=entity_id,
-        )
-    except Exception as e:  # noqa: BLE001 — source may 404/geoblock/remove a track
-        logger.warning(f"download failed for #{chosen.result_id}: {e!r}")
-        try:
-            await bot.edit_message_text(
-                inline_message_id=chosen.inline_message_id,
-                text=i18n.get('error-track-unavailable') + "\n\n" + i18n.get('support-hint'),
-            )
-        except TelegramBadRequest as edit_err:
-            logger.warning(f"error edit failed for #{chosen.result_id}: {edit_err.message}")
+    await deliver_track(
+        ref, chosen.inline_message_id, chosen.from_user,
+        bot, musicocean, track_repo, user_repo, i18n
+    )
+
+
+@router.callback_query(F.data.regexp(r'^(dz|sc|yt|sp|ya)_tr_'))
+async def download_button(
+        callback: CallbackQuery,
+        bot: Bot,
+        musicocean: FromDishka[TelegramMusicOceanClient],
+        track_repo: FromDishka[TrackRepository],
+        user_repo: FromDishka[UserRepository],
+        i18n: I18nContext,
+):
+    """The manual path. Telegram feeds chosen_inline_result only for a share of
+    picks, and posting as an anonymous channel drops it entirely — the button is
+    what a user has left when the automatic download never starts."""
+    ref = parse_track_ref(callback.data or '')
+    if ref is None or not callback.inline_message_id:
+        await callback.answer()
         return
-    file_id = cached.file_id
-    logger.debug(f"got file id: {file_id}")
-    try:
-        await bot.edit_message_media(
-            media=InputMediaAudio(media=file_id),
-            inline_message_id=chosen.inline_message_id
-        )
-        logger.info(f"Successfully sent track #{chosen.result_id}")
-    except TelegramBadRequest as e:
-        logger.warning(f"edit failed for #{chosen.result_id}: {e.message}")
 
-    # telegram caching causing this shi
-    db_track = await track_repo.get_track(entity_id, engine)
-    if db_track is None:
-        await save_track_with_source(
-            track_repo,
-            engine=engine,
-            track_id=entity_id,
-            cached=cached,
-            file_id=file_id,
-            file_unique_id=cached.file_unique_id,
-            user_id=chosen.from_user.id,
-            download_context=download_context,
-            entity_type=entity_kind,
-            download_mode=download_mode
-        )
-        notify_admins = await user_repo.get_notify_admin_ids(settings.telegram.admins)
-        await notify_admins_track(
-            bot, notify_admins,
-            engine, cached.artist_name, cached.title,
-            entity_id, chosen.from_user
-        )
+    if is_in_flight(callback.inline_message_id):
+        await callback.answer(i18n.get('btn-downloading'))
+        return
 
-    return
+    logger.info(f"download button #{callback.data} by {callback.from_user.id}")
+    await callback.answer()
+    await deliver_track(
+        ref, callback.inline_message_id, callback.from_user,
+        bot, musicocean, track_repo, user_repo, i18n
+    )
+
+
+# "meow mrrnyaahhhhh" is the pre-button callback data: those messages are still
+# sitting in chats, and a press on them must not spin forever
+@router.callback_query(F.data.in_({'downloading', 'meow mrrnyaahhhhh'}))
+async def already_downloading(callback: CallbackQuery, i18n: I18nContext):
+    await callback.answer(i18n.get('btn-downloading'))

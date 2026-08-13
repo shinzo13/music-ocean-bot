@@ -1,4 +1,5 @@
 from .admin_panel_keyboard import admin_panel_keyboard
+from .download_button import download_keyboard, downloading_keyboard
 from .engines_keyboard import engines_keyboard
 from .guide_keyboard import guide_keyboard
 from .home_keyboard import home_keyboard

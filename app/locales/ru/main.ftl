@@ -123,6 +123,7 @@ bot-busy = Сейчас качаю сразу несколько альбомо�
 btn-search-for-track = Найти трек
 btn-download-all = Скачать все треки
 btn-downloading = Скачиваю...
+btn-click-to-download = Нажми, чтобы скачать
 
 ## entities
 entity-album =
