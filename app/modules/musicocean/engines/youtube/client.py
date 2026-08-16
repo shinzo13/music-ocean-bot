@@ -11,7 +11,8 @@ from app.config.log import get_logger
 from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
 from app.modules.musicocean.engines.youtube.constants import HEADERS, YTM_DOMAIN, YTM_BASE_API
 from app.modules.musicocean.engines.youtube.enums.api_method import YoutubeAPIMethod
-from app.modules.musicocean.engines.youtube.exceptions import YouTubeAuthException
+from app.modules.musicocean.engines.youtube.exceptions import YouTubeAuthException, YoutubeBlockedException, \
+    YoutubeDataException
 from app.modules.musicocean.engines.youtube.models.youtube_album import YoutubeAlbum
 from app.modules.musicocean.engines.youtube.models.youtube_artist import YoutubeArtist
 from app.modules.musicocean.engines.youtube.models.youtube_playlist import YoutubePlaylist
@@ -68,8 +69,30 @@ class YoutubeClient(BaseEngineClient):
             # ...
             return raw_data
 
+    # youtube answers the same request with a bot check maybe a third of the
+    # time, and a different client is usually served without one. Order matters:
+    # the first is pytubefix's default, the rest are what still worked when it
+    # was refused.
+    CLIENTS = ("ANDROID_VR", "WEB_MUSIC", "IOS", "WEB")
+
+    async def _open(self, track_id: str) -> AsyncYouTube:
+        """Opens a video, walking through clients until one is not challenged."""
+        url = f"https://youtube.com/watch?v={track_id}"
+        last: Exception | None = None
+        for client in self.CLIENTS:
+            yt = AsyncYouTube(url, client=client)
+            try:
+                # forces the player response: without it the bot check surfaces
+                # later, halfway through the download
+                await yt.title()
+                return yt
+            except Exception as e:  # noqa: BLE001 — every client fails its own way
+                last = e
+                logger.debug(f"yt: {client} refused {track_id}: {type(e).__name__}")
+        raise YoutubeDataException(f"no youtube client could open {track_id}: {last!r}")
+
     async def get_track(self, track_id: str) -> YoutubeTrackPreview:
-        yt = AsyncYouTube.from_id(track_id)
+        yt = await self._open(track_id)
         return YoutubeTrackPreview(
             id=track_id,
             title=await yt.title(),
@@ -151,7 +174,8 @@ class YoutubeClient(BaseEngineClient):
             track_id: str,
             watermark: Optional[str] = None
     ) -> YoutubeTrack:
-        yt = AsyncYouTube.from_id(track_id)
+        yt, raw = await self._fetch_audio(track_id)
+
         cover_url = await yt.thumbnail_url()
         async with self.session.get(
                 f"https://i.ytimg.com/vi/{track_id}/maxresdefault.jpg"
@@ -171,17 +195,50 @@ class YoutubeClient(BaseEngineClient):
             duration=await yt.length(),
             cover=cover
         )
-        logger.debug("yt: downloading")
-        stream = await yt.get_stream_by_itag(140)
-        data = io.BytesIO()
-        # blocking download + cpu-heavy transcode must not starve the event loop
-        await asyncio.to_thread(stream.stream_to_buffer, data)
-        data.seek(0)
-        raw = data.read()
         logger.debug("yt: writing id3")
         track.content = await asyncio.to_thread(write_mp4_tags, track, raw, watermark)
         logger.debug("yt: finished")
         return track
+
+    async def _fetch_audio(self, track_id: str) -> tuple[AsyncYouTube, bytes]:
+        """Downloads the audio stream, changing client whenever youtube decides
+        this request looks automated.
+
+        The check does not fire on opening the video but on reaching for the
+        stream, and not every time — so the retry has to wrap the whole download,
+        not just the metadata call.
+        """
+        url = f"https://youtube.com/watch?v={track_id}"
+        last: Exception | None = None
+
+        for client in self.CLIENTS:
+            yt = AsyncYouTube(url, client=client)
+            try:
+                logger.debug(f"yt: downloading {track_id} via {client}")
+                stream = await yt.get_stream_by_itag(140)
+                data = io.BytesIO()
+                # blocking download + cpu-heavy transcode must not starve the event loop
+                await asyncio.to_thread(stream.stream_to_buffer, data)
+                data.seek(0)
+                return yt, data.read()
+            except Exception as e:  # noqa: BLE001 — every client refuses in its own way
+                last = e
+                logger.debug(f"yt: {client} refused {track_id}: {type(e).__name__}")
+
+        raise YoutubeBlockedException(
+            track_id,
+            f"no youtube client would serve {track_id}: {last!r}",
+            *(await self._describe(track_id)),
+        )
+
+    async def _describe(self, track_id: str) -> tuple[str | None, str | None]:
+        """Title and artist for a video whose audio we could not get: with them
+        the track can still be found on another engine."""
+        try:
+            preview = await self.get_track(track_id)
+            return preview.title, preview.artist_name
+        except Exception:  # noqa: BLE001 — a name is a bonus, not a requirement
+            return None, None
 
     async def close(self):
         pass

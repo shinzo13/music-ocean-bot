@@ -24,7 +24,7 @@ from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.exceptions import EngineUnavailableException, ProviderException
 from app.modules.musicocean.lastfm.client import LastFMClient
 from app.modules.musicocean.utils.shazam_wrapped import shazam_wrapped
-from app.modules.musicocean.utils.title_match import titles_match
+from app.modules.musicocean.utils.title_match import artists_match, is_usable_artist, name_candidates, titles_match
 
 
 class MusicOceanClient:
@@ -190,16 +190,32 @@ class MusicOceanClient:
             raise SpotifyDataException("No Deezer or YouTube source found for Spotify track")
         return Engine.YOUTUBE, match.id, track.cover_url
 
-    async def resolve_snippet_source(self, title: str, artist_name: str) -> Optional[tuple[Engine, int | str]]:
-        # some soundcloud tracks only stream a 30s preview; look for the whole
-        # thing elsewhere, but never hand back a track with a different title
-        query = f"{artist_name} {title}"
-        try:
-            for dz in await self.deezer.search_tracks(query):
-                if titles_match(title, dz.title):
+    async def resolve_snippet_source(
+            self,
+            title: Optional[str],
+            artist_name: Optional[str]
+    ) -> Optional[tuple[Engine, int | str]]:
+        # some tracks cannot be fetched from their own engine — a 30s soundcloud
+        # preview, a youtube bot check — so look for the whole thing elsewhere,
+        # but never hand back a track with a different title
+        if not title:
+            return None
+
+        for name, artist in name_candidates(title, artist_name):
+            # a bare title with nobody to attribute it to is too weak to act on:
+            # "MTC" is somebody else's track as well
+            if artist is None:
+                continue
+            try:
+                candidates = await self.deezer.search_tracks(f"{artist} {name}")
+            except ProviderException:
+                continue
+            for dz in candidates:
+                if titles_match(name, dz.title) and artists_match(artist, dz.artist_name):
                     return Engine.DEEZER, dz.id
-        except ProviderException:
-            pass
+
+        if not is_usable_artist(artist_name):
+            return None
         try:
             match = await self.youtube.search_exact_match(title, artist_name)
         except ProviderException:

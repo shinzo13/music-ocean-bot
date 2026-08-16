@@ -13,6 +13,7 @@ from app.database.repositories import TrackRepository
 from app.modules.musicocean.client import MusicOceanClient
 from app.modules.musicocean.engines.shared.models import BaseTrackPreview
 from app.modules.musicocean.engines.soundcloud.exceptions import SoundCloudSnippetException
+from app.modules.musicocean.engines.youtube.exceptions import YoutubeBlockedException
 from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean_tg.models.cached_track import CachedTrack
 from app.modules.musicocean_tg.utils import engine_to_prefix
@@ -83,6 +84,21 @@ class TelegramMusicOceanClient(MusicOceanClient):
             logger.info(
                 f"soundcloud {track_id} is a 30s snippet, "
                 f"downloading from {source_engine.value} {source_id} instead"
+            )
+            track = await super().download_track(source_engine, source_id)
+        except YoutubeBlockedException as blocked:
+            # youtube bot checks come and go; the track itself is usually on
+            # deezer, and a scrobble the user asked for should not depend on
+            # which mood youtube is in
+            if not blocked.title or not blocked.artist_name:
+                raise
+            resolved = await self.resolve_snippet_source(blocked.title, blocked.artist_name)
+            if resolved is None:
+                raise
+            source_engine, source_id = resolved
+            logger.info(
+                f"youtube refused {track_id}, downloading from "
+                f"{source_engine.value} {source_id} instead"
             )
             track = await super().download_track(source_engine, source_id)
         elapsed = time.monotonic() - started

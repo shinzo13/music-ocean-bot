@@ -1,4 +1,5 @@
-from app.modules.musicocean.exceptions import ProviderException, ProviderAuthException, ProviderAPIException
+from app.modules.musicocean.exceptions import ProviderException, ProviderAuthException, ProviderAPIException, \
+    ProviderDataException
 
 
 class YouTubeException(ProviderException):
@@ -9,3 +10,17 @@ class YouTubeAuthException(ProviderAuthException):
 
 class YouTubeAPIException(ProviderAPIException):
     pass
+
+class YoutubeDataException(ProviderDataException):
+    pass
+
+
+class YoutubeBlockedException(YoutubeDataException):
+    """Youtube refused every client with a bot check. Carries whatever we know
+    about the track so it can be looked for elsewhere."""
+
+    def __init__(self, track_id: str, message: str, title: str | None, artist_name: str | None):
+        super().__init__(message)
+        self.track_id = track_id
+        self.title = title
+        self.artist_name = artist_name
