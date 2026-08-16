@@ -233,11 +233,28 @@ class YoutubeClient(BaseEngineClient):
 
     async def _describe(self, track_id: str) -> tuple[str | None, str | None]:
         """Title and artist for a video whose audio we could not get: with them
-        the track can still be found on another engine."""
+        the track can still be found on another engine.
+
+        Asked over oembed rather than the player: when youtube is refusing the
+        download it refuses the player response too, while oembed keeps
+        answering — and a name is all the fallback needs.
+        """
+        try:
+            async with self.session.get(
+                    "https://www.youtube.com/oembed",
+                    params={"url": f"https://www.youtube.com/watch?v={track_id}", "format": "json"}
+            ) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    author = (data.get("author_name") or "").removesuffix(' - Topic')
+                    return data.get("title"), author or None
+        except Exception:  # noqa: BLE001 — a name is a bonus, not a requirement
+            pass
+
         try:
             preview = await self.get_track(track_id)
             return preview.title, preview.artist_name
-        except Exception:  # noqa: BLE001 — a name is a bonus, not a requirement
+        except Exception:  # noqa: BLE001
             return None, None
 
     async def close(self):

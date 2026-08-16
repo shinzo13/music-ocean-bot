@@ -193,7 +193,8 @@ class MusicOceanClient:
     async def resolve_snippet_source(
             self,
             title: Optional[str],
-            artist_name: Optional[str]
+            artist_name: Optional[str],
+            exclude: Optional[Engine] = None
     ) -> Optional[tuple[Engine, int | str]]:
         # some tracks cannot be fetched from their own engine — a 30s soundcloud
         # preview, a youtube bot check — so look for the whole thing elsewhere,
@@ -214,7 +215,9 @@ class MusicOceanClient:
                 if titles_match(name, dz.title) and artists_match(artist, dz.artist_name):
                     return Engine.DEEZER, dz.id
 
-        if not is_usable_artist(artist_name):
+        # the engine we are running from is the one that just refused: sending
+        # the track back to it is how a retry loops instead of rescuing anything
+        if exclude is Engine.YOUTUBE or not is_usable_artist(artist_name):
             return None
         try:
             match = await self.youtube.search_exact_match(title, artist_name)

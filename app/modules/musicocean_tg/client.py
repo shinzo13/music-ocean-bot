@@ -92,7 +92,9 @@ class TelegramMusicOceanClient(MusicOceanClient):
             # which mood youtube is in
             if not blocked.title or not blocked.artist_name:
                 raise
-            resolved = await self.resolve_snippet_source(blocked.title, blocked.artist_name)
+            resolved = await self.resolve_snippet_source(
+                blocked.title, blocked.artist_name, exclude=Engine.YOUTUBE
+            )
             if resolved is None:
                 raise
             source_engine, source_id = resolved
