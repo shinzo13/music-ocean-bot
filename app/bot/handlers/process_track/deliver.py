@@ -1,5 +1,5 @@
 from aiogram import Bot
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramBadRequest, TelegramEntityTooLarge
 from aiogram.types import Chat, InputMediaAudio, User
 from aiogram_i18n import I18nContext
 
@@ -11,6 +11,7 @@ from app.config.log import get_logger
 from app.config.settings import settings
 from app.database.repositories import TrackRepository, UserRepository
 from app.modules.musicocean_tg import TelegramMusicOceanClient
+from app.modules.musicocean_tg.client import TrackTooLarge
 
 logger = get_logger(__name__)
 
@@ -80,10 +81,14 @@ async def _deliver(
         cached = await musicocean.download_track(engine=ref.engine, track_id=ref.track_id)
     except Exception as e:  # noqa: BLE001 — source may 404/geoblock/remove a track
         logger.warning(f"download failed for {ref.engine.value} {ref.track_id}: {e!r}")
+        # a two-hour tv rip is not a broken track: saying "unavailable" sends the
+        # user retrying something that will never fit
+        too_large = isinstance(e, (TelegramEntityTooLarge, TrackTooLarge))
+        reason = 'error-track-too-large' if too_large else 'error-track-unavailable'
         try:
             await bot.edit_message_text(
                 inline_message_id=inline_message_id,
-                text=i18n.get('error-track-unavailable') + "\n\n" + i18n.get('support-hint'),
+                text=i18n.get(reason) + "\n\n" + i18n.get('support-hint'),
             )
         except TelegramBadRequest as edit_err:
             logger.warning(f"error edit failed for {ref.track_id}: {edit_err.message}")

@@ -20,6 +20,13 @@ from app.modules.musicocean_tg.worker import TelegramWorker
 
 logger = log.get_logger(__name__)
 
+# what a bot may upload through the telegram api
+UPLOAD_LIMIT = 50 * 1024 * 1024
+
+
+class TrackTooLarge(Exception):
+    pass
+
 
 class TelegramMusicOceanClient(MusicOceanClient):
     pending: dict[int, asyncio.Future[str]] = {}
@@ -96,6 +103,13 @@ class TelegramMusicOceanClient(MusicOceanClient):
             thumbnail = BufferedInputFile(file=track.cover, filename="cover.jpg")
         else:
             thumbnail = URLInputFile(track.cover_url)
+
+        if len(track.content) > UPLOAD_LIMIT:
+            # checked before the upload rather than after: telegram rejects it
+            # anyway, and pushing 50+ MB up just to be told so wastes a worker
+            raise TrackTooLarge(
+                f"{track.artist_name} - {track.title} is {len(track.content) / 1048576:.0f} MB"
+            )
 
         logger.debug(f"uploading track {track_id}")
         msg = await executor.send_audio(

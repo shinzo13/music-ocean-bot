@@ -146,6 +146,7 @@ not-recognized = <i>Nie rozpoznano!</i>
 
 ## support / errors
 error-track-unavailable = Ten utwór jest niedostępny do pobrania.
+error-track-too-large = Plik ma ponad 50 MB — telegram go nie przyjmie. Zwykle to długie nagranie, a nie utwór.
 support-hint = Jeśli problem nadal występuje — napisz do wsparcia @koshkesupportbot
 
 ## support menu

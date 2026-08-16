@@ -148,6 +148,7 @@ not-recognized = <i>Not recognized!</i>
 
 ## support / errors
 error-track-unavailable = This track is unavailable for download.
+error-track-too-large = The file is over 50 MB — telegram won't take it. That's usually a long recording rather than a track.
 support-hint = Still not working? Contact support @koshkesupportbot
 
 ## support menu

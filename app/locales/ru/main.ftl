@@ -145,6 +145,7 @@ not-recognized = <i>Не распознано!</i>
 
 ## support / errors
 error-track-unavailable = Трек недоступен для загрузки.
+error-track-too-large = Файл больше 50 МБ — телеграм не пропускает такие. Обычно это длинная запись, а не трек.
 support-hint = Если проблема осталась — напиши в поддержку @koshkesupportbot
 
 ## support menu
