@@ -37,6 +37,15 @@ current=$(git rev-parse HEAD)
 target=$(git rev-parse "origin/$BRANCH")
 [ "$current" = "$target" ] && { log "already at ${target:0:7}"; exit 0; }
 
+# This script resets the checkout it runs in, so it must not run in the one
+# where work happens: an uncommitted edit would be gone without a word. The
+# deploy directory is a separate clone that nobody types in.
+if [ -n "$(git status --porcelain)" ]; then
+    log "working copy is dirty, refusing to reset it"
+    notify "🔴 кошке: в $PROJECT есть несохранённые изменения, деплой не трогаю"
+    exit 1
+fi
+
 log "new commit ${target:0:7} (at ${current:0:7})"
 
 if [ "$force" -eq 0 ]; then
