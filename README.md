@@ -65,6 +65,24 @@ Here is some notes about several `.env` variables:
 docker compose up --build
 ```
 
+### Deployment
+
+CI runs on every push and pull request: tests, a byte-compile of every module,
+a locale check that every string the code asks for exists in all four
+languages, and a build of the image.
+
+A deployment is a push to `main`. On the server a timer runs
+`scripts/deploy.sh` every few minutes: it looks for a new commit, refuses to
+deploy unless that commit's checks are green, rebuilds, then verifies the
+container is up with a clean log and rolls back to the previous commit if it is
+not. Nothing has to be exposed for this — the server asks GitHub, GitHub never
+reaches in.
+
+Run it in a clone of its own, not the one you work in: the script resets the
+checkout to the target commit, and it stops rather than do that to a dirty
+tree. `deploy.sh --force` skips the CI check, for when a fix has to go out
+before the build finishes.
+
 ## Usage
 
 ### User manual

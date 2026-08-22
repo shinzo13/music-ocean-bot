@@ -51,7 +51,15 @@ log "new commit ${target:0:7} (at ${current:0:7})"
 if [ "$force" -eq 0 ]; then
     # Deploying a commit whose tests never ran is how a red build reaches
     # production while everyone believes CI is protecting them.
-    status=$(curl -s -m 20 "https://api.github.com/repos/$REPO/commits/$target/check-runs" \
+    # Authenticated when a token is around: anonymous api calls share one small
+    # hourly budget per address, and running out reads exactly like a network
+    # failure — the deploy would stall with nothing to point at.
+    auth=()
+    token="${GITHUB_TOKEN:-$(sed -n 's|https://[^:]*:\([^@]*\)@github\.com|\1|p' "$HOME/.git-credentials" 2>/dev/null | head -1)}"
+    [ -n "$token" ] && auth=(-H "Authorization: token $token")
+
+    status=$(curl -s -m 30 --retry 2 --retry-delay 3 "${auth[@]}" \
+        "https://api.github.com/repos/$REPO/commits/$target/check-runs" \
         | python3 -c "
 import json, sys
 try:
