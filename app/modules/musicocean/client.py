@@ -24,7 +24,8 @@ from app.modules.musicocean.enums.engine import Engine
 from app.modules.musicocean.exceptions import EngineUnavailableException, ProviderException
 from app.modules.musicocean.lastfm.client import LastFMClient
 from app.modules.musicocean.utils.shazam_wrapped import shazam_wrapped
-from app.modules.musicocean.utils.title_match import artists_match, is_usable_artist, name_candidates, titles_match
+from app.modules.musicocean.utils.title_match import artists_match, is_usable_artist, name_candidates, \
+    normalize_title, titles_match
 
 
 class MusicOceanClient:
@@ -207,8 +208,16 @@ class MusicOceanClient:
             # "MTC" is somebody else's track as well
             if artist is None:
                 continue
+            # searched normalised, not raw: deezer returns nothing at all for
+            # "Kai Angel & 9mice - LIPSTICK (Official Music Video)" while the
+            # track sits right there under "kai angel 9mice lipstick". We were
+            # normalising only to compare, and asking with the youtube dressing
+            # still attached
+            query = f"{normalize_title(artist)} {normalize_title(name)}".strip()
+            if not query:
+                continue
             try:
-                candidates = await self.deezer.search_tracks(f"{artist} {name}")
+                candidates = await self.deezer.search_tracks(query)
             except ProviderException:
                 continue
             for dz in candidates:
