@@ -1,12 +1,13 @@
 from aiogram import Router, F
 from aiogram.types import InlineQuery
+from aiogram_i18n import I18nContext
 from dishka import FromDishka
 
-from app.bot.utils.search_results import get_track_results, usage_guide_result
+from app.bot.utils.search_results import get_track_results, not_supported_result, usage_guide_result
 from app.config.log import get_logger
 from app.database.models import User
 from app.modules.musicocean.enums import Engine
-from app.modules.musicocean.exceptions import ProviderDataException
+from app.modules.musicocean.exceptions import ProviderDataException, ProviderException
 from app.modules.musicocean_tg import TelegramMusicOceanClient
 from app.modules.musicocean_tg.utils import prefix_to_engine
 
@@ -19,7 +20,8 @@ router = Router()
 async def inline_query(
         query: InlineQuery,
         musicocean: FromDishka[TelegramMusicOceanClient],
-        user: User
+        user: User,
+        i18n: I18nContext
 ):
     engine_prefix, entity_prefix, entity_id = query.query.split('::', maxsplit=2)
     logger.info(f"User #{query.from_user.id} searched for \"{query.query}\"")
@@ -46,6 +48,15 @@ async def inline_query(
                 return  # TODO
     except ProviderDataException:
         logger.debug("No data for that query")
+        return
+    except ProviderException as e:
+        # spotify answers 403 for an artist's tracks under client credentials;
+        # an unanswered inline query just spins, so say what happened instead
+        logger.warning(f"{entity_prefix} tracks failed on {engine.value} {entity_id}: {e!r}")
+        await query.answer(
+            not_supported_result(i18n.get('feature-entity-tracks')),
+            cache_time=0
+        )
         return
 
     logger.debug(f"matches: {matches}")

@@ -103,6 +103,7 @@ usage-guide-message =
     i dont know
 feature-soundcloud-link-search = SoundCloud link search
 feature-yandex-link-search = Yandex Music link search
+feature-entity-tracks = Track list for this entity
 entity-not-available = Could not get this from the track's source.
 entity-album-unknown = The source does not say which album this is from.
 entity-artist-unknown = The source does not say whose track this is.
