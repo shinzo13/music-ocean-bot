@@ -92,10 +92,13 @@ class SoundCloudClient(BaseEngineClient):
             raise SoundCloudAPIException(raw_data['error'])
         return raw_data
 
-    async def get_track(self, query: str) -> SoundCloudTrackPreview:
+    async def get_track(self, track_id: int | str) -> SoundCloudTrackPreview:
+        # /tracks/<id>, the same shape download_track already uses: passing the
+        # id as a query parameter asks for a track list and gets a 4xx
         raw_track = await self._api_request(
             method=SoundCloudAPIMethod.GET_TRACK,
-            q=query
+            path=str(track_id),
+            antibot=True
         )
         return SoundCloudTrackPreview.from_dict(raw_track)
 

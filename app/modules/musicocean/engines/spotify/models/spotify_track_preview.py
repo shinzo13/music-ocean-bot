@@ -18,5 +18,7 @@ class SpotifyTrackPreview(BaseTrackPreview):
             artist_name=", ".join(a["name"] for a in data["artists"]),
             cover_url=cover_url,
             preview_url=data.get("preview_url"),
-            isrc=(data.get("external_ids") or {}).get("isrc")
+            isrc=(data.get("external_ids") or {}).get("isrc"),
+            album_id=(data.get("album") or {}).get("id"),
+            artist_id=next((a["id"] for a in data.get("artists") or [] if a.get("id")), None)
         )

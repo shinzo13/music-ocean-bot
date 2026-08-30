@@ -11,5 +11,7 @@ class YandexTrackPreview(BaseTrackPreview):
             title=track.title,
             artist_name=", ".join(a.name for a in track.artists) or "Unknown",
             cover_url=build_cover_url(track.cover_uri),
-            preview_url=None
+            preview_url=None,
+            album_id=track.albums[0].id if track.albums else None,
+            artist_id=track.artists[0].id if track.artists else None
         )

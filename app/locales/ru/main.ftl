@@ -101,6 +101,9 @@ usage-guide-message = <b>Как пользоваться расширенным 
     i dont know
 feature-soundcloud-link-search = Поиск по ссылке SoundCloud
 feature-yandex-link-search = Поиск по ссылке Яндекс Музыки
+entity-not-available = Не получилось узнать это у источника трека.
+entity-album-unknown = Источник не говорит, из какого это альбома.
+entity-artist-unknown = Источник не говорит, чей это трек.
 engine-disabled = Этот движок сейчас отключён.
 feature-spotify-link-search = Поиск по ссылке Spotify (плейлист/исполнитель)
 feature-youtube-advanced-search = Расширенный поиск по YouTube

@@ -11,5 +11,8 @@ class SoundCloudTrackPreview(BaseTrackPreview):
             title=data["title"],
             artist_name=data['user']['username'],
             cover_url=format_cover_url(data["artwork_url"]),
-            preview_url=None
+            preview_url=None,
+            # soundcloud has uploaders, not albums: a track belongs to a user
+            # and optionally to playlists, so only the artist can be resolved
+            artist_id=data['user'].get('id')
         )

@@ -109,11 +109,13 @@ class DeezerClient(BaseEngineClient):
             raw_data = [raw_track | {entity_type.value: {"id": entity_id}} for raw_track in raw_data["data"]]
             return [DeezerTrackPreview.from_dict(raw_track) for raw_track in raw_data]
 
-    async def get_track(self, query: str) -> DeezerTrackPreview:
-        raw_track = await self._api_request(
-            method=DeezerAPIMethod.GET_TRACK,
-            q=query
-        )
+    async def get_track(self, track_id: int | str) -> DeezerTrackPreview:
+        # /track/<id>, not /track?q=<id>: the query form answers
+        # "Unknown path components" for every track there has ever been
+        async with self.session.get(f"{API_URL}/{DeezerAPIMethod.GET_TRACK}/{track_id}") as resp:
+            raw_track = await resp.json()
+        if "error" in raw_track:
+            raise DeezerAPIException(raw_track["error"])
         return DeezerTrackPreview.from_dict(raw_track)
 
     async def get_track_by_isrc(self, isrc: str) -> Optional[DeezerTrackPreview]:

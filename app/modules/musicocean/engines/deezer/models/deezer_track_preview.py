@@ -11,5 +11,7 @@ class DeezerTrackPreview(BaseTrackPreview):
             title=data["title"],
             artist_name=data['artist']['name'],
             cover_url=COVER_URL.format(album_id=data['album']['id']),
-            preview_url=data['preview']
+            preview_url=data['preview'],
+            album_id=data['album'].get('id'),
+            artist_id=data['artist'].get('id')
         )

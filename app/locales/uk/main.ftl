@@ -102,6 +102,9 @@ usage-guide-message =
     i dont know
 feature-soundcloud-link-search = Пошук за посиланням SoundCloud
 feature-yandex-link-search = Пошук за посиланням Яндекс Музики
+entity-not-available = Не вдалося дізнатися це в джерела треку.
+entity-album-unknown = Джерело не каже, з якого це альбому.
+entity-artist-unknown = Джерело не каже, чий це трек.
 engine-disabled = Цей рушій зараз вимкнено.
 feature-spotify-link-search = Пошук за посиланням Spotify (плейлист/виконавець)
 feature-youtube-advanced-search = Розширений пошук по YouTube

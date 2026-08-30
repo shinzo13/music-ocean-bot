@@ -101,6 +101,9 @@ usage-guide-message =
     i dont know
 feature-soundcloud-link-search = Wyszukiwanie po linku SoundCloud
 feature-yandex-link-search = Wyszukiwanie po linku Yandex Music
+entity-not-available = Nie udało się tego uzyskać ze źródła utworu.
+entity-album-unknown = Źródło nie podaje, z jakiego to albumu.
+entity-artist-unknown = Źródło nie podaje, czyj to utwór.
 engine-disabled = Ten silnik jest teraz wyłączony.
 feature-spotify-link-search = Wyszukiwanie po linku Spotify (playlista/artysta)
 feature-youtube-advanced-search = Zaansowane wyszukiwanie przez YT
