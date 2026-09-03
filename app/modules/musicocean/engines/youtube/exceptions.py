@@ -24,3 +24,11 @@ class YoutubeBlockedException(YoutubeDataException):
         self.track_id = track_id
         self.title = title
         self.artist_name = artist_name
+
+class YoutubeRefusedException(YoutubeDataException):
+    """Youtube refused us for this request — another client or a fresh visitor
+    id may still get through."""
+
+
+class YoutubeUnavailableException(YoutubeDataException):
+    """The video itself is gone, private or age-gated: retrying is pointless."""
