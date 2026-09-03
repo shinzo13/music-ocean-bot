@@ -15,7 +15,7 @@ import io
 from dataclasses import dataclass
 from typing import Awaitable, Callable
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientTimeout
 
 from app.config.log import get_logger
 from app.modules.musicocean.engines.youtube.constants import (
@@ -29,6 +29,10 @@ logger = get_logger(__name__)
 
 CHUNK_SIZE = 1 << 20
 CHUNK_CONCURRENCY = 4
+CHUNK_ATTEMPTS = 3
+CHUNK_TIMEOUT = 60
+PLAYER_TIMEOUT = 20
+RETRY_PAUSE = 0.5
 
 
 @dataclass
@@ -90,16 +94,29 @@ class InnertubePlayer:
 
         async def part(start: int) -> tuple[int, bytes]:
             end = min(start + CHUNK_SIZE - 1, info.audio_size - 1)
-            async with slots:
-                async with self.session.get(
-                        f"{info.audio_url}&range={start}-{end}",
-                        headers={"User-Agent": info.user_agent},
-                ) as resp:
-                    if resp.status != 200:
-                        raise YoutubeRefusedException(
-                            f"stream answered http {resp.status}"
-                        )
-                    return start, await resp.read()
+            last: Exception | None = None
+            # one chunk failing would throw away a download that is otherwise
+            # complete, and a repeated range usually just works
+            for attempt in range(CHUNK_ATTEMPTS):
+                async with slots:
+                    try:
+                        async with self.session.get(
+                                f"{info.audio_url}&range={start}-{end}",
+                                headers={"User-Agent": info.user_agent},
+                                timeout=ClientTimeout(total=CHUNK_TIMEOUT),
+                        ) as resp:
+                            if resp.status != 200:
+                                raise YoutubeRefusedException(
+                                    f"stream answered http {resp.status}"
+                                )
+                            return start, await resp.read()
+                    except Exception as e:  # noqa: BLE001 — retried below
+                        last = e
+                if attempt + 1 < CHUNK_ATTEMPTS:
+                    await asyncio.sleep(RETRY_PAUSE * (attempt + 1))
+            raise YoutubeRefusedException(
+                f"range {start}-{end} failed {CHUNK_ATTEMPTS} times: {last!r}"
+            )
 
         starts = range(0, info.audio_size, CHUNK_SIZE)
         parts = await asyncio.gather(*[part(s) for s in starts])
@@ -139,7 +156,8 @@ class InnertubePlayer:
             "Content-Type": "application/json",
         }
         async with self.session.post(
-                f"{YT_BASE_API}/player", json=body, headers=headers
+                f"{YT_BASE_API}/player", json=body, headers=headers,
+                timeout=ClientTimeout(total=PLAYER_TIMEOUT),
         ) as resp:
             if resp.status != 200:
                 raise YoutubeRefusedException(f"player answered http {resp.status}")

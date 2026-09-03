@@ -60,7 +60,7 @@ class FakeSession:
         self.status = status
         self.range_calls = []
 
-    def get(self, url, headers=None):
+    def get(self, url, headers=None, timeout=None):
         start, end = url.split("&range=")[1].split("-")
         start, end = int(start), int(end)
         self.range_calls.append((start, end, (headers or {}).get("User-Agent")))
@@ -138,6 +138,24 @@ async def test_download_reassembles_ranges_in_order():
     # every byte asked for exactly once, and the requests keep the client's agent
     assert sum(end - start + 1 for start, end, _ in session.range_calls) == len(blob)
     assert {ua for _, _, ua in session.range_calls} == {"test-agent"}
+
+
+async def test_download_retries_a_chunk_that_was_refused_once():
+    blob = b"x" * 4096
+
+    class FlakySession(FakeSession):
+        def get(self, url, headers=None, timeout=None):
+            self.range_calls.append(url)
+            if len(self.range_calls) == 1:
+                return FakeResp(status=403)
+            start, end = url.split("&range=")[1].split("-")
+            return FakeResp(body=self.blob[int(start):int(end) + 1])
+
+    session = FlakySession(blob)
+    raw = await make_player(session).download(info_for(len(blob)))
+
+    assert raw == blob
+    assert len(session.range_calls) == 2
 
 
 async def test_download_rejects_a_truncated_transfer():
