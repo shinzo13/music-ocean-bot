@@ -24,6 +24,7 @@ dependencies = [
     "shazamio>=0.8.1",
     "sqlalchemy~=2.0.44",
     "yandex-music[async]>=3.0.0",
+    "yt-dlp>=2026.8.19",
 ]
 
 [dependency-groups]

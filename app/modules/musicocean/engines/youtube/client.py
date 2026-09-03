@@ -1,11 +1,13 @@
 import asyncio
-import io
 import json
 import re
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Optional
 
 from aiohttp import ClientSession
 from pytubefix import AsyncYouTube
+from yt_dlp import YoutubeDL
 
 from app.config.log import get_logger
 from app.modules.musicocean.engines.shared.base_client import BaseEngineClient
@@ -15,6 +17,7 @@ from app.modules.musicocean.engines.youtube.exceptions import YouTubeAuthExcepti
     YoutubeDataException
 from app.modules.musicocean.engines.youtube.models.youtube_album import YoutubeAlbum
 from app.modules.musicocean.engines.youtube.models.youtube_artist import YoutubeArtist
+from app.modules.musicocean.engines.youtube.models.youtube_audio import YoutubeAudio
 from app.modules.musicocean.engines.youtube.models.youtube_playlist import YoutubePlaylist
 from app.modules.musicocean.engines.youtube.models.youtube_track import YoutubeTrack
 from app.modules.musicocean.engines.youtube.models.youtube_track_preview import YoutubeTrackPreview
@@ -174,9 +177,9 @@ class YoutubeClient(BaseEngineClient):
             track_id: str,
             watermark: Optional[str] = None
     ) -> YoutubeTrack:
-        yt, raw = await self._fetch_audio(track_id)
+        audio, raw = await self._fetch_audio(track_id)
 
-        cover_url = await yt.thumbnail_url()
+        cover_url = audio.thumbnail_url
         async with self.session.get(
                 f"https://i.ytimg.com/vi/{track_id}/maxresdefault.jpg"
         ) as resp:
@@ -189,10 +192,10 @@ class YoutubeClient(BaseEngineClient):
         cover = await asyncio.to_thread(square_cover, cover)
         track = YoutubeTrack(
             id=track_id,
-            title=await yt.title(),
-            artist_name=(await yt.author()).removesuffix(' - Topic'),
+            title=audio.title,
+            artist_name=audio.artist_name.removesuffix(' - Topic'),
             cover_url=cover_url,
-            duration=await yt.length(),
+            duration=audio.duration,
             cover=cover
         )
         logger.debug("yt: writing id3")
@@ -200,36 +203,55 @@ class YoutubeClient(BaseEngineClient):
         logger.debug("yt: finished")
         return track
 
-    async def _fetch_audio(self, track_id: str) -> tuple[AsyncYouTube, bytes]:
-        """Downloads the audio stream, changing client whenever youtube decides
-        this request looks automated.
+    # 140 is the m4a audio track youtube serves for music; the rest is for the
+    # occasional upload that has no 140 at all
+    AUDIO_FORMAT = "140/bestaudio[ext=m4a]/bestaudio"
 
-        The check does not fire on opening the video but on reaching for the
-        stream, and not every time — so the retry has to wrap the whole download,
-        not just the metadata call.
+    def _download_audio(self, track_id: str) -> tuple[dict, bytes]:
+        """Blocking download — call it in a thread."""
+        with TemporaryDirectory() as tmp:
+            options = {
+                "format": self.AUDIO_FORMAT,
+                "outtmpl": f"{tmp}/%(id)s.%(ext)s",
+                "quiet": True,
+                "no_warnings": True,
+                "noprogress": True,
+                "retries": 3,
+            }
+            with YoutubeDL(options) as ydl:
+                info = ydl.extract_info(
+                    f"https://youtube.com/watch?v={track_id}",
+                    download=True
+                )
+                return info, Path(ydl.prepare_filename(info)).read_bytes()
+
+    async def _fetch_audio(self, track_id: str) -> tuple[YoutubeAudio, bytes]:
+        """Downloads the audio stream through yt-dlp.
+
+        pytubefix still opens videos fine, but since youtube tightened the
+        player it hands out stream urls that die mid-transfer on every one of
+        its clients: bot check, 403 or 400 once the bytes start moving. yt-dlp
+        keeps up with the player changes, so the download goes through it while
+        the metadata calls stay on pytubefix.
         """
-        url = f"https://youtube.com/watch?v={track_id}"
-        last: Exception | None = None
+        try:
+            logger.debug(f"yt: downloading {track_id}")
+            info, raw = await asyncio.to_thread(self._download_audio, track_id)
+        except Exception as e:  # noqa: BLE001 — yt-dlp raises its own hierarchy
+            logger.debug(f"yt: yt-dlp refused {track_id}: {type(e).__name__}")
+            raise YoutubeBlockedException(
+                track_id,
+                f"yt-dlp could not serve {track_id}: {e!r}",
+                *(await self._describe(track_id)),
+            )
 
-        for client in self.CLIENTS:
-            yt = AsyncYouTube(url, client=client)
-            try:
-                logger.debug(f"yt: downloading {track_id} via {client}")
-                stream = await yt.get_stream_by_itag(140)
-                data = io.BytesIO()
-                # blocking download + cpu-heavy transcode must not starve the event loop
-                await asyncio.to_thread(stream.stream_to_buffer, data)
-                data.seek(0)
-                return yt, data.read()
-            except Exception as e:  # noqa: BLE001 — every client refuses in its own way
-                last = e
-                logger.debug(f"yt: {client} refused {track_id}: {type(e).__name__}")
-
-        raise YoutubeBlockedException(
-            track_id,
-            f"no youtube client would serve {track_id}: {last!r}",
-            *(await self._describe(track_id)),
+        audio = YoutubeAudio(
+            title=info.get("track") or info.get("title") or track_id,
+            artist_name=info.get("artist") or info.get("uploader") or "?",
+            duration=int(info.get("duration") or 0),
+            thumbnail_url=info.get("thumbnail") or "",
         )
+        return audio, raw
 
     async def _describe(self, track_id: str) -> tuple[str | None, str | None]:
         """Title and artist for a video whose audio we could not get: with them
