@@ -16,6 +16,8 @@ from app.modules.musicocean.enums.engine import Engine
 
 logger = get_logger(__name__)
 
+STATS_EXCLUDED_ENGINES = (Engine.YANDEX,)
+
 
 class TrackRepository:
     def __init__(self, session: AsyncSession):
@@ -104,28 +106,31 @@ class TrackRepository:
         return result.scalar_one_or_none()
 
     async def usage_stats(self) -> dict:
+        counted = BaseTrack.engine.not_in(STATS_EXCLUDED_ENGINES)
         total = (await self.session.execute(
-            select(func.count()).select_from(BaseTrack)
+            select(func.count()).select_from(BaseTrack).where(counted)
         )).scalar_one()
         users = (await self.session.execute(
-            select(func.count(distinct(BaseTrack.user_id)))
+            select(func.count(distinct(BaseTrack.user_id))).where(counted)
         )).scalar_one()
         by_context = (await self.session.execute(
             select(BaseTrack.download_context, func.count())
+            .where(counted)
             .group_by(BaseTrack.download_context)
         )).all()
         by_entity = (await self.session.execute(
             select(BaseTrack.entity_type, BaseTrack.download_mode, func.count())
-            .where(BaseTrack.download_context == DownloadContext.ENTITY)
+            .where(counted, BaseTrack.download_context == DownloadContext.ENTITY)
             .group_by(BaseTrack.entity_type, BaseTrack.download_mode)
         )).all()
         by_engine = (await self.session.execute(
             select(BaseTrack.engine, func.count())
+            .where(counted)
             .group_by(BaseTrack.engine)
         )).all()
         speed_by_engine = (await self.session.execute(
             select(BaseTrack.engine, func.avg(BaseTrack.download_speed))
-            .where(BaseTrack.download_speed.is_not(None))
+            .where(counted, BaseTrack.download_speed.is_not(None))
             .group_by(BaseTrack.engine)
         )).all()
         return {
