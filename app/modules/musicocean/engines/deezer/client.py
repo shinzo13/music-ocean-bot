@@ -3,7 +3,7 @@ import json
 import re
 from typing import Optional
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientResponseError
 
 from app.config.log import get_logger
 from app.modules.musicocean.engines.deezer.constants import *
@@ -48,6 +48,9 @@ class DeezerClient(BaseEngineClient):
             raise_for_status=True
         )
 
+        await self._refresh_license_token()
+
+    async def _refresh_license_token(self):
         options = (await (await self.session.get(
             USERDATA_URL
         )).json())['results']['USER']['OPTIONS']
@@ -192,6 +195,18 @@ class DeezerClient(BaseEngineClient):
         return DeezerTrack.from_dict(json.loads(match)["DATA"])
 
     async def _get_track_url(self, track_token: str) -> str:
+        try:
+            return await self._request_track_url(track_token)
+        except ClientResponseError as e:
+            if e.status != 401:
+                raise
+        # the license token goes stale long before the arl does: get_url starts
+        # answering 401 while everything else keeps working
+        logger.info("deezer get_url answered 401, refreshing the license token")
+        await self._refresh_license_token()
+        return await self._request_track_url(track_token)
+
+    async def _request_track_url(self, track_token: str) -> str:
         async with self.session.post(
                 MEDIA_URL,
                 json={
